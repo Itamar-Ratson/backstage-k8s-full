@@ -1,0 +1,5 @@
+apiVersion: v2
+name: test-02
+description: checking if I need to manually register
+type: application
+version: 0.1.0

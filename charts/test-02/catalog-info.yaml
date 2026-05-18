@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: test-02
+  description: checking if I need to manually register
+  annotations:
+    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/test-02/
+    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
+    backstage.io/kubernetes-id: test-02
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:default/itamar
+  system: system:default/developer-portal
