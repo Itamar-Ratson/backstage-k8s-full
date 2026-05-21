@@ -1,6 +1,6 @@
-# Deploying Backstage on Kubernetes (KinD + Terraform + Gateway API)
+# Deploying Backstage on Kubernetes (KinD + Terraform + ArgoCD)
 
-A local Kubernetes development environment for Backstage, provisioned by Terraform with Envoy Gateway for ingress.
+A local Kubernetes development environment for Backstage, provisioned by Terraform and reconciled by ArgoCD. Envoy Gateway provides ingress for workloads.
 
 **Official Documentation:**
 
@@ -45,75 +45,22 @@ sudo apt-get update
 sudo apt-get install -y python3 g++ build-essential
 ```
 
-## Step 1: Create the Backstage App
+## Bootstrap
 
-```bash
-npx @backstage/create-app@latest
-```
+1. Install tools: Docker, KinD, kubectl, Helm, Terraform, Node.js, `actionlint`, and `yq`.
+2. Create and install the GitHub App using the [operator guide](docs/operator/github-app-setup.md).
+3. Fill `terraform/terraform.tfvars` from `terraform/terraform.tfvars.example` with the GitHub App credentials. Keep both the downloaded `.pem` key and `terraform.tfvars` out of version control.
+4. Apply Terraform:
 
-This scaffolds a complete Backstage application in a `backstage/` folder with all necessary files.
+   ```bash
+   cd terraform && terraform apply
+   ```
 
-## Step 2: Configure Repository Files
+5. Wait for ArgoCD to finish syncing, then visit <http://backstage.localtest.me:8080>.
 
-Two files in your generated `backstage/` directory need to be replaced or added. The reference versions live in this repo at the matching paths — overwrite or create them in your `backstage/` directory before building:
+Terraform creates the KinD cluster, the Backstage namespace, the `backstage-github-app` Secret, the ArgoCD seed install, and the root ArgoCD Application. ArgoCD then reconciles platform charts from `charts/platform/` and workloads from `charts/workloads/`.
 
-| File | Purpose |
-|------|---------|
-| `backstage/Dockerfile` | Multi-stage build that compiles everything inside Docker |
-| `backstage/.dockerignore` | Must NOT exclude source files (unlike the host build version) |
-
-After scaffolding, install the GitHub catalog discovery backend module:
-
-```bash
-cd backstage
-yarn --cwd packages/backend add @backstage/plugin-catalog-backend-module-github
-```
-
-Then add this import to `packages/backend/src/index.ts`:
-
-```typescript
-backend.add(import('@backstage/plugin-catalog-backend-module-github'));
-```
-
-This enables the catalog to discover `catalog-info.yaml` files from GitHub via URL discovery.
-
-Key configuration note: `backstage/.dockerignore` must NOT exclude `packages/*/src`. The default from `create-app` excludes source files, which causes `yarn tsc` to fail with "No inputs were found".
-
-Production app-config is no longer baked into the image. Instead, the Helm chart renders a ConfigMap from `values.appConfig` and mounts it into the pod at runtime via `--config /etc/backstage/app-config.runtime.yaml`. To change runtime configuration, edit `deploy/dev/backstage.yaml` (or the chart's `values.appConfig` defaults) and run `helm upgrade` — no image rebuild required.
-
-## Step 3: Provision the Cluster
-
-Terraform brings up a KinD cluster and the Envoy Gateway controller:
-
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
-This creates:
-- A 2-node KinD cluster (1 control-plane + 1 worker) with port 8080 mapped to the Envoy data plane
-- Gateway API CRDs + Envoy Gateway controller
-- A custom `GatewayClass` (`eg-nodeport`) wired for NodePort exposure
-
-Verify the cluster is ready:
-
-```bash
-kubectl get nodes
-# Should show 2 nodes (control-plane + worker) in Ready state
-```
-
-## Step 4: Confirm the Backstage Image
-
-The dev overlay pulls Backstage from GHCR:
-
-```bash
-grep -A3 '^image:' deploy/dev/backstage.yaml
-```
-
-The `image.tag` value is populated by the CI/CD image build workflow after the first successful build. Until that first build has landed a tag in `deploy/dev/backstage.yaml`, a fresh clone may not have a pullable image for the local Helm deployment.
-
-GHCR packages default to private after the first push. Flip package visibility to public manually in GitHub package settings once per package so the local cluster can pull without image pull secrets.
+The dev overlay pulls Backstage from GHCR using the tag in `deploy/dev/backstage.yaml`. The CI/CD image build workflow updates that tag after a successful image build. GHCR packages default to private after the first push; set package visibility to public once per package so the local cluster can pull without image pull secrets.
 
 ## Verifying Images
 
@@ -125,81 +72,49 @@ cosign verify ghcr.io/itamar-ratson/backstage-k8s-full/<app>:<sha> \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
-## First-Deploy Bootstrap
+## Verifying the install
 
-A fresh clone needs the first image build to populate `deploy/dev/backstage.yaml` with an `image.tag` value before the local Helm deployment can pull Backstage from GHCR. After the build workflow lands, trigger the bootstrap build with a small path-matching change under `backstage/`; [issue #5](https://github.com/Itamar-Ratson/backstage-k8s-full/issues/5) is the bootstrap runbook for that first deployment.
-
-## Step 5: Create the GitHub App Secret
-
-Backstage discovers catalog entities from this GitHub repo at runtime, uses scaffolder actions to publish GitHub changes, and supports GitHub sign-in. It uses one GitHub App for all of those GitHub calls.
-
-1. Create and install a GitHub App for this repo:
-   - **Repository access:** Only select `Itamar-Ratson/backstage-k8s-full`
-   - **Permissions:**
-     - `Contents: Read and write` — read catalog-info.yaml files and publish scaffolded changes
-     - `Commit statuses: Read` — preflight check the catalog URL provider performs before reading (without this you get `403 Forbidden` and an empty catalog)
-     - `Pull requests: Read and write` — open pull requests from scaffolder actions
-     - `Workflows: Read and write` — publish changes that include workflow files
-     - `Metadata: Read` — auto-granted
-   - **Callback URL:** `http://backstage.localtest.me:8080/api/auth/github/handler/frame`
-
-2. Create the Kubernetes secret. Either use the imperative form:
+Check ArgoCD Applications first:
 
 ```bash
-kubectl create namespace backstage --dry-run=client -o yaml | kubectl apply -f - --context kind-backstage
-kubectl create secret generic backstage-github-app \
-  --from-literal=APP_ID="$APP_ID" \
-  --from-literal=CLIENT_ID="$CLIENT_ID" \
-  --from-literal=CLIENT_SECRET="$CLIENT_SECRET" \
-  --from-file=PRIVATE_KEY=path/to/private-key.pem \
-  -n backstage --context kind-backstage
+kubectl get applications -n argocd
 ```
 
-Keep the downloaded `.pem` file out of version control.
+The platform Applications should include `argo-cd`, `envoy-gateway`, and `edge-gateway`. The workloads ApplicationSet should create `backstage` from `charts/workloads/backstage` and `deploy/dev/backstage.yaml`.
 
-Verify:
+Then check Backstage through the Gateway:
 
 ```bash
-kubectl get secret backstage-github-app -n backstage --context kind-backstage
+curl -fsS --retry 10 --retry-delay 3 --retry-connrefused --retry-all-errors \
+  http://backstage.localtest.me:8080 | grep -q '<title>'
 ```
 
-This Secret is a one-time bootstrap prerequisite for a fresh kind cluster. Verify that it exists before installing the Backstage chart; the chart consumes the Secret but does not create it.
-
-## Step 6: Deploy with Helm
-
-Install the edge-gateway chart (shared Gateway resource) and then the backstage chart:
-
-```bash
-# Install the edge-gateway (creates the gateway namespace)
-helm upgrade --install edge-gateway charts/platform/edge-gateway \
-  --namespace gateway --create-namespace --wait \
-  --kube-context kind-backstage \
-  -f deploy/dev/edge-gateway.yaml
-
-# Pre-create the backstage namespace and apply the opt-in label (idempotent)
-kubectl create namespace backstage --dry-run=client -o yaml | kubectl apply -f - --context kind-backstage
-kubectl label namespace backstage gateway-routes=enabled --overwrite --context kind-backstage
-
-# Install backstage
-helm upgrade --install backstage charts/workloads/backstage \
-  --namespace backstage --wait --timeout 5m \
-  --kube-context kind-backstage \
-  -f deploy/dev/backstage.yaml
-```
-
-**Namespace label requirement:** Any app fronting the shared edge-gateway must have its namespace labeled with `gateway-routes=enabled`. The Gateway uses a label-selector `allowedRoutes` policy — only HTTPRoutes in namespaces carrying this label are admitted. Apply the label before installing workloads that define HTTPRoutes.
-
-## Step 7: Access Backstage
-
-Open <http://backstage.localtest.me:8080> in your browser. No port-forwarding required.
+Open <http://backstage.localtest.me:8080> in your browser. No port-forwarding is required.
 
 `localtest.me` is a real DNS domain that resolves to 127.0.0.1. Traffic flows through KinD's port mappings into the Envoy Gateway, which routes based on the hostname to the Backstage service.
 
 You should see both `Guest` and `GitHub` sign-in options.
 
+## Operations
+
+**Force a sync during debugging:** the local KinD cluster has no GitHub webhook receiver, so use ArgoCD as the escape hatch when you do not want to wait for polling:
+
+```bash
+argocd app sync <app>
+```
+
+**Rotate GitHub App credentials:** edit `terraform/terraform.tfvars`, re-apply Terraform, then restart Backstage so envFrom values are re-read:
+
+```bash
+cd terraform && terraform apply
+kubectl rollout restart deployment/backstage -n backstage
+```
+
+**Future migration path:** Terraform-managed Secrets are the local-development bootstrap path. ExternalSecrets Operator is the planned migration when production or shared cloud secret stores arrive.
+
 ## Manual RBAC Demo
 
-Run the Helm deployment sequence above after changing frontend code or pulling a new image tag.
+After changing frontend code or pulling a new image tag, wait for ArgoCD to sync the updated `deploy/dev/backstage.yaml` value.
 
 Then verify the end-to-end flow:
 
@@ -212,21 +127,12 @@ Then verify the end-to-end flow:
 7. Open a scaffolder template and attempt to create it.
 8. Confirm execution is denied by the permission framework.
 
-## Updating Backstage
-
-When you make changes and need to redeploy:
-
-```bash
-# Upgrade the helm release with the image tag recorded in deploy/dev/backstage.yaml
-helm upgrade backstage charts/workloads/backstage \
-  --namespace backstage --wait --timeout 5m \
-  --kube-context kind-backstage \
-  -f deploy/dev/backstage.yaml
-```
-
 ## Useful Commands
 
 ```bash
+# View ArgoCD Applications
+kubectl get applications -n argocd
+
 # View pod logs
 kubectl logs -n backstage -l app.kubernetes.io/name=backstage
 
@@ -246,56 +152,17 @@ kubectl logs -n envoy-gateway-system deploy/envoy-gateway
 # View all resources in the namespace
 kubectl get all -n backstage
 
-# Uninstall charts
-helm uninstall backstage -n backstage
-helm uninstall edge-gateway -n gateway
-
 # Tear down the cluster
 cd terraform && terraform destroy
 ```
 
-## Smoke Test
-
-Run the full end-to-end verification. This assumes `deploy/dev/backstage.yaml` points at a Backstage image tag that exists in GHCR:
-
-```bash
-terraform -chdir=terraform fmt -check -recursive
-terraform -chdir=terraform init -backend=false -input=false
-terraform -chdir=terraform validate
-helm lint charts/platform/edge-gateway -f deploy/dev/edge-gateway.yaml
-helm lint charts/workloads/backstage -f deploy/dev/backstage.yaml
-curl -fsS --retry 10 --retry-delay 3 --retry-connrefused --retry-all-errors http://backstage.localtest.me:8080 | grep -q '<title>'
-```
-
-Run Terraform validation only:
-
-```bash
-terraform -chdir=terraform fmt -check -recursive
-terraform -chdir=terraform init -backend=false -input=false
-terraform -chdir=terraform validate
-```
-
-Run Helm chart linting only:
-
-```bash
-./tests/charts/test-actionlint.sh
-./tests/charts/test-templates-registered.sh
-./tests/charts/test-chart-layout.sh
-helm dependency build charts/platform/argo-cd
-helm lint charts/platform/argo-cd
-helm dependency build charts/platform/envoy-gateway
-helm lint charts/platform/envoy-gateway
-helm lint charts/platform/edge-gateway -f deploy/dev/edge-gateway.yaml
-helm lint charts/workloads/backstage -f deploy/dev/backstage.yaml
-```
-
 ## Next Steps
 
-1. **Define a production auth target** — The kind deployment now carries the supported GitHub OAuth path. A production deployment still needs HTTPS callbacks, environment-specific OAuth Apps, and a decision on guest auth. See the [Authentication documentation](https://backstage.io/docs/auth/).
+1. **Define a production auth target** — The kind deployment now carries the supported GitHub App auth path. A production deployment still needs HTTPS callbacks, environment-specific GitHub Apps, and a decision on guest auth. See the [Authentication documentation](https://backstage.io/docs/auth/).
 
-2. **Add the Helm chart scaffolder template** — Use Backstage to scaffold new workload charts and publish them as pull requests instead of copying `charts/` by hand.
+2. **Add the Helm chart scaffolder template** — Use the `helm-chart` template to scaffold new workload charts and publish them as pull requests instead of copying chart files by hand. Merged charts under `charts/workloads/` are discovered by the workloads ApplicationSet.
 
-3. **Decommission a scaffolded Helm chart** — Use the `helm-chart-decommission` template to select a catalog Component, verify it was created by `helm-chart`, block removal when dependents still reference it, and open a PR deleting `charts/<name>/`. Merging that PR removes the entity from catalog discovery on the next refresh. The template does not uninstall the running release; do that manually with `helm uninstall <name> -n <namespace>` until ArgoCD lands.
+3. **Decommission a scaffolded Helm chart** — Use the `helm-chart-decommission` template to select a catalog Component, verify it was created by `helm-chart`, block removal when dependents still reference it, and open a PR deleting `charts/workloads/<name>/` plus `deploy/dev/<name>.yaml`. Merging that PR lets ArgoCD prune the running release.
 
 4. **Set up TechDocs** — Add `backstage.io/techdocs-ref` annotations and enable documentation generation and viewing.
 
