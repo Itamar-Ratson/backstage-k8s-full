@@ -83,3 +83,15 @@ metadata:
 spec:
   type: url
   target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/helm-chart-decommission/template.yaml
+---
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: ci-cd-pipeline-template
+  description: Backstage scaffolder template for CI/CD pipeline workflows.
+  annotations:
+    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/ci-cd-pipeline/template.yaml
+    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
+spec:
+  type: url
+  target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/ci-cd-pipeline/template.yaml
