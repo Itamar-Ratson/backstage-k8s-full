@@ -13,13 +13,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-if [ -f "$CHART_DIR/Chart.yaml" ]; then
-  PASS=$((PASS + 1))
-else
-  FAIL=$((FAIL + 1))
-  echo "FAIL: wrapper Chart.yaml exists"
-  echo "  missing: $CHART_DIR/Chart.yaml"
-fi
+assert_file_exists "wrapper Chart.yaml exists" "$CHART_DIR/Chart.yaml"
 
 if git check-ignore -q "$CHART_DIR/charts/gateway-helm-v1.8.0.tgz"; then
   PASS=$((PASS + 1))

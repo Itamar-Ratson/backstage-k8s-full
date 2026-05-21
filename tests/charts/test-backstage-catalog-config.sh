@@ -17,7 +17,7 @@ assert_contains "catalog rules include User" "$output" "User"
 assert_contains "catalog rules include Group" "$output" "Group"
 
 # Test 3: Default values without overlay have empty locations
-default_output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/github-create-true.yaml" 2>&1)
+default_output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/minimal.yaml" 2>&1)
 assert_contains "default catalog rules include Domain" "$default_output" "Domain"
 assert_contains "default catalog rules include User" "$default_output" "User"
 assert_contains "default catalog rules include Group" "$default_output" "Group"

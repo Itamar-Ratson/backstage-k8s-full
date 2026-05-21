@@ -45,6 +45,39 @@ assert_fails() {
   fi
 }
 
+assert_file_exists() {
+  local label="$1" path="$2"
+  if [ -f "$path" ]; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  missing: $path"
+  fi
+}
+
+assert_directory_exists() {
+  local label="$1" path="$2"
+  if [ -d "$path" ]; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  missing: $path"
+  fi
+}
+
+assert_path_missing() {
+  local label="$1" path="$2"
+  if [ ! -e "$path" ]; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  still present: $path"
+  fi
+}
+
 report_results() {
   local suite="$1"
   echo ""

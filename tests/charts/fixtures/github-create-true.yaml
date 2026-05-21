@@ -1,7 +1,0 @@
-github:
-  auth:
-    create: false
-    existingSecret: backstage-github-app
-postgres:
-  auth:
-    password: test-pass

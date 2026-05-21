@@ -6,7 +6,7 @@ source "$(dirname "$0")/helpers.sh"
 echo "=== ConfigMap app-config tests ==="
 
 # Test 1: Default values produce a ConfigMap with appConfig content
-output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/github-create-true.yaml" 2>&1)
+output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/minimal.yaml" 2>&1)
 assert_contains "ConfigMap is rendered" "$output" "kind: ConfigMap"
 assert_contains "ConfigMap has runtime config filename" "$output" "app-config.runtime.yaml"
 assert_contains "ConfigMap preserves POSTGRES_HOST substitution" "$output" '${POSTGRES_HOST}'
@@ -32,7 +32,7 @@ assert_contains "Deployment has checksum annotation" "$output" "checksum/config:
 
 # Test 5: Custom appConfig override appears in rendered ConfigMap
 custom_output=$(helm template backstage "$CHART_DIR" \
-  -f "$FIXTURES/github-create-true.yaml" \
+  -f "$FIXTURES/minimal.yaml" \
   --set "appConfig.app.baseUrl=http://custom.example.com" 2>&1)
 assert_contains "Custom baseUrl in ConfigMap" "$custom_output" "baseUrl: http://custom.example.com"
 
