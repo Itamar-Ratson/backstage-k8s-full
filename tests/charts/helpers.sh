@@ -8,7 +8,7 @@ FAIL=0
 
 assert_contains() {
   local label="$1" output="$2" expected="$3"
-  if echo "$output" | grep -qF -- "$expected"; then
+  if grep -qF -- "$expected" <<<"$output"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
@@ -19,7 +19,7 @@ assert_contains() {
 
 assert_not_contains() {
   local label="$1" output="$2" unexpected="$3"
-  if ! echo "$output" | grep -qF -- "$unexpected"; then
+  if ! grep -qF -- "$unexpected" <<<"$output"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
@@ -35,7 +35,7 @@ assert_fails() {
   if output=$("$@" 2>&1); then
     FAIL=$((FAIL + 1))
     echo "FAIL: $label (expected failure but succeeded)"
-  elif echo "$output" | grep -qF -- "$expected_msg"; then
+  elif grep -qF -- "$expected_msg" <<<"$output"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
