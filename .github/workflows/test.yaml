@@ -26,6 +26,12 @@ jobs:
           mkdir -p "$HOME/.local/bin"
           mv actionlint "$HOME/.local/bin/actionlint"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install yq
+        env:
+          YQ_VERSION: v4.44.3
+        run: |
+          sudo curl -fsSL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
+          sudo chmod +x /usr/local/bin/yq
       - name: charts-lint
         run: make charts-lint
       - name: charts-test

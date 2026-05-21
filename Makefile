@@ -11,6 +11,7 @@ tf-check:
 
 charts-lint:
 	./tests/charts/test-actionlint.sh
+	./tests/charts/test-templates-registered.sh
 	helm lint charts/edge-gateway -f deploy/dev/edge-gateway.yaml
 	helm lint charts/backstage -f deploy/dev/backstage.yaml
 
