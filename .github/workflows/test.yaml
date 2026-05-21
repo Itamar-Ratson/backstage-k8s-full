@@ -38,6 +38,7 @@ jobs:
           ./tests/charts/test-templates-registered.sh
           ./tests/charts/test-chart-layout.sh
           ./tests/charts/test-no-make-references.sh
+          ./tests/docs/test-github-app-setup-doc.sh
           helm dependency build charts/platform/argo-cd
           helm lint charts/platform/argo-cd
           helm dependency build charts/platform/envoy-gateway

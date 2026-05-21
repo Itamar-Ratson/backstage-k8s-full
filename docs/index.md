@@ -23,6 +23,10 @@ Use the ADR pages for durable decisions:
 - [ADR-0001: KinD + Terraform + Envoy Gateway](adr/0001-kind-terraform-envoy-gateway.md)
 - [ADR-0002: Helm Chart Architecture](adr/0002-helm-chart-architecture.md)
 
+Use the operator guides for setup tasks:
+
+- [GitHub App Setup](operator/github-app-setup.md)
+
 ## Operational Notes
 
 The Backstage pod builds TechDocs locally on first request using the mkdocs tooling bundled into the Backstage image. Generated output is published to the pod filesystem, so a pod restart clears the cache and the next reader pays the build cost again.
