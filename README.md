@@ -191,7 +191,7 @@ Install the edge-gateway chart (shared Gateway resource) and then the backstage 
 
 ```bash
 # Install the edge-gateway (creates the gateway namespace)
-helm upgrade --install edge-gateway charts/edge-gateway \
+helm upgrade --install edge-gateway charts/platform/edge-gateway \
   --namespace gateway --create-namespace --wait \
   --kube-context kind-backstage \
   -f deploy/dev/edge-gateway.yaml
@@ -201,7 +201,7 @@ kubectl create namespace backstage --dry-run=client -o yaml | kubectl apply -f -
 kubectl label namespace backstage gateway-routes=enabled --overwrite --context kind-backstage
 
 # Install backstage
-helm upgrade --install backstage charts/backstage \
+helm upgrade --install backstage charts/workloads/backstage \
   --namespace backstage --wait --timeout 5m \
   --kube-context kind-backstage \
   -f deploy/dev/backstage.yaml \
@@ -250,7 +250,7 @@ When you make changes and need to redeploy:
 
 ```bash
 # Upgrade the helm release with the image tag recorded in deploy/dev/backstage.yaml
-helm upgrade backstage charts/backstage \
+helm upgrade backstage charts/workloads/backstage \
   --namespace backstage --wait --timeout 5m \
   --kube-context kind-backstage \
   -f deploy/dev/backstage.yaml \

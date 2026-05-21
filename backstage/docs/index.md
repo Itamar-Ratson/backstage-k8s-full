@@ -4,7 +4,7 @@ This site documents the `developer-portal` System: the Backstage application tha
 
 ## System Boundary
 
-The System entity represents the portal as a product surface. The implementation lives in the `backstage/` workspace, while the deployable Kubernetes workload is rendered from `charts/backstage/` and receives environment-specific values from `deploy/dev/backstage.yaml`.
+The System entity represents the portal as a product surface. The implementation lives in the `backstage/` workspace, while the deployable Kubernetes workload is rendered from `charts/workloads/backstage/` and receives environment-specific values from `deploy/dev/backstage.yaml`.
 
 ```mermaid
 flowchart LR

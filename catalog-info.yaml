@@ -30,7 +30,7 @@ metadata:
   name: edge
   description: Edge networking layer providing ingress and routing via Envoy Gateway.
   annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/edge-gateway/
+    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/platform/edge-gateway/
     backstage.io/techdocs-ref: dir:.
     github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:

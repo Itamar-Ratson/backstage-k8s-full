@@ -12,8 +12,9 @@ tf-check:
 charts-lint:
 	./tests/charts/test-actionlint.sh
 	./tests/charts/test-templates-registered.sh
-	helm lint charts/edge-gateway -f deploy/dev/edge-gateway.yaml
-	helm lint charts/backstage -f deploy/dev/backstage.yaml
+	./tests/charts/test-chart-layout.sh
+	helm lint charts/platform/edge-gateway -f deploy/dev/edge-gateway.yaml
+	helm lint charts/workloads/backstage -f deploy/dev/backstage.yaml
 
 charts-test:
 	./tests/charts/test-backstage-image.sh
@@ -38,7 +39,7 @@ rbac-admin-auth-test:
 
 smoke: tf-check charts-lint charts-test
 	terraform -chdir=terraform apply -auto-approve
-	helm upgrade --install edge-gateway charts/edge-gateway \
+	helm upgrade --install edge-gateway charts/platform/edge-gateway \
 		--namespace $(GATEWAY_NS) --create-namespace --wait \
 		--kube-context $(KUBE_CONTEXT) \
 		-f deploy/dev/edge-gateway.yaml
@@ -56,7 +57,7 @@ smoke: tf-check charts-lint charts-test
 		 echo "Create it with:" && \
 		 echo '  kubectl create secret generic backstage-github-oauth --from-literal=AUTH_GITHUB_CLIENT_ID="..." --from-literal=AUTH_GITHUB_CLIENT_SECRET="..." -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT)' && \
 		 exit 1)
-	helm upgrade --install backstage charts/backstage \
+	helm upgrade --install backstage charts/workloads/backstage \
 		--namespace $(BACKSTAGE_NS) --wait --timeout 5m \
 		--kube-context $(KUBE_CONTEXT) \
 		-f deploy/dev/backstage.yaml \

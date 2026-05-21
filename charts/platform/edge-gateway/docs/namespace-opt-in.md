@@ -10,7 +10,7 @@ By default, a namespace must carry this label:
 kubectl label namespace <namespace> gateway-routes=enabled --overwrite --context kind-backstage
 ```
 
-The corresponding Gateway listener policy is rendered from `charts/edge-gateway/values.yaml`:
+The corresponding Gateway listener policy is rendered from `charts/platform/edge-gateway/values.yaml`:
 
 ```yaml
 allowedRoutes:

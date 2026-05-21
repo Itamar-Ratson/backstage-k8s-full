@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CHART_DIR="charts/backstage"
+CHART_DIR="charts/workloads/backstage"
 FIXTURES="tests/charts/fixtures"
 PASS=0
 FAIL=0

@@ -58,7 +58,7 @@ metadata:
   name: backstage-postgres
   description: PostgreSQL database backing the Backstage catalog, auth, and scaffolder state.
   annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/backstage/
+    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/workloads/backstage/
     github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: database

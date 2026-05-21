@@ -40,7 +40,7 @@ The chart's runtime ConfigMap delivers `app-config.runtime.yaml`, `rbac-policies
 The canonical files remain at their repo-root locations and are passed during install with:
 
 ```bash
-helm upgrade --install backstage charts/backstage \
+helm upgrade --install backstage charts/workloads/backstage \
   --set-file rbac.policies=backstage/rbac-policies.csv \
   --set-file rbac.users=users.yaml
 ```

@@ -1,6 +1,6 @@
 # Edge Gateway
 
-This site documents the `edge` System: the Envoy Gateway entry point used by the local KinD platform. The `charts/edge-gateway` Helm chart owns the shared Gateway resource, while workload charts attach their own `HTTPRoute` resources from application namespaces.
+This site documents the `edge` System: the Envoy Gateway entry point used by the local KinD platform. The `charts/platform/edge-gateway` Helm chart owns the shared Gateway resource, while workload charts attach their own `HTTPRoute` resources from application namespaces.
 
 ## Architecture
 

@@ -52,7 +52,7 @@ Consequences: The demo can show both sides of the gate: guest can browse catalog
 - Dev-mode auth has both guest and GitHub sign-in, with secrets kept out of committed config.
 - RBAC policy is reproducible across `yarn dev` restarts because the committed CSV is loaded on startup.
 - The admin must be configured in both places: `permission.rbac.admin.users` for `/rbac` administration, and `backstage/rbac-policies.csv` for broad plugin permissions.
-- The follow-up KinD/Helm-chart PRD will need to revisit `charts/backstage/templates/configmap.yaml`, `deploy/dev/backstage.yaml`, and the Helm `values.appConfig` schema to port the local-only settings into chart-managed runtime config.
+- The follow-up KinD/Helm-chart PRD will need to revisit `charts/workloads/backstage/templates/configmap.yaml`, `deploy/dev/backstage.yaml`, and the Helm `values.appConfig` schema to port the local-only settings into chart-managed runtime config.
 
 ## Deferred
 

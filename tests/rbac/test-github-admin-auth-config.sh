@@ -15,7 +15,7 @@ users_path="users.yaml"
 sign_in_module_path="backstage/packages/app/src/modules/signIn/index.tsx"
 app_path="backstage/packages/app/src/App.tsx"
 dev_values_path="deploy/dev/backstage.yaml"
-chart_values_path="charts/backstage/values.yaml"
+chart_values_path="charts/workloads/backstage/values.yaml"
 
 backend_index=$(cat "$backend_index_path")
 app_config=$(cat "$app_config_path")
