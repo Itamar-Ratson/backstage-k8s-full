@@ -1,0 +1,44 @@
+gateway-helm:
+  crds:
+    gatewayAPI:
+      enabled: true
+      channel: standard
+    envoyGateway:
+      enabled: true
+  config:
+    envoyGateway:
+      gateway:
+        controllerName: gateway.envoyproxy.io/gatewayclass-controller
+      provider:
+        type: Kubernetes
+      logging:
+        level:
+          default: info
+
+gatewayClass:
+  enabled: true
+  name: eg-nodeport
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: custom-proxy-config
+    namespace: envoy-gateway-system
+
+envoyProxy:
+  enabled: true
+  name: custom-proxy-config
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: NodePort
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              externalTrafficPolicy: Cluster
+              ports:
+                - port: 80
+                  nodePort: 30080
+                  protocol: TCP

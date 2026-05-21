@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-dev
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - name: argo-cd
+            namespace: argocd
+            syncWave: "-3"
+          - name: envoy-gateway
+            namespace: envoy-gateway-system
+            syncWave: "-2"
+          - name: edge-gateway
+            namespace: gateway
+            syncWave: "-1"
+  template:
+    metadata:
+      name: '{{.name}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{.syncWave}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Itamar-Ratson/backstage-k8s-full.git
+        targetRevision: main
+        path: charts/platform/{{.name}}
+        helm:
+          valueFiles:
+            - /deploy/dev/{{.name}}.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

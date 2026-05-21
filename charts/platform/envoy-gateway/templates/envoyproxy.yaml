@@ -1,0 +1,12 @@
+{{- with .Values.envoyProxy }}
+{{- if .enabled }}
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  provider:
+    {{- toYaml .provider | nindent 4 }}
+{{- end }}
+{{- end }}

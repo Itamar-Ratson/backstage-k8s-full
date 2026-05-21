@@ -66,6 +66,7 @@ jobs:
           ./tests/charts/test-ci-cd-pipeline-scaffold.sh
           ./tests/charts/test-platform-argo-cd-renders.sh
           ./tests/charts/test-platform-envoy-gateway-renders.sh
+          ./tests/gitops/test-platform-appset.sh
       - name: rbac-test
         run: ./tests/rbac/test-rbac-policies-csv.sh
       - name: rbac-admin-auth-test
