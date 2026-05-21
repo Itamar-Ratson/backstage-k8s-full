@@ -8,12 +8,12 @@ image:
 github:
   auth:
     create: false
-    existingSecret: backstage-github-token
+    existingSecret: backstage-github-app
 
 oauth:
   github:
     create: false
-    existingSecret: backstage-github-oauth
+    existingSecret: backstage-github-app
 
 postgres:
   enabled: true
@@ -52,8 +52,16 @@ appConfig:
     providers:
       github:
         development:
-          clientId: ${AUTH_GITHUB_CLIENT_ID}
-          clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+          clientId: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
+  integrations:
+    github:
+      - host: github.com
+        apps:
+          - appId: ${APP_ID}
+            clientId: ${CLIENT_ID}
+            clientSecret: ${CLIENT_SECRET}
+            privateKey: ${PRIVATE_KEY}
   permission:
     rbac:
       admin:

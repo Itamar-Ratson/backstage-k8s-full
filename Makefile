@@ -45,17 +45,11 @@ smoke: tf-check charts-lint charts-test
 		-f deploy/dev/edge-gateway.yaml
 	kubectl create namespace $(BACKSTAGE_NS) --dry-run=client -o yaml | kubectl apply -f - --context $(KUBE_CONTEXT)
 	kubectl label namespace $(BACKSTAGE_NS) gateway-routes=enabled --overwrite --context $(KUBE_CONTEXT)
-	@echo "Checking for backstage-github-token secret..."
-	@kubectl get secret backstage-github-token -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT) >/dev/null 2>&1 || \
-		(echo "ERROR: Secret backstage-github-token not found in namespace $(BACKSTAGE_NS)." && \
+	@echo "Checking for backstage-github-app secret..."
+	@kubectl get secret backstage-github-app -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT) >/dev/null 2>&1 || \
+		(echo "ERROR: Secret backstage-github-app not found in namespace $(BACKSTAGE_NS)." && \
 		 echo "Create it with:" && \
-		 echo '  kubectl create secret generic backstage-github-token --from-literal=GITHUB_TOKEN="$$GITHUB_TOKEN" -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT)' && \
-		 exit 1)
-	@echo "Checking for backstage-github-oauth secret..."
-	@kubectl get secret backstage-github-oauth -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT) >/dev/null 2>&1 || \
-		(echo "ERROR: Secret backstage-github-oauth not found in namespace $(BACKSTAGE_NS)." && \
-		 echo "Create it with:" && \
-		 echo '  kubectl create secret generic backstage-github-oauth --from-literal=AUTH_GITHUB_CLIENT_ID="..." --from-literal=AUTH_GITHUB_CLIENT_SECRET="..." -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT)' && \
+		 echo '  kubectl create secret generic backstage-github-app --from-literal=APP_ID="..." --from-literal=CLIENT_ID="..." --from-literal=CLIENT_SECRET="..." --from-file=PRIVATE_KEY=path/to/private-key.pem -n $(BACKSTAGE_NS) --context $(KUBE_CONTEXT)' && \
 		 exit 1)
 	helm upgrade --install backstage charts/workloads/backstage \
 		--namespace $(BACKSTAGE_NS) --wait --timeout 5m \

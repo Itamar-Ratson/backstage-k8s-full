@@ -1,7 +1,7 @@
 github:
   auth:
-    create: true
-    token: test-token
+    create: false
+    existingSecret: backstage-github-app
 postgres:
   auth:
     password: test-pass

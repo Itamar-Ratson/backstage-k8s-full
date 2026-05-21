@@ -46,16 +46,18 @@ assert_contains "admin user has empty group membership" "$users_yaml" "memberOf:
 
 assert_contains "admin user is assigned platform-admin" "$rbac_policies" "g, user:default/itamar-ratson, role:default/platform-admin"
 
-assert_contains "dev values use OAuth client ID env placeholder" "$dev_values" 'clientId: ${AUTH_GITHUB_CLIENT_ID}'
-assert_contains "dev values use OAuth client secret env placeholder" "$dev_values" 'clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}'
+assert_contains "dev values use GitHub App client ID env placeholder" "$dev_values" 'clientId: ${CLIENT_ID}'
+assert_contains "dev values use GitHub App client secret env placeholder" "$dev_values" 'clientSecret: ${CLIENT_SECRET}'
+assert_contains "dev values use GitHub App ID env placeholder" "$dev_values" 'appId: ${APP_ID}'
+assert_contains "dev values use GitHub App private key env placeholder" "$dev_values" 'privateKey: ${PRIVATE_KEY}'
 assert_contains "dev values configure RBAC admin user" "$dev_values" "user:default/itamar-ratson"
 assert_contains "dev values override RBAC CSV path" "$dev_values" "/etc/backstage/rbac-policies.csv"
 assert_contains "dev values catalog users from mounted file" "$dev_values" "target: /etc/backstage/users.yaml"
-assert_contains "dev values reference OAuth existing secret" "$dev_values" "existingSecret: backstage-github-oauth"
+assert_contains "dev values reference GitHub App existing secret" "$dev_values" "existingSecret: backstage-github-app"
 assert_contains "chart values declare OAuth section" "$chart_values" "oauth:"
 assert_contains "chart values declare OAuth GitHub section" "$chart_values" "github:"
 assert_contains "chart values default OAuth creation off" "$chart_values" "create: false"
-assert_contains "chart values declare OAuth existingSecret" "$chart_values" "existingSecret: backstage-github-oauth"
+assert_contains "chart values declare OAuth existingSecret" "$chart_values" "existingSecret: backstage-github-app"
 
 assert_contains "sign-in module exports signInModule" "$sign_in_module" "export const signInModule"
 assert_contains "sign-in module uses SignInPageBlueprint" "$sign_in_module" "SignInPageBlueprint"

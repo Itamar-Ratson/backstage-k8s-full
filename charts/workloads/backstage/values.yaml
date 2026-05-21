@@ -36,13 +36,13 @@ service:
 github:
   auth:
     create: false
-    existingSecret: ""
+    existingSecret: backstage-github-app
     token: ""
 
 oauth:
   github:
     create: false
-    existingSecret: backstage-github-oauth
+    existingSecret: backstage-github-app
     clientId: ""
     clientSecret: ""
 
@@ -95,10 +95,22 @@ appConfig:
         port: ${POSTGRES_PORT}
         user: ${POSTGRES_USER}
         password: ${POSTGRES_PASSWORD}
+  integrations:
+    github:
+      - host: github.com
+        apps:
+          - appId: ${APP_ID}
+            clientId: ${CLIENT_ID}
+            clientSecret: ${CLIENT_SECRET}
+            privateKey: ${PRIVATE_KEY}
   auth:
     providers:
       guest:
         dangerouslyAllowOutsideDevelopment: true
+      github:
+        development:
+          clientId: ${CLIENT_ID}
+          clientSecret: ${CLIENT_SECRET}
   catalog:
     rules:
       - allow: [Component, System, API, Resource, Location, Domain, User, Group, Template]

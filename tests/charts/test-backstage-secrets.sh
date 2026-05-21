@@ -3,27 +3,20 @@ set -euo pipefail
 # shellcheck source=helpers.sh
 source "$(dirname "$0")/helpers.sh"
 
-echo "=== GitHub auth hybrid tests ==="
+echo "=== GitHub App auth tests ==="
 
-# Test 1: create=true with token renders Secret and Deployment references it
-output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/github-create-true.yaml" 2>&1)
-assert_contains "github create=true renders Secret" "$output" "name: backstage-github"
-assert_contains "github Secret has GITHUB_TOKEN" "$output" "GITHUB_TOKEN:"
-assert_contains "deployment refs github secret" "$output" "name: backstage-github"
+# Test 1: dev values use the single GitHub App Secret and do not render GitHub credentials
+output=$(helm template backstage "$CHART_DIR" -f deploy/dev/backstage.yaml 2>&1)
+assert_contains "deployment refs GitHub App existingSecret" "$output" "name: backstage-github-app"
+assert_not_contains "GitHub App Secret is not rendered" "$output" "APP_ID:"
+assert_not_contains "legacy PAT Secret data key is not rendered" "$output" "GITHUB_TOKEN:"
+assert_not_contains "legacy OAuth client ID key is not rendered" "$output" "AUTH_GITHUB_CLIENT_ID:"
+assert_not_contains "legacy OAuth client secret key is not rendered" "$output" "AUTH_GITHUB_CLIENT_SECRET:"
 
 # Test 2: create=false with existingSecret — no GitHub Secret rendered, Deployment references supplied name
 output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/github-existing-secret.yaml" 2>&1)
 assert_contains "deployment refs existingSecret" "$output" "name: my-gh-secret"
 assert_not_contains "github create=false should not render PAT Secret data key" "$output" "GITHUB_TOKEN:"
-
-# Test 3: create=true with empty token fails with required message
-assert_fails "github empty token fails" "github.auth.token is required" \
-  helm template backstage "$CHART_DIR" -f "$FIXTURES/github-create-empty-token.yaml"
-
-# Test 3b: create=false with empty existingSecret fails with required message
-assert_fails "github defaults (create=false, no existingSecret) fails" \
-  "github.auth.existingSecret is required when github.auth.create=false" \
-  helm template backstage "$CHART_DIR" -f "$FIXTURES/github-defaults.yaml"
 
 echo ""
 echo "=== Postgres auth hybrid tests ==="

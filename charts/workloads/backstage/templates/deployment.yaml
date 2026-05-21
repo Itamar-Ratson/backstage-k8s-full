@@ -1,5 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
+{{- $githubSecretName := include "backstage.githubSecretName" . }}
+{{- $githubOAuthSecretName := include "backstage.githubOAuthSecretName" . }}
 metadata:
   name: {{ include "backstage.fullname" . }}
   labels:
@@ -55,9 +57,11 @@ spec:
             - secretRef:
                 name: {{ include "backstage.postgresSecretName" . }}
             - secretRef:
-                name: {{ include "backstage.githubSecretName" . }}
+                name: {{ $githubSecretName }}
+            {{- if ne $githubSecretName $githubOAuthSecretName }}
             - secretRef:
-                name: {{ include "backstage.githubOAuthSecretName" . }}
+                name: {{ $githubOAuthSecretName }}
+            {{- end }}
           volumeMounts:
             - name: app-config
               mountPath: /etc/backstage

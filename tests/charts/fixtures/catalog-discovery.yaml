@@ -1,7 +1,7 @@
 github:
   auth:
     create: false
-    existingSecret: backstage-github-token
+    existingSecret: backstage-github-app
 
 postgres:
   auth:

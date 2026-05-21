@@ -16,22 +16,22 @@ The supported runtime for the demo is now the kind cluster. Maintaining GitHub O
 
 ## Decision
 
-### OAuth Credentials Use a Kubernetes Secret
+### GitHub App Credentials Use a Kubernetes Secret
 
-GitHub OAuth credentials are delivered to the pod through a Kubernetes Secret named `backstage-github-oauth` by default. The chart exposes:
+GitHub App credentials are delivered to the pod through a Kubernetes Secret named `backstage-github-app` by default. The chart exposes:
 
 ```yaml
 oauth:
   github:
     create: false
-    existingSecret: backstage-github-oauth
+    existingSecret: backstage-github-app
     clientId: ""
     clientSecret: ""
 ```
 
-When `oauth.github.create` is `true`, the chart renders a Secret with `AUTH_GITHUB_CLIENT_ID` and `AUTH_GITHUB_CLIENT_SECRET`. When it is `false`, the Deployment references `oauth.github.existingSecret`.
+The Deployment references the configured existing Secret. The chart does not render GitHub credential Secrets.
 
-This mirrors the existing GitHub PAT pattern under `github.auth.{create,existingSecret,token}` while keeping OAuth credentials out of committed config.
+This keeps GitHub App credentials out of committed config while allowing the same App to back catalog/scaffolder access and user sign-in.
 
 ### RBAC Files Are Delivered by ConfigMap
 

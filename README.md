@@ -129,11 +129,11 @@ cosign verify ghcr.io/itamar-ratson/backstage-k8s-full/<app>:<sha> \
 
 A fresh clone needs the first image build to populate `deploy/dev/backstage.yaml` with an `image.tag` value before `make smoke` can pull Backstage from GHCR. After the build workflow lands, trigger the bootstrap build with a small path-matching change under `backstage/`; [issue #5](https://github.com/Itamar-Ratson/backstage-k8s-full/issues/5) is the bootstrap runbook for that first deployment.
 
-## Step 5: Create the GitHub PAT Secret
+## Step 5: Create the GitHub App Secret
 
-Backstage discovers catalog entities from this GitHub repo at runtime and uses scaffolder actions to publish GitHub changes. It needs a fine-grained Personal Access Token (PAT) for those GitHub API calls.
+Backstage discovers catalog entities from this GitHub repo at runtime, uses scaffolder actions to publish GitHub changes, and supports GitHub sign-in. It uses one GitHub App for all of those GitHub calls.
 
-1. Create a **fine-grained PAT** at <https://github.com/settings/personal-access-tokens/new>:
+1. Create and install a GitHub App for this repo:
    - **Repository access:** Only select `Itamar-Ratson/backstage-k8s-full`
    - **Permissions:**
      - `Contents: Read and write` — read catalog-info.yaml files and publish scaffolded changes
@@ -141,51 +141,31 @@ Backstage discovers catalog entities from this GitHub repo at runtime and uses s
      - `Pull requests: Read and write` — open pull requests from scaffolder actions
      - `Workflows: Read and write` — publish changes that include workflow files
      - `Metadata: Read` — auto-granted
+   - **Callback URL:** `http://backstage.localtest.me:8080/api/auth/github/handler/frame`
 
 2. Create the Kubernetes secret. Either use the imperative form:
 
 ```bash
 kubectl create namespace backstage --dry-run=client -o yaml | kubectl apply -f - --context kind-backstage
-kubectl create secret generic backstage-github-token \
-  --from-literal=GITHUB_TOKEN="$GITHUB_TOKEN" \
+kubectl create secret generic backstage-github-app \
+  --from-literal=APP_ID="$APP_ID" \
+  --from-literal=CLIENT_ID="$CLIENT_ID" \
+  --from-literal=CLIENT_SECRET="$CLIENT_SECRET" \
+  --from-file=PRIVATE_KEY=path/to/private-key.pem \
   -n backstage --context kind-backstage
 ```
 
-…or copy `secret-backstage-github-token.example.yaml` to `secret-backstage-github-token.yaml` (gitignored), substitute the PAT, and `kubectl apply -f` it.
+Keep the downloaded `.pem` file out of version control.
 
 Verify:
 
 ```bash
-kubectl get secret backstage-github-token -n backstage --context kind-backstage
+kubectl get secret backstage-github-app -n backstage --context kind-backstage
 ```
-
-## Step 6: Provision a GitHub OAuth App for the kind deployment
-
-The kind deployment supports GitHub admin sign-in alongside guest auth.
-
-Create or edit a GitHub OAuth App at <https://github.com/settings/developers> with:
-
-- **Homepage URL:** `http://backstage.localtest.me:8080`
-- **Authorization callback URL:** `http://backstage.localtest.me:8080/api/auth/github/handler/frame`
-
-An existing OAuth App can be edited in place. Reuse the same `client_id` and `client_secret`; only the homepage and callback URLs need to point at the kind hostname.
-
-Create the Kubernetes Secret. Either use the imperative form:
-
-```bash
-kubectl create secret generic backstage-github-oauth \
-  --from-literal=AUTH_GITHUB_CLIENT_ID="$AUTH_GITHUB_CLIENT_ID" \
-  --from-literal=AUTH_GITHUB_CLIENT_SECRET="$AUTH_GITHUB_CLIENT_SECRET" \
-  -n backstage --context kind-backstage
-```
-
-…or copy `secret-backstage-github-oauth.example.yaml` to `secret-backstage-github-oauth.yaml` (gitignored), substitute the OAuth App credentials, and `kubectl apply -f` it.
 
 This Secret is a one-time bootstrap prerequisite for a fresh kind cluster. `make smoke` checks that it exists, but it does not regenerate it on each run.
 
-The OAuth App is separate from the `backstage-github-token` PAT. The OAuth App signs you in to Backstage; the PAT lets Backstage discover catalog files and publish GitHub changes during scaffolder actions.
-
-## Step 7: Deploy with Helm
+## Step 6: Deploy with Helm
 
 Install the edge-gateway chart (shared Gateway resource) and then the backstage chart:
 
@@ -217,7 +197,7 @@ Or simply run the full smoke test which performs all of the above:
 make smoke
 ```
 
-## Step 8: Access Backstage
+## Step 7: Access Backstage
 
 Open <http://backstage.localtest.me:8080> in your browser. No port-forwarding required.
 

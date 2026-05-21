@@ -34,19 +34,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "backstage.githubSecretName" -}}
-{{- if .Values.github.auth.create }}
-{{- include "backstage.fullname" . }}-github
-{{- else }}
-{{- required "github.auth.existingSecret is required when github.auth.create=false" .Values.github.auth.existingSecret }}
-{{- end }}
+{{- required "github.auth.existingSecret is required for GitHub App credentials" .Values.github.auth.existingSecret }}
 {{- end }}
 
 {{- define "backstage.githubOAuthSecretName" -}}
-{{- if .Values.oauth.github.create }}
-{{- include "backstage.fullname" . }}-github-oauth
-{{- else }}
-{{- required "oauth.github.existingSecret is required when oauth.github.create=false" .Values.oauth.github.existingSecret }}
-{{- end }}
+{{- required "oauth.github.existingSecret is required for GitHub App credentials" .Values.oauth.github.existingSecret }}
 {{- end }}
 
 {{- define "backstage.postgresSecretName" -}}

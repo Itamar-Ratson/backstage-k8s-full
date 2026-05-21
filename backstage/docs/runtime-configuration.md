@@ -12,7 +12,7 @@ auth:
 
 The backend imports `@backstage/plugin-auth-backend` and the guest provider module, so a local KinD user can enter the portal without configuring an external identity provider. This is suitable for the repo's current single-developer local environment. A production identity provider would need a separate auth provider module, provider-specific secrets, and a matching sign-in resolver policy.
 
-GitHub access is separate from user sign-in. The GitHub integration reads `GITHUB_TOKEN` from the runtime environment, and the Helm deployment sources that value from the `backstage-github-token` Kubernetes Secret. That token is used for catalog discovery and scaffolder publishing actions.
+GitHub access and user sign-in share one GitHub App. The GitHub integration reads `APP_ID`, `CLIENT_ID`, `CLIENT_SECRET`, and `PRIVATE_KEY` from the runtime environment, and the Helm deployment sources those values from the `backstage-github-app` Kubernetes Secret. Backstage mints short-lived installation tokens from the private key for catalog discovery and scaffolder publishing actions.
 
 ## Catalog Discovery
 
