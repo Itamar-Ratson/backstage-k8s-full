@@ -57,32 +57,30 @@ resource "helm_release" "argocd" {
   namespace        = "argocd"
   create_namespace = true
 
-  values = [
-    yamlencode({
-      extraObjects = [
-        merge(
-          local.root_application,
-          {
-            spec = merge(
-              local.root_application.spec,
-              {
-                source = merge(
-                  local.root_application.spec.source,
-                  {
-                    repoURL = var.gitops_repo_url
-                  }
-                )
-              }
-            )
-          }
-        )
-      ]
-    })
-  ]
-
   lifecycle {
     ignore_changes = [version, values]
   }
 
   depends_on = [kind_cluster.this]
+}
+
+resource "kubectl_manifest" "root_app" {
+  yaml_body = yamlencode(merge(
+    local.root_application,
+    {
+      spec = merge(
+        local.root_application.spec,
+        {
+          source = merge(
+            local.root_application.spec.source,
+            {
+              repoURL = var.gitops_repo_url
+            }
+          )
+        }
+      )
+    }
+  ))
+
+  depends_on = [helm_release.argocd]
 }
