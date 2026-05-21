@@ -41,6 +41,8 @@
 
 # Terraform state and cache (override folder allowlist)
 terraform/.terraform/**
+terraform/terraform.tfvars
+!terraform/terraform.tfvars.example
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/.terraform.tfstate.lock.info

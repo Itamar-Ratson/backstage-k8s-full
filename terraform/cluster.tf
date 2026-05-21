@@ -20,3 +20,69 @@ resource "kind_cluster" "this" {
     }
   }
 }
+
+resource "kubernetes_namespace_v1" "backstage" {
+  metadata {
+    name = "backstage"
+
+    labels = {
+      gateway-routes = "enabled"
+    }
+  }
+
+  depends_on = [kind_cluster.this]
+}
+
+resource "kubernetes_secret_v1" "backstage_github_app" {
+  metadata {
+    name      = "backstage-github-app"
+    namespace = kubernetes_namespace_v1.backstage.metadata[0].name
+  }
+
+  data = {
+    APP_ID        = var.APP_ID
+    CLIENT_ID     = var.CLIENT_ID
+    CLIENT_SECRET = var.CLIENT_SECRET
+    PRIVATE_KEY   = var.PRIVATE_KEY
+  }
+
+  type = "Opaque"
+}
+
+resource "helm_release" "argocd" {
+  name             = "argo-cd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  version          = "9.5.15"
+  namespace        = "argocd"
+  create_namespace = true
+
+  values = [
+    yamlencode({
+      extraObjects = [
+        merge(
+          local.root_application,
+          {
+            spec = merge(
+              local.root_application.spec,
+              {
+                source = merge(
+                  local.root_application.spec.source,
+                  {
+                    repoURL = var.gitops_repo_url
+                  }
+                )
+              }
+            )
+          }
+        )
+      ]
+    })
+  ]
+
+  lifecycle {
+    ignore_changes = [version, values]
+  }
+
+  depends_on = [kind_cluster.this]
+}

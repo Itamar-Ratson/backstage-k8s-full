@@ -1,0 +1,8 @@
+APP_ID        = "123456"
+CLIENT_ID     = "Iv1.exampleclientid"
+CLIENT_SECRET = "example-client-secret"
+PRIVATE_KEY   = <<EOT
+-----BEGIN RSA PRIVATE KEY-----
+example-private-key
+-----END RSA PRIVATE KEY-----
+EOT
