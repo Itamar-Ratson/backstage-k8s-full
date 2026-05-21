@@ -33,15 +33,43 @@ jobs:
           sudo curl -fsSL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
           sudo chmod +x /usr/local/bin/yq
       - name: charts-lint
-        run: make charts-lint
+        run: |
+          ./tests/charts/test-actionlint.sh
+          ./tests/charts/test-templates-registered.sh
+          ./tests/charts/test-chart-layout.sh
+          ./tests/charts/test-no-make-references.sh
+          helm dependency build charts/platform/argo-cd
+          helm lint charts/platform/argo-cd
+          helm dependency build charts/platform/envoy-gateway
+          helm lint charts/platform/envoy-gateway
+          helm lint charts/platform/edge-gateway -f deploy/dev/edge-gateway.yaml
+          helm lint charts/workloads/backstage -f deploy/dev/backstage.yaml
       - name: charts-test
-        run: make charts-test
+        run: |
+          ./tests/charts/test-backstage-image.sh
+          ./tests/charts/test-backstage-secrets.sh
+          ./tests/charts/test-backstage-oauth.sh
+          ./tests/charts/test-backstage-configmap.sh
+          ./tests/charts/test-backstage-catalog-config.sh
+          ./tests/charts/test-backstage-mkdocs-image-toolchain.sh
+          ./tests/charts/test-backstage-techdocs-config.sh
+          ./tests/charts/test-backstage-kubernetes-label.sh
+          ./tests/charts/test-backstage-rbac.sh
+          ./tests/charts/test-edge-gateway-kubernetes-label.sh
+          ./tests/charts/test-helm-chart-techdocs-scaffold.sh
+          ./tests/charts/test-helm-chart-kubernetes-scaffold.sh
+          ./tests/charts/test-ci-cd-pipeline-scaffold.sh
+          ./tests/charts/test-platform-argo-cd-renders.sh
+          ./tests/charts/test-platform-envoy-gateway-renders.sh
       - name: rbac-test
-        run: make rbac-test
+        run: ./tests/rbac/test-rbac-policies-csv.sh
       - name: rbac-admin-auth-test
-        run: make rbac-admin-auth-test
+        run: ./tests/rbac/test-github-admin-auth-config.sh
       - name: tf-check
-        run: make tf-check
+        run: |
+          terraform -chdir=terraform fmt -check -recursive
+          terraform -chdir=terraform init -backend=false -input=false
+          terraform -chdir=terraform validate
 
   docs-lint:
     name: docs-lint

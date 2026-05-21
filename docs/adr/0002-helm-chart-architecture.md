@@ -19,7 +19,7 @@ The system is packaged as two independent Helm charts: `backstage` (application 
 Rejected alternatives:
 - **Single umbrella chart with subcharts** — adds subchart-values-namespacing complexity without a use case; no plan to install postgres or gateway independently of backstage via the umbrella.
 - **Separate postgres chart** — postgres in this chart is a dev convenience toggled off in production; pulling in bitnami/postgresql would import ~50 values keys for features the dev case does not consume.
-- **BYO postgres only (no inline)** — removes the zero-config contributor experience; contributors would need to provision postgres externally before `make smoke` works.
+- **BYO postgres only (no inline)** — removes the zero-config contributor experience; contributors would need to provision postgres externally before local smoke verification works.
 
 ### Edge-Gateway Reusability
 
@@ -44,7 +44,7 @@ The chart is neutral on which external-secrets system (ESO, Sealed Secrets, SOPS
 
 Rejected alternatives:
 - **Always render Secrets** — forces prod credentials through Helm value resolution and release storage.
-- **Never render Secrets** — removes the zero-config local-dev path; contributors must manually create Secrets before `make smoke` works.
+- **Never render Secrets** — removes the zero-config local-dev path; contributors must manually create Secrets before local smoke verification works.
 - **Commit to a specific external-secrets tooling** — premature; the choice depends on the production cluster's existing tooling.
 
 ### App-Config as a Mounted ConfigMap
@@ -64,7 +64,7 @@ Neither chart templates a Namespace resource. Install uses `--create-namespace` 
 
 Rejected alternatives:
 - **Chart templates its own Namespace** — creates Argo tracking-annotation edge cases and ownership conflicts between charts.
-- **Require manual namespace creation** — breaks the single-command `make smoke` experience.
+- **Require manual namespace creation** — breaks the single-command local smoke experience.
 
 ### Image Fields with Chart.appVersion Fallback
 

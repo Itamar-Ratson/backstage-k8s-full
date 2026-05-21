@@ -10,14 +10,14 @@ Touches ADR-0005 (Backstage RBAC on kind) without contradiction — Backstage au
 
 ## Context
 
-The local KinD environment bootstraps via `make smoke`, which chains `terraform apply`, two `helm upgrade --install` calls, manual namespace + label commands, two `kubectl get secret` preconditions, a `kubectl wait` on the Backstage Deployment, and a curl smoke check. The Makefile is the orchestrator, and CI invokes the same Makefile targets to lint and test charts.
+The local KinD environment previously bootstrapped through a smoke target, which chained `terraform apply`, two `helm upgrade --install` calls, manual namespace + label commands, two `kubectl get secret` preconditions, a `kubectl wait` on the Backstage Deployment, and a curl smoke check. The Makefile was the orchestrator, and CI invoked the same target bodies to lint and test charts.
 
 This works for a single environment with one operator, but four gaps compound:
 
 - The `helm-chart-decommission` scaffolder template opens a PR deleting `charts/<name>/`, but the running Helm release is not uninstalled. The template's PR description warns the operator to run `helm uninstall <name> -n <namespace>` manually. The README's Next Steps document this as the "until ArgoCD lands" gap.
 - The `helm-chart` scaffolder template produces charts in `charts/<name>/` that nothing deploys. Each scaffolded chart requires a follow-up manual `helm install`.
 - Bootstrap is imperative and multi-step: two manual Secrets (`backstage-github-token`, `backstage-github-oauth`) via `kubectl create secret`, `terraform apply`, two `helm upgrade --install`s, namespace creation, namespace labeling, secret existence checks, then a Deployment wait.
-- Drift between Git and the running cluster is invisible. A failed `make smoke` retry can leave half-deployed state. No dashboard, no audit trail, no self-healing.
+- Drift between Git and the running cluster is invisible. A failed imperative smoke retry can leave half-deployed state. No dashboard, no audit trail, no self-healing.
 
 The repo's `charts/` and `deploy/<env>/` layout was deliberately built (ADR-0002) so an in-cluster reconciliation controller could consume it without restructure. This ADR records the decisions that activate that path.
 
@@ -30,7 +30,7 @@ ArgoCD is the in-cluster GitOps controller. One ArgoCD instance per environment 
 The two decision factors:
 
 - **Backstage IDP integration.** ArgoCD has a polished, well-maintained Backstage plugin (`@roadiehq/backstage-plugin-argo-cd`) that surfaces per-component sync status on Backstage component pages. This is structurally aligned with the project's IDP direction.
-- **App-of-apps with `Application` and `ApplicationSet` CRs maps directly to the two-chart-now-four-chart layout.** Sync waves enforce the natural ordering (envoy-gateway → edge-gateway → workloads) that `make smoke` previously enforced by command sequence.
+- **App-of-apps with `Application` and `ApplicationSet` CRs maps directly to the two-chart-now-four-chart layout.** Sync waves enforce the natural ordering (envoy-gateway → edge-gateway → workloads) that the old smoke command sequence previously enforced.
 
 Rejected alternatives:
 
@@ -63,7 +63,7 @@ ArgoCD's child Application for `argo-cd` itself points at the vendored wrapper c
 
 Rejected alternatives:
 
-- **`make bootstrap` target separate from `terraform apply`.** Adds a second command between cluster creation and a working cluster; "did you remember to run it?" is a real footgun even with documentation.
+- **Separate bootstrap target after `terraform apply`.** Adds a second command between cluster creation and a working cluster; "did you remember to run it?" is a real footgun even with documentation.
 - **`argocd-autopilot`.** Opinionated directory layout (Kustomize overlay-based `bootstrap/argo-cd/`, `projects/`, `apps/<app>/overlays/<cluster>/`) fights the existing Helm-based shape. Designed for greenfield platform-team setups.
 - **`extraObjects` inline in the `.tf` file.** External file aligns with the repo's existing aesthetic (Helm values in `deploy/<env>/`, not embedded in Terraform), supports `kubectl apply -f` as a disaster-recovery escape hatch, and gets editor schema validation.
 - **`argocd-apps` companion chart for the seed Application.** Two `helm_release` resources instead of one for a single Application is over-machined. argocd-apps is the right tool when used inside `gitops/` to declare a batch of children; not for the Terraform-side seed.
@@ -162,8 +162,8 @@ The Makefile is deleted. The chart-test and rbac-test bash scripts remain on dis
 
 Rejected alternatives:
 
-- **Slim the Makefile to a single `make verify` target.** Acceptable but the explicit goal is "no Makefile." If the convenience signal is missed later, a 3-line `scripts/verify.sh` is the recovery — still no Makefile.
-- **Keep `make smoke` as a thin wrapper.** "One command says I'm done" has value, but `kubectl get applications -n argocd` and a browser visit provide the same signal with no orchestrator.
+- **Slim the Makefile to a single verify target.** Acceptable but the explicit goal is "no Makefile." If the convenience signal is missed later, a 3-line `scripts/verify.sh` is the recovery — still no Makefile.
+- **Keep a thin smoke wrapper.** "One command says I'm done" has value, but `kubectl get applications -n argocd` and a browser visit provide the same signal with no orchestrator.
 
 ### Prod Deferred; Env-Scoped Layout Future-Proofs
 

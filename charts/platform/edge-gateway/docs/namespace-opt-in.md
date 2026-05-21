@@ -36,7 +36,7 @@ The route status should show whether it has been accepted by the parent Gateway.
 
 ## Current Automation
 
-`make smoke` labels the `backstage` namespace before installing the Backstage chart:
+The local deployment flow labels the `backstage` namespace before installing the Backstage chart:
 
 ```bash
 kubectl label namespace backstage gateway-routes=enabled --overwrite --context kind-backstage
