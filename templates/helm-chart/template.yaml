@@ -70,7 +70,22 @@ spec:
       action: fetch:template
       input:
         url: ./skeleton
-        targetPath: charts/${{ parameters.name }}
+        targetPath: charts/workloads/${{ parameters.name }}
+        templateFileExtension: '.njk'
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          image: ${{ parameters.image }}
+          host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
+          port: ${{ parameters.port }}
+    - id: fetchDevValues
+      name: Fetch dev values
+      action: fetch:template
+      input:
+        url: ./skeleton-values
+        targetPath: deploy/dev
         templateFileExtension: '.njk'
         values:
           name: ${{ parameters.name }}

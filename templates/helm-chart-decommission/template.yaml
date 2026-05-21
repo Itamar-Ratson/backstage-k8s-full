@@ -72,17 +72,17 @@ spec:
       action: fetch:plain
       input:
         url: >-
-          https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/${{
+          https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/workloads/${{
             steps.fetchEntity.output.entity.metadata.name
           }}/
-        targetPath: charts/${{ steps.fetchEntity.output.entity.metadata.name }}
+        targetPath: charts/workloads/${{ steps.fetchEntity.output.entity.metadata.name }}
 
     - id: listChartFiles
       name: List chart files
       action: fs:readdir
       input:
         paths:
-          - charts/${{ steps.fetchEntity.output.entity.metadata.name }}
+          - charts/workloads/${{ steps.fetchEntity.output.entity.metadata.name }}
         recursive: true
 
     - id: extractChartFilePaths
@@ -97,7 +97,7 @@ spec:
       action: fs:delete
       input:
         files:
-          - charts/${{ steps.fetchEntity.output.entity.metadata.name }}
+          - charts/workloads/${{ steps.fetchEntity.output.entity.metadata.name }}
 
     - id: publishPullRequest
       name: Publish pull request
@@ -111,12 +111,17 @@ spec:
           Decommissioned scaffolded workload chart generated from Backstage.
 
           - Component: `${{ steps.fetchEntity.output.entity.metadata.name }}`
-          - Removed path: `charts/${{ steps.fetchEntity.output.entity.metadata.name }}`
+          - Removed path: `charts/workloads/${{ steps.fetchEntity.output.entity.metadata.name }}`
+          - Removed values file: `deploy/dev/${{ steps.fetchEntity.output.entity.metadata.name }}.yaml`
           - File count: `${{ steps.listChartFiles.output.files.length }}`
           - Requesting user: `${{ user.ref or 'unknown' }}`
 
-          Warning: this pull request only removes repository files. The running Helm release will NOT be uninstalled automatically. The requester must run `helm uninstall ${{ steps.fetchEntity.output.entity.metadata.name }} -n <namespace>` manually until ArgoCD lands.
-        filesToDelete: ${{ steps.extractChartFilePaths.output.extracted }}
+          Merging this PR removes the chart files. ArgoCD will detect the removal and prune the running release within ~3 minutes.
+        filesToDelete: ${{
+          steps.extractChartFilePaths.output.extracted.concat([
+            'deploy/dev/' + steps.fetchEntity.output.entity.metadata.name + '.yaml'
+          ])
+        }}
         draft: false
   output:
     links:

@@ -9,23 +9,17 @@ The Template is deliberately conservative. It validates the selected catalog ent
 The pull request deletes the selected chart directory:
 
 ```text
-charts/<component-name>/
+charts/workloads/<component-name>/
 ```
 
-For charts scaffolded by the `helm-chart` Template, that directory includes the Helm chart, workload catalog entity, `mkdocs.yaml`, and the chart's `docs/` folder. Removing the directory therefore removes both the deployable chart source and the co-located TechDocs source for that Component.
+For charts scaffolded by the `helm-chart` Template, that directory includes the Helm chart, workload catalog entity, `mkdocs.yaml`, and the chart's `docs/` folder. The pull request also deletes `deploy/dev/<component-name>.yaml`. Removing both files stops the workloads ApplicationSet from materializing the Application for that Component.
 
 ## What It Does Not Remove
 
-The Template does not uninstall anything from Kubernetes. It does not run `helm uninstall`, delete Deployments or Services, remove namespaces, or clean up live `HTTPRoute` resources directly.
-
-After the pull request merges, the requester still needs to remove any running release manually until a deployment controller such as Argo CD owns that lifecycle:
-
-```bash
-helm uninstall <component-name> -n <namespace>
-```
+The Template does not run imperative Kubernetes commands, delete namespaces, or clean up resources outside the Helm release directly. After the pull request merges, ArgoCD detects the removed chart directory and prunes the running release through the workloads ApplicationSet.
 
 The Template also does not remove external DNS records, secrets, databases, queues, object storage, or downstream dependencies. Those resources must be handled by the owning team before or alongside the repository cleanup.
 
 ## Pull Request Output
 
-The generated pull request targets `main` on a branch named `decommission/helm-chart/<component-name>`. Its description records the Component name, removed path, file count, requesting user, and a warning that the running Helm release is not uninstalled automatically.
+The generated pull request targets `main` on a branch named `decommission/helm-chart/<component-name>`. Its description records the Component name, removed chart path, removed values file, file count, requesting user, and the expected ArgoCD prune behavior.

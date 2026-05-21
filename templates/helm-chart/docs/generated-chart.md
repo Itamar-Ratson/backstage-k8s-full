@@ -14,12 +14,14 @@ A generated chart contains these files:
 | `templates/_helpers.tpl` | Shared naming and Kubernetes label helpers. |
 | `catalog-info.yaml` | Backstage Component entity for the workload. |
 | `mkdocs.yaml` and `docs/index.md` | Starter TechDocs site for the new Component. |
+| `deploy/dev/<name>.yaml` | Dev environment values consumed by the workloads ApplicationSet. |
 
 ## Conventions
 
 The scaffolded chart follows the repo's local platform conventions:
 
-- The chart is created under `charts/<name>/`.
+- The chart is created under `charts/workloads/<name>/`.
+- The dev values file is created at `deploy/dev/<name>.yaml`.
 - Kubernetes names flow through the `workload.fullname` helper and are truncated to DNS-safe lengths where needed.
 - Workload labels use the standard `app.kubernetes.io/*` keys plus `helm.sh/chart`.
 - The Deployment uses `imagePullPolicy: IfNotPresent`.

@@ -45,7 +45,8 @@ describe('helm chart template contract', () => {
           'title: New Helm Chart',
           'branchName: scaffold/helm-chart/${{ parameters.name }}',
           'draft: false',
-          'targetPath: charts/${{ parameters.name }}',
+          'targetPath: charts/workloads/${{ parameters.name }}',
+          'targetPath: deploy/dev',
         ],
       },
       {
@@ -54,7 +55,7 @@ describe('helm chart template contract', () => {
           'lifecycle: experimental',
           'backstage.io/kubernetes-id: ${{ values.name }}',
           `github.com/project-slug: ${repoSlug}`,
-          `backstage.io/source-location: url:${repoUrl}/tree/main/charts/` +
+          `backstage.io/source-location: url:${repoUrl}/tree/main/charts/workloads/` +
             '${{ values.name }}/',
         ],
       },
@@ -94,6 +95,8 @@ describe('helm chart decommission template contract', () => {
           'action: catalog:fetch',
           'action: fetch:plain',
           'action: fs:readdir',
+          'deploy/dev/\' + steps.fetchEntity.output.entity.metadata.name + \'.yaml',
+          'ArgoCD will detect the removal and prune the running release within ~3 minutes.',
           'draft: false',
         ],
       },
