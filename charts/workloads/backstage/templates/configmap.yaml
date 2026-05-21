@@ -7,7 +7,3 @@ metadata:
 data:
   app-config.runtime.yaml: |
     {{- .Values.appConfig | toYaml | nindent 4 }}
-  rbac-policies.csv: |
-    {{- .Values.rbac.policies | nindent 4 }}
-  users.yaml: |
-    {{- .Values.rbac.users | nindent 4 }}

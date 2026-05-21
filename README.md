@@ -184,9 +184,7 @@ kubectl label namespace backstage gateway-routes=enabled --overwrite --context k
 helm upgrade --install backstage charts/workloads/backstage \
   --namespace backstage --wait --timeout 5m \
   --kube-context kind-backstage \
-  -f deploy/dev/backstage.yaml \
-  --set-file rbac.policies=backstage/rbac-policies.csv \
-  --set-file rbac.users=users.yaml
+  -f deploy/dev/backstage.yaml
 ```
 
 **Namespace label requirement:** Any app fronting the shared edge-gateway must have its namespace labeled with `gateway-routes=enabled`. The Gateway uses a label-selector `allowedRoutes` policy — only HTTPRoutes in namespaces carrying this label are admitted. The Makefile applies this label automatically as part of `make smoke`.
@@ -233,9 +231,7 @@ When you make changes and need to redeploy:
 helm upgrade backstage charts/workloads/backstage \
   --namespace backstage --wait --timeout 5m \
   --kube-context kind-backstage \
-  -f deploy/dev/backstage.yaml \
-  --set-file rbac.policies=backstage/rbac-policies.csv \
-  --set-file rbac.users=users.yaml
+  -f deploy/dev/backstage.yaml
 ```
 
 ## Useful Commands

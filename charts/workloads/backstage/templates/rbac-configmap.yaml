@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "backstage.fullname" . }}-rbac
+  labels:
+    {{- include "backstage.labels" . | nindent 4 }}
+data:
+  rbac-policies.csv: |
+    {{- .Values.rbac.policies | nindent 4 }}
+  users.yaml: |
+    {{- .Values.rbac.users | nindent 4 }}

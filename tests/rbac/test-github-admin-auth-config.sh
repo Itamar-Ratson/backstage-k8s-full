@@ -51,8 +51,8 @@ assert_contains "dev values use GitHub App client secret env placeholder" "$dev_
 assert_contains "dev values use GitHub App ID env placeholder" "$dev_values" 'appId: ${APP_ID}'
 assert_contains "dev values use GitHub App private key env placeholder" "$dev_values" 'privateKey: ${PRIVATE_KEY}'
 assert_contains "dev values configure RBAC admin user" "$dev_values" "user:default/itamar-ratson"
-assert_contains "dev values override RBAC CSV path" "$dev_values" "/etc/backstage/rbac-policies.csv"
-assert_contains "dev values catalog users from mounted file" "$dev_values" "target: /etc/backstage/users.yaml"
+assert_contains "dev values override RBAC CSV path" "$dev_values" "/etc/backstage/rbac/rbac-policies.csv"
+assert_contains "dev values catalog users from mounted file" "$dev_values" "target: /etc/backstage/rbac/users.yaml"
 assert_contains "dev values reference GitHub App existing secret" "$dev_values" "existingSecret: backstage-github-app"
 assert_contains "chart values declare OAuth section" "$chart_values" "oauth:"
 assert_contains "chart values declare OAuth GitHub section" "$chart_values" "github:"

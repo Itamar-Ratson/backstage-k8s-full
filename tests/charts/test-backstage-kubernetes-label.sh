@@ -13,6 +13,7 @@ assert_contains "Backstage resources have kubernetes-id label" "$output" "backst
 for resource in \
   "name: backstage" \
   "name: backstage-app-config" \
+  "name: backstage-rbac" \
   "kind: ServiceAccount" \
   "kind: HTTPRoute" \
   "name: backstage-postgres" \
@@ -22,6 +23,6 @@ for resource in \
 done
 
 label_count=$(echo "$output" | grep -c "backstage.io/kubernetes-id: backstage" || true)
-assert_contains "kubernetes-id label appears on chart-rendered resources" "count:$label_count" "count:13"
+assert_contains "kubernetes-id label appears on chart-rendered resources" "count:$label_count" "count:14"
 
 report_results "Backstage Kubernetes labels"

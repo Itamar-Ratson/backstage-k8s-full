@@ -54,9 +54,7 @@ smoke: tf-check charts-lint charts-test
 	helm upgrade --install backstage charts/workloads/backstage \
 		--namespace $(BACKSTAGE_NS) --wait --timeout 5m \
 		--kube-context $(KUBE_CONTEXT) \
-		-f deploy/dev/backstage.yaml \
-		--set-file rbac.policies=backstage/rbac-policies.csv \
-		--set-file rbac.users=users.yaml
+		-f deploy/dev/backstage.yaml
 	kubectl wait --for=condition=Available deployment/backstage \
 		-n $(BACKSTAGE_NS) --timeout=300s --context $(KUBE_CONTEXT)
 	@echo "Verifying Backstage is reachable..."

@@ -1,7 +1,7 @@
 # This caller intentionally does not include these backstage/ files in the
 # image-build path filter:
-# - backstage/rbac-policies.csv: mounted through Helm --set-file, not baked into
-#   the container image.
+# - backstage/rbac-policies.csv: rendered into the chart's RBAC ConfigMap from
+#   deploy/dev/backstage.yaml, not baked into the container image.
 # - backstage/app-config*.yaml: runtime configuration is rendered by the chart
 #   from deploy/dev/backstage.yaml.
 # - backstage/catalog-info.yaml, backstage/mkdocs.yaml, and backstage/docs/**:

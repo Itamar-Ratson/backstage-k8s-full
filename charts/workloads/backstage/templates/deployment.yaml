@@ -15,6 +15,7 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/rbac-config: {{ include (print $.Template.BasePath "/rbac-configmap.yaml") . | sha256sum }}
       labels:
         {{- include "backstage.labels" . | nindent 8 }}
     spec:
@@ -66,6 +67,9 @@ spec:
             - name: app-config
               mountPath: /etc/backstage
               readOnly: true
+            - name: rbac-config
+              mountPath: /etc/backstage/rbac
+              readOnly: true
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- if .Values.probes.enabled }}
@@ -82,3 +86,6 @@ spec:
         - name: app-config
           configMap:
             name: {{ include "backstage.fullname" . }}-app-config
+        - name: rbac-config
+          configMap:
+            name: {{ include "backstage.fullname" . }}-rbac

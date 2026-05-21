@@ -7,8 +7,6 @@ echo "=== Backstage GitHub OAuth chart tests ==="
 
 dev_values_args=(
   -f deploy/dev/backstage.yaml
-  --set-file rbac.policies=backstage/rbac-policies.csv
-  --set-file rbac.users=users.yaml
 )
 
 dev_output=$(helm template backstage "$CHART_DIR" \
@@ -26,8 +24,8 @@ assert_contains "Runtime config has GitHub App client ID placeholder" "$dev_outp
 assert_contains "Runtime config has GitHub App client secret placeholder" "$dev_output" 'clientSecret: ${CLIENT_SECRET}'
 assert_contains "Runtime config has GitHub App private key placeholder" "$dev_output" 'privateKey: ${PRIVATE_KEY}'
 assert_contains "Runtime config has RBAC admin user" "$dev_output" "user:default/itamar-ratson"
-assert_contains "Runtime config has absolute RBAC CSV path" "$dev_output" "policies-csv-file: /etc/backstage/rbac-policies.csv"
-assert_contains "Runtime config targets mounted users catalog" "$dev_output" "target: /etc/backstage/users.yaml"
+assert_contains "Runtime config has absolute RBAC CSV path" "$dev_output" "policies-csv-file: /etc/backstage/rbac/rbac-policies.csv"
+assert_contains "Runtime config targets mounted users catalog" "$dev_output" "target: /etc/backstage/rbac/users.yaml"
 assert_contains "ConfigMap remains mounted at /etc/backstage" "$dev_output" "mountPath: /etc/backstage"
 assert_contains "ConfigMap volume mount remains read only" "$dev_output" "readOnly: true"
 
