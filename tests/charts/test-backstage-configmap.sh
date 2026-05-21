@@ -37,8 +37,8 @@ custom_output=$(helm template backstage "$CHART_DIR" \
 assert_contains "Custom baseUrl in ConfigMap" "$custom_output" "baseUrl: http://custom.example.com"
 
 # Test 6: Checksum changes when appConfig changes
-checksum1=$(echo "$output" | grep "checksum/config:" | awk '{print $2}')
-checksum2=$(echo "$custom_output" | grep "checksum/config:" | awk '{print $2}')
+checksum1=$(grep "checksum/config:" <<<"$output" | awk '{print $2}')
+checksum2=$(grep "checksum/config:" <<<"$custom_output" | awk '{print $2}')
 if [ "$checksum1" != "$checksum2" ]; then
   PASS=$((PASS + 1))
 else

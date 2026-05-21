@@ -14,14 +14,7 @@ cleanup() {
 trap cleanup EXIT
 
 assert_file_exists "wrapper Chart.yaml exists" "$CHART_DIR/Chart.yaml"
-
-if git check-ignore -q "$CHART_DIR/charts/argo-cd-9.5.15.tgz"; then
-  PASS=$((PASS + 1))
-else
-  FAIL=$((FAIL + 1))
-  echo "FAIL: dependency archive is gitignored"
-  echo "  expected ignored: $CHART_DIR/charts/argo-cd-9.5.15.tgz"
-fi
+assert_git_ignored "dependency archive is gitignored" "$CHART_DIR/charts/argo-cd-9.5.15.tgz"
 
 if output=$(helm dependency build "$CHART_DIR" 2>&1); then
   PASS=$((PASS + 1))

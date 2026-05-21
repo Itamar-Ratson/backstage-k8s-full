@@ -22,7 +22,7 @@ for resource in \
   assert_contains "Rendered output includes $resource" "$output" "$resource"
 done
 
-label_count=$(echo "$output" | grep -c "backstage.io/kubernetes-id: backstage" || true)
+label_count=$(grep -c "backstage.io/kubernetes-id: backstage" <<<"$output" || true)
 assert_contains "kubernetes-id label appears on chart-rendered resources" "count:$label_count" "count:14"
 
 report_results "Backstage Kubernetes labels"

@@ -78,6 +78,17 @@ assert_path_missing() {
   fi
 }
 
+assert_git_ignored() {
+  local label="$1" path="$2"
+  if git check-ignore -q "$path"; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  expected ignored: $path"
+  fi
+}
+
 report_results() {
   local suite="$1"
   echo ""

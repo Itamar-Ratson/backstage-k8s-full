@@ -42,14 +42,14 @@ echo "=== Postgres toggle tests ==="
 
 # Test 7: postgres.enabled=true renders Deployment, Service, PVC
 output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/postgres-create-true.yaml" 2>&1)
-deploy_count=$(echo "$output" | grep -c "kind: Deployment" || true)
+deploy_count=$(grep -c "kind: Deployment" <<<"$output" || true)
 assert_contains "postgres enabled has 2 Deployments" "count:$deploy_count" "count:2"
 assert_contains "postgres Service present" "$output" "name: postgres"
 assert_contains "postgres PVC present" "$output" "kind: PersistentVolumeClaim"
 
 # Test 8: postgres.enabled=false — no postgres Deployment, Service, PVC, or Secret
 output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/postgres-disabled.yaml" 2>&1)
-deploy_count=$(echo "$output" | grep -c "kind: Deployment" || true)
+deploy_count=$(grep -c "kind: Deployment" <<<"$output" || true)
 assert_contains "postgres disabled has 1 Deployment" "count:$deploy_count" "count:1"
 assert_not_contains "no PVC when postgres disabled" "$output" "kind: PersistentVolumeClaim"
 assert_not_contains "no postgres Secret when disabled" "$output" "POSTGRES_USER:"
