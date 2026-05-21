@@ -3,6 +3,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "backstage.fullname" . }}-postgres
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
   labels:
     {{- include "backstage.labels" . | nindent 4 }}
     app.kubernetes.io/component: postgres
