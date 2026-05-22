@@ -60,6 +60,7 @@ jobs:
           ./tests/charts/test-backstage-mkdocs-image-toolchain.sh
           ./tests/charts/test-backstage-techdocs-config.sh
           ./tests/charts/test-backstage-kubernetes-label.sh
+          ./tests/charts/test-backstage-httproute-defaults.sh
           ./tests/charts/test-backstage-rbac.sh
           ./tests/charts/test-edge-gateway-kubernetes-label.sh
           ./tests/charts/test-helm-chart-techdocs-scaffold.sh
