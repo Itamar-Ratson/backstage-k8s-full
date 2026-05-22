@@ -1,6 +1,6 @@
-# Helm Chart Template
+# Application Template
 
-The `helm-chart` Template scaffolds a new workload chart under `charts/workloads/<name>/`, adds a matching `deploy/dev/<name>.yaml` values file, and opens a pull request against this repository. Use it when a service needs the standard local-platform shape: a Deployment, Service, Gateway API `HTTPRoute`, catalog metadata, and a starter TechDocs site.
+The `application` Template scaffolds a new workload chart under `charts/workloads/<name>/`, adds a matching `deploy/dev/<name>.yaml` values file, and opens a pull request against this repository. Use it when a service needs the standard local-platform shape: a Deployment, Service, Gateway API `HTTPRoute`, catalog metadata, and a starter TechDocs site.
 
 ## Parameters
 
@@ -20,8 +20,8 @@ The template does not run deployment commands. It creates a pull request contain
 
 ## Pull Request Output
 
-When the scaffolder runs, it fetches `templates/helm-chart/skeleton`, renders every `.njk` file with the submitted values, and writes the result to `charts/workloads/<name>/`. It also renders the dev values skeleton to `deploy/dev/<name>.yaml`.
+When the scaffolder runs, it fetches `templates/application/skeleton`, renders every `.njk` file with the submitted values, and writes the result to `charts/workloads/<name>/`. It also renders the dev values skeleton to `deploy/dev/<name>.yaml`.
 
-The pull request branch is named `scaffold/helm-chart/<name>` and targets `main`. The PR description records the submitted name, description, owner, system, image, host, and port so reviewers can compare the rendered files with the form input.
+The pull request branch is named `scaffold/application/<name>` and targets `main`. The PR description records the submitted name, description, owner, system, image, host, and port so reviewers can compare the rendered files with the form input.
 
 After the PR is created, the Template output links directly to the GitHub pull request.

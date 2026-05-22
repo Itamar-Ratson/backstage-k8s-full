@@ -64,9 +64,9 @@ jobs:
           ./tests/charts/test-backstage-httproute-defaults.sh
           ./tests/charts/test-backstage-rbac.sh
           ./tests/charts/test-edge-gateway-kubernetes-label.sh
-          ./tests/charts/test-helm-chart-techdocs-scaffold.sh
-          ./tests/charts/test-helm-chart-kubernetes-scaffold.sh
-          ./tests/charts/test-ci-cd-pipeline-scaffold.sh
+          ./tests/charts/test-application-techdocs-scaffold.sh
+          ./tests/charts/test-application-kubernetes-scaffold.sh
+          ./tests/charts/test-ci-pipeline-scaffold.sh
           ./tests/charts/test-platform-argo-cd-renders.sh
           ./tests/charts/test-platform-envoy-gateway-renders.sh
           ./tests/gitops/test-platform-appset.sh

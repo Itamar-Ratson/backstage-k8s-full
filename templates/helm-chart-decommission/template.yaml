@@ -38,11 +38,11 @@ spec:
       name: Assert template marker
       action: util:assert
       input:
-        condition: ${{ steps.fetchEntity.output.entity.metadata.annotations['backstage.io/managed-by-template'] === 'helm-chart' }}
+        condition: ${{ steps.fetchEntity.output.entity.metadata.annotations['backstage.io/managed-by-template'] === 'application' }}
         message: >-
           Component `${{ parameters.component }}` is not eligible for helm chart
           decommission. Expected annotation
-          `backstage.io/managed-by-template: helm-chart`.
+          `backstage.io/managed-by-template: application`.
 
     - id: collectBlockingRelations
       name: Collect blocking dependents

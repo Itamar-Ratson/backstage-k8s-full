@@ -11,9 +11,9 @@ const repoRoot = path.resolve(__dirname, '../../../../');
 const repoSlug = 'Itamar-Ratson/backstage-k8s-full';
 const repoUrl = `https://github.com/${repoSlug}`;
 const catalogInfoPath = 'catalog-info.yaml';
-const chartTemplatePath = 'templates/helm-chart/template.yaml';
+const chartTemplatePath = 'templates/application/template.yaml';
 const decommissionTemplatePath = 'templates/helm-chart-decommission/template.yaml';
-const chartCatalogPath = 'templates/helm-chart/skeleton/catalog-info.yaml.njk';
+const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
 const readmePath = 'README.md';
 
 function readRepoFile(relativePath: string) {
@@ -28,22 +28,22 @@ function expectFileToContain(relativePath: string, snippets: readonly string[]) 
   }
 }
 
-describe('helm chart template contract', () => {
+describe('application template contract', () => {
   it('registers the template and publishes the expected scaffold', () => {
     const fileExpectations = [
       {
         path: catalogInfoPath,
         snippets: [
           'kind: Location',
-          `target: ${repoUrl}/blob/main/templates/helm-chart/template.yaml`,
+          `target: ${repoUrl}/blob/main/templates/application/template.yaml`,
         ],
       },
       {
         path: chartTemplatePath,
         snippets: [
           'kind: Template',
-          'title: New Helm Chart',
-          'branchName: scaffold/helm-chart/${{ parameters.name }}',
+          'title: New Application',
+          'branchName: scaffold/application/${{ parameters.name }}',
           'draft: false',
           'targetPath: charts/workloads/${{ parameters.name }}',
           'targetPath: deploy/dev',
@@ -66,7 +66,7 @@ describe('helm chart template contract', () => {
     }
 
     const readme = readRepoFile(readmePath);
-    const templateSection = '**Add the Helm chart scaffolder template**';
+    const templateSection = '**Add the application scaffolder template**';
     const techDocsSection = '**Set up TechDocs**';
     expect(readme).toContain(templateSection);
     expect(readme.indexOf(templateSection)).toBeLessThan(readme.indexOf(techDocsSection));
@@ -102,7 +102,7 @@ describe('helm chart decommission template contract', () => {
       },
       {
         path: chartCatalogPath,
-        snippets: ['backstage.io/managed-by-template: helm-chart'],
+        snippets: ['backstage.io/managed-by-template: application'],
       },
     ] as const;
 
@@ -111,8 +111,8 @@ describe('helm chart decommission template contract', () => {
     }
 
     const readme = readRepoFile(readmePath);
-    const templateSection = '**Add the Helm chart scaffolder template**';
-    const decommissionSection = '**Decommission a scaffolded Helm chart**';
+    const templateSection = '**Add the application scaffolder template**';
+    const decommissionSection = '**Decommission a scaffolded application**';
     const techDocsSection = '**Set up TechDocs**';
     expect(readme).toContain(decommissionSection);
     expect(readme.indexOf(templateSection)).toBeLessThan(
@@ -141,7 +141,7 @@ describe('helm chart decommission template contract', () => {
             entity: {
               metadata: {
                 name: 'test-01',
-                annotations: { 'backstage.io/managed-by-template': 'helm-chart' },
+                annotations: { 'backstage.io/managed-by-template': 'application' },
               },
             },
           },

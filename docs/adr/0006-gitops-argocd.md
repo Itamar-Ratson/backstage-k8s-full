@@ -73,7 +73,7 @@ Rejected alternatives:
 The `charts/` tree splits into two role-based subdirectories:
 
 - `charts/platform/` — infrastructure the cluster needs to host workloads. Few, hand-curated, sync-ordered. Today: `envoy-gateway` (vendored wrapper), `argo-cd` (vendored wrapper for self-management), `edge-gateway` (local).
-- `charts/workloads/` — applications running on top of the platform. Many, convention-shaped, parallel-deployable. Today: `backstage`. Future: any chart produced by the `helm-chart` Backstage scaffolder template.
+- `charts/workloads/` — applications running on top of the platform. Many, convention-shaped, parallel-deployable. Today: `backstage`. Future: any chart produced by the `application` Backstage scaffolder template.
 
 Rejected alternatives:
 
@@ -144,7 +144,7 @@ Without these, ArgoCD treats Gateway/HTTPRoute as Healthy on creation, and sync-
 
 Sync options applied at the platform ApplicationSet level: `CreateNamespace=true`, `ServerSideApply=true` (Gateway API resources have multiple controllers writing status; server-side apply avoids spurious diffs).
 
-The Backstage chart's Postgres `PersistentVolumeClaim` template carries `argocd.argoproj.io/sync-options: Prune=false` so an accidental decommission cannot wipe the dev database. The `helm-chart` scaffolder template encodes the same convention for PVCs in scaffolded stateful workloads.
+The Backstage chart's Postgres `PersistentVolumeClaim` template carries `argocd.argoproj.io/sync-options: Prune=false` so an accidental decommission cannot wipe the dev database. The `application` scaffolder template encodes the same convention for PVCs in scaffolded stateful workloads.
 
 Rejected alternatives:
 
@@ -180,7 +180,7 @@ Rejected alternatives:
 
 - Fresh-clone bootstrap collapses to: install tools; create a GitHub App in the UI; fill `terraform/terraform.tfvars`; `cd terraform && terraform apply`; visit `http://backstage.localtest.me:8080` when the workloads `backstage` Application reports Healthy in `kubectl get applications -n argocd`. The README's prior eight numbered steps shrink to five.
 - The `helm-chart-decommission` scaffolder template's loop fully closes. Merging a decommission PR removes the chart directory from `charts/workloads/<name>/`; the Git directory generator stops producing the Application; the finalizer prunes its resources; the running Helm release is gone. The README's "until ArgoCD lands" caveat is removed.
-- The `helm-chart` scaffolder template's output deploys without intervention: any chart it produces under `charts/workloads/<name>/` with a sibling `deploy/dev/<name>.yaml` is auto-discovered by the workloads ApplicationSet on the next reconcile.
+- The `application` scaffolder template's output deploys without intervention: any chart it produces under `charts/workloads/<name>/` with a sibling `deploy/dev/<name>.yaml` is auto-discovered by the workloads ApplicationSet on the next reconcile.
 - The two-chart pattern from ADR-0002 extends to four charts. The `existingSecret`-based Hybrid Secrets pattern from ADR-0002 carries through; only the Secret name and shape change, and only the `existingSecret: false` rendering path is exercised under GitOps.
 - The Backstage RBAC Secret pattern from ADR-0005 is preserved in shape (Backstage reads credentials from a Kubernetes Secret via `existingSecret`). The Secret's identity changes from a pair (`backstage-github-token`, `backstage-github-oauth`) to a single `backstage-github-app`, and its content changes from PAT + OAuth credentials to GitHub App App ID + private key + client ID + client secret.
 - The Backstage chart's `--set-file rbac.policies=...` and `--set-file rbac.users=...` invocations are eliminated. The chart consumes RBAC content from a sibling ConfigMap (rendered from values in `deploy/dev/backstage.yaml` or from a separate manifest in `gitops/dev/`), because ArgoCD's Helm source has no `--set-file` equivalent.

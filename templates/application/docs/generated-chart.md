@@ -28,7 +28,7 @@ The scaffolded chart follows the repo's local platform conventions:
 - The Service and container both use the submitted `port` value with a named `http` target port.
 - The `HTTPRoute` attaches to the shared `edge-gateway` Gateway in the `gateway` namespace.
 - The default hostname is `<name>.localtest.me`, matching the local Envoy Gateway wildcard listener.
-- The generated Component is marked `lifecycle: experimental` and includes `backstage.io/managed-by-template: helm-chart`.
+- The generated Component is marked `lifecycle: experimental` and includes `backstage.io/managed-by-template: application`.
 - The generated Component includes `backstage.io/techdocs-ref: dir:.`, so its co-located docs site can appear in Backstage.
 
 ## Before Merge

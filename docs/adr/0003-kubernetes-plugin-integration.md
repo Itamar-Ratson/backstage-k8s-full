@@ -8,7 +8,7 @@ Accepted
 
 Backstage already had the Kubernetes backend plugin imported, but no cluster was configured, the frontend plugin was not explicitly registered, and the in-cluster ServiceAccount did not have the read permissions the plugin needs. Catalog entities also needed a stable way to match Backstage Components to Kubernetes resources.
 
-Two modeling gaps blocked useful entity-level views. `edge-gateway` was cataloged as a Resource, but the new alpha frontend attaches Kubernetes content to Component pages by default. The `helm-chart` Software Template already emitted `backstage.io/kubernetes-id` on scaffolded Components, but its chart skeleton did not apply the matching label to rendered resources.
+Two modeling gaps blocked useful entity-level views. `edge-gateway` was cataloged as a Resource, but the new alpha frontend attaches Kubernetes content to Component pages by default. The `application` Software Template already emitted `backstage.io/kubernetes-id` on scaffolded Components, but its chart skeleton did not apply the matching label to rendered resources.
 
 This ADR records the decisions that closed PRD #35 and documents the work intentionally left out of this slice.
 
@@ -110,7 +110,7 @@ The `edge-gateway` Component's Kubernetes tab includes chart-rendered resources 
 ## Consequences
 
 - Operators can open Kubernetes views for the `backstage` and `edge-gateway` Components.
-- Charts scaffolded from the `helm-chart` Software Template inherit the catalog annotation and rendered-resource label needed for a working Kubernetes tab.
+- Charts scaffolded from the `application` Software Template inherit the catalog annotation and rendered-resource label needed for a working Kubernetes tab.
 - Local app development remains disconnected from the in-cluster Kubernetes API unless environment values are layered in.
 - Chart-managed RBAC is self-contained for KinD and can be disabled for platform-admin-managed environments.
 - The selector immutability rule from ADR-0002 remains intact because Kubernetes plugin labels are not selector labels.

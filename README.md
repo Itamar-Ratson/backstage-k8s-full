@@ -60,7 +60,7 @@ sudo apt-get install -y python3 g++ build-essential
 
 Terraform creates the KinD cluster, the Backstage namespace, the `backstage-github-app` Secret, the ArgoCD seed install, and the root ArgoCD Application. ArgoCD then reconciles platform charts from `charts/platform/` and workloads from `charts/workloads/`.
 
-The dev overlay pulls Backstage from GHCR using the tag in `deploy/dev/backstage.yaml`. The CI/CD image build workflow updates that tag after a successful image build. GHCR packages default to private after the first push; set package visibility to public once per package so the local cluster can pull without image pull secrets.
+The dev overlay pulls Backstage from GHCR using the tag in `deploy/dev/backstage.yaml`. The CI image build workflow updates that tag after a successful image build. GHCR packages default to private after the first push; set package visibility to public once per package so the local cluster can pull without image pull secrets.
 
 ## Verifying Images
 
@@ -168,9 +168,9 @@ cd terraform && terraform destroy
 
 1. **Define a production auth target** — The kind deployment now carries the supported GitHub App auth path. A production deployment still needs HTTPS callbacks, environment-specific GitHub Apps, and a decision on guest auth. See the [Authentication documentation](https://backstage.io/docs/auth/).
 
-2. **Add the Helm chart scaffolder template** — Use the `helm-chart` template to scaffold new workload charts and publish them as pull requests instead of copying chart files by hand. Merged charts under `charts/workloads/` are discovered by the workloads ApplicationSet.
+2. **Add the application scaffolder template** — Use the `application` template to scaffold new deployable applications and publish them as pull requests instead of copying chart files by hand. Merged charts under `charts/workloads/` are discovered by the workloads ApplicationSet.
 
-3. **Decommission a scaffolded Helm chart** — Use the `helm-chart-decommission` template to select a catalog Component, verify it was created by `helm-chart`, block removal when dependents still reference it, and open a PR deleting `charts/workloads/<name>/` plus `deploy/dev/<name>.yaml`. Merging that PR lets ArgoCD prune the running release.
+3. **Decommission a scaffolded application** — Use the `helm-chart-decommission` template to select a catalog Component, verify it was created by `application`, block removal when dependents still reference it, and open a PR deleting `charts/workloads/<name>/` plus `deploy/dev/<name>.yaml`. Merging that PR lets ArgoCD prune the running release.
 
 4. **Set up TechDocs** — Add `backstage.io/techdocs-ref` annotations and enable documentation generation and viewing.
 

@@ -5,7 +5,7 @@
 The first step fetches the selected catalog entity with `catalog:fetch`. The next step asserts that the entity was created by the supported template:
 
 ```yaml
-backstage.io/managed-by-template: helm-chart
+backstage.io/managed-by-template: application
 ```
 
 If the annotation is missing or has a different value, the Template stops before reading repository files or opening a pull request. This prevents the flow from deleting arbitrary chart directories for Components that do not follow the scaffolded chart layout.

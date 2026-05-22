@@ -4,15 +4,16 @@ set -euo pipefail
 # shellcheck source=helpers.sh
 source tests/charts/helpers.sh
 
-SKELETON_DIR="templates/helm-chart/skeleton"
-TEMPLATE="$(cat templates/helm-chart/template.yaml)"
+SKELETON_DIR="templates/application/skeleton"
+TEMPLATE="$(cat templates/application/template.yaml)"
 MKDOCS_TEMPLATE="$(cat "$SKELETON_DIR/mkdocs.yaml.njk" 2>/dev/null || true)"
 DOCS_INDEX_TEMPLATE="$(cat "$SKELETON_DIR/docs/index.md.njk" 2>/dev/null || true)"
 CATALOG_TEMPLATE="$(cat "$SKELETON_DIR/catalog-info.yaml.njk")"
 
-echo "=== Helm chart TechDocs scaffold tests ==="
+echo "=== Application TechDocs scaffold tests ==="
 
 assert_contains "template targets workload chart path" "$TEMPLATE" 'targetPath: charts/workloads/${{ parameters.name }}'
+assert_contains "template title is user-facing" "$TEMPLATE" "title: New Application"
 assert_contains "mkdocs scaffold inherits shared base" "$MKDOCS_TEMPLATE" "INHERIT: ../../shared-mkdocs-base.yml"
 assert_contains "mkdocs scaffold uses chart name" "$MKDOCS_TEMPLATE" 'site_name: '\''${{ values.name }}'\'''
 assert_contains "mkdocs scaffold sets docs dir" "$MKDOCS_TEMPLATE" "docs_dir: docs"
@@ -35,4 +36,4 @@ fi
 assert_contains "catalog scaffold has techdocs annotation" "$CATALOG_TEMPLATE" "backstage.io/techdocs-ref: dir:."
 assert_contains "catalog source-location uses workload path" "$CATALOG_TEMPLATE" 'tree/main/charts/workloads/${{ values.name }}/'
 
-report_results "Helm chart TechDocs scaffold"
+report_results "Application TechDocs scaffold"

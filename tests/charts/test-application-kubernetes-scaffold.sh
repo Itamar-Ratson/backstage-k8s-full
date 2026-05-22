@@ -4,16 +4,18 @@ set -euo pipefail
 # shellcheck source=helpers.sh
 source tests/charts/helpers.sh
 
-SKELETON_DIR="templates/helm-chart/skeleton"
-TEMPLATE="$(cat templates/helm-chart/template.yaml)"
+SKELETON_DIR="templates/application/skeleton"
+TEMPLATE="$(cat templates/application/template.yaml)"
 HELPERS_TEMPLATE="$(cat "$SKELETON_DIR/templates/_helpers.tpl")"
 CATALOG_TEMPLATE="$(cat "$SKELETON_DIR/catalog-info.yaml.njk")"
-DEPLOY_TEMPLATE="$(cat "templates/helm-chart/skeleton-values/\${{ values.name }}.yaml.njk" 2>/dev/null || true)"
+DEPLOY_TEMPLATE="$(cat "templates/application/skeleton-values/\${{ values.name }}.yaml.njk" 2>/dev/null || true)"
 
-echo "=== Helm chart Kubernetes scaffold tests ==="
+echo "=== Application Kubernetes scaffold tests ==="
 
 assert_contains "template targets workload chart path" "$TEMPLATE" 'targetPath: charts/workloads/${{ parameters.name }}'
 assert_contains "template emits dev values file" "$TEMPLATE" "targetPath: deploy/dev"
+assert_contains "template name is application" "$TEMPLATE" "name: application"
+assert_contains "catalog records application template" "$CATALOG_TEMPLATE" "backstage.io/managed-by-template: application"
 assert_contains "dev values skeleton contains image" "$DEPLOY_TEMPLATE" 'image: ${{ values.image }}'
 assert_contains "dev values skeleton contains host" "$DEPLOY_TEMPLATE" 'host: ${{ values.host }}'
 assert_contains "dev values skeleton contains port" "$DEPLOY_TEMPLATE" 'port: ${{ values.port }}'
@@ -21,4 +23,4 @@ assert_contains "helpers scaffold emits kubernetes-id label" "$HELPERS_TEMPLATE"
 assert_contains "catalog scaffold has kubernetes-id annotation" "$CATALOG_TEMPLATE" 'backstage.io/kubernetes-id: ${{ values.name }}'
 assert_contains "catalog source-location uses workload path" "$CATALOG_TEMPLATE" 'tree/main/charts/workloads/${{ values.name }}/'
 
-report_results "Helm chart Kubernetes scaffold"
+report_results "Application Kubernetes scaffold"
