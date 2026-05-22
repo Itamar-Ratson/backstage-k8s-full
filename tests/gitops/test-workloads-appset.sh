@@ -29,7 +29,7 @@ assert_contains "source uses workload chart path" "$appset" "path: '{{.path.path
 assert_contains "source uses matching dev values file" "$appset" "/deploy/dev/{{.path.basename}}.yaml"
 assert_contains "destination namespace uses basename" "$appset" "namespace: '{{.path.basename}}'"
 assert_contains "sync-wave is zero" "$appset" 'argocd.argoproj.io/sync-wave: "0"'
-assert_contains "CreateNamespace sync option is enabled" "$appset" "CreateNamespace=true"
+assert_not_contains "CreateNamespace sync option is disabled (workload charts own their namespace)" "$appset" "CreateNamespace=true"
 assert_contains "ServerSideApply sync option is enabled" "$appset" "ServerSideApply=true"
 assert_contains "automated prune is enabled" "$appset" "prune: true"
 assert_contains "automated self-heal is enabled" "$appset" "selfHeal: true"
