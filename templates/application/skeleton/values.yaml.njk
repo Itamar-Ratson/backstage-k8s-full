@@ -3,7 +3,10 @@ fullnameOverride: ""
 
 replicaCount: 1
 
-image: ${{ values.image }}
+image:
+  repository: ${{ values.repository }}
+  tag: ${{ values.tag }}
+  pullPolicy: IfNotPresent
 
 host: ${{ values.host }}
 port: ${{ values.port }}

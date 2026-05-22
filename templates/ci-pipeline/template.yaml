@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: ci-pipeline
   title: New CI Pipeline
-  description: Create an application CI pipeline and deploy value bump file.
+  description: Create an application CI pipeline and deploy value bump file. It composes with the application template in either order by owning only the environment override file.
   tags:
     - github-actions
     - ci

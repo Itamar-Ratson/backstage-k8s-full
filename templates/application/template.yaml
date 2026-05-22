@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: application
   title: New Application
-  description: Create a deployable application and catalog entry as a pull request.
+  description: Create a deployable application chart and catalog entry. It can run from chart defaults, and the ci-pipeline template can add an environment override file later.
   annotations:
     backstage.io/techdocs-ref: dir:.
   tags:
@@ -20,7 +20,8 @@ spec:
         - description
         - owner
         - system
-        - image
+        - repository
+        - tag
       properties:
         name:
           title: Name
@@ -50,11 +51,16 @@ spec:
           ui:options:
             allowedKinds:
               - System
-        image:
-          title: Image
+        repository:
+          title: Image repository
           type: string
-          description: Container image to run, as repo:tag.
-          default: nginx:latest
+          description: Container image repository to run.
+          default: ghcr.io/itamar-ratson/backstage-k8s-full/${{ parameters.name }}
+        tag:
+          title: Image tag
+          type: string
+          description: Container image tag to run until a ci-pipeline override bumps it.
+          default: latest
         host:
           title: Host
           type: string
@@ -77,22 +83,8 @@ spec:
           description: ${{ parameters.description }}
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
-          image: ${{ parameters.image }}
-          host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
-          port: ${{ parameters.port }}
-    - id: fetchDevValues
-      name: Fetch dev values
-      action: fetch:template
-      input:
-        url: ./skeleton-values
-        targetPath: deploy/dev
-        templateFileExtension: '.njk'
-        values:
-          name: ${{ parameters.name }}
-          description: ${{ parameters.description }}
-          owner: ${{ parameters.owner }}
-          system: ${{ parameters.system }}
-          image: ${{ parameters.image }}
+          repository: ${{ parameters.repository }}
+          tag: ${{ parameters.tag }}
           host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
           port: ${{ parameters.port }}
     - id: publishPullRequest
@@ -110,7 +102,8 @@ spec:
           - Description: `${{ parameters.description }}`
           - Owner: `${{ parameters.owner }}`
           - System: `${{ parameters.system }}`
-          - Image: `${{ parameters.image }}`
+          - Image repository: `${{ parameters.repository }}`
+          - Image tag: `${{ parameters.tag }}`
           - Host: `${{ parameters.host or (parameters.name + '.localtest.me') }}`
           - Port: `${{ parameters.port }}`
 

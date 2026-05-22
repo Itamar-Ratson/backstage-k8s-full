@@ -66,9 +66,11 @@ jobs:
           ./tests/charts/test-edge-gateway-kubernetes-label.sh
           ./tests/charts/test-application-techdocs-scaffold.sh
           ./tests/charts/test-application-kubernetes-scaffold.sh
+          ./tests/charts/test-application-image-renders.sh
           ./tests/charts/test-ci-pipeline-scaffold.sh
           ./tests/charts/test-platform-argo-cd-renders.sh
           ./tests/charts/test-platform-envoy-gateway-renders.sh
+          ./tests/charts/test-workloads-appset-ignore-missing-value-files.sh
           ./tests/gitops/test-platform-appset.sh
           ./tests/gitops/test-workloads-appset.sh
       - name: rbac-test

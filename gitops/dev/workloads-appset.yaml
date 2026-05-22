@@ -25,6 +25,7 @@ spec:
         targetRevision: main
         path: '{{.path.path}}'
         helm:
+          ignoreMissingValueFiles: true
           valueFiles:
             - /deploy/dev/{{.path.basename}}.yaml
       destination:

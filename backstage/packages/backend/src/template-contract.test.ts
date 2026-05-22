@@ -46,7 +46,8 @@ describe('application template contract', () => {
           'branchName: scaffold/application/${{ parameters.name }}',
           'draft: false',
           'targetPath: charts/workloads/${{ parameters.name }}',
-          'targetPath: deploy/dev',
+          'repository: ${{ parameters.repository }}',
+          'tag: ${{ parameters.tag }}',
         ],
       },
       {
@@ -54,7 +55,7 @@ describe('application template contract', () => {
         snippets: [
           'lifecycle: experimental',
           'backstage.io/kubernetes-id: ${{ values.name }}',
-          `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}","deploy/dev/\${{ values.name }}.yaml"]'`,
+          `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}"]'`,
           `github.com/project-slug: ${repoSlug}`,
           `backstage.io/source-location: url:${repoUrl}/tree/main/charts/workloads/` +
             '${{ values.name }}/',
@@ -109,7 +110,7 @@ describe('generic decommission component template contract', () => {
         path: chartCatalogPath,
         snippets: [
           'backstage.io/managed-by-template: application',
-          `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}","deploy/dev/\${{ values.name }}.yaml"]'`,
+          `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}"]'`,
         ],
       },
     ] as const;
