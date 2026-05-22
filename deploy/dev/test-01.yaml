@@ -1,0 +1,7 @@
+image: nginx:latest
+host: test-01.localtest.me
+port: 80
+
+gateway:
+  name: edge-gateway
+  namespace: gateway
