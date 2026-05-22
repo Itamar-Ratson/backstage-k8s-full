@@ -53,7 +53,8 @@
     "pg": "^8.11.3"
   },
   "devDependencies": {
-    "@backstage/cli": "^0.36.1"
+    "@backstage/cli": "^0.36.1",
+    "nunjucks": "^3.2.3"
   },
   "files": [
     "dist"

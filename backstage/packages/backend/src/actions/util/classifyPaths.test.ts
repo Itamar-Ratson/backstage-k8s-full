@@ -1,7 +1,17 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import type { ActionContext } from '@backstage/plugin-scaffolder-node';
 import { createClassifyPathsAction } from './classifyPaths';
+
+type ClassifyPathsInput = {
+  paths: string[];
+};
+
+type ClassifyPathsOutput = {
+  files: string[];
+  directories: string[];
+};
 
 function createActionContext(workspacePath: string, paths: string[]) {
   const outputs: Record<string, unknown> = {};
@@ -11,7 +21,7 @@ function createActionContext(workspacePath: string, paths: string[]) {
     output: (name: string, value: unknown) => {
       outputs[name] = value;
     },
-  } as any;
+  } as ActionContext<ClassifyPathsInput, ClassifyPathsOutput>;
   return { ctx, outputs };
 }
 

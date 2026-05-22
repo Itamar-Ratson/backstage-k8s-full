@@ -2,6 +2,14 @@ import { createTemplateAction } from '@backstage/plugin-scaffolder-node';
 
 const parseJsonArrayActionId = 'util:parseJsonArray';
 
+function isNonEmptyStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every(item => typeof item === 'string' && item.length > 0)
+  );
+}
+
 export function createParseJsonArrayAction() {
   return createTemplateAction({
     id: parseJsonArrayActionId,
@@ -28,11 +36,7 @@ export function createParseJsonArrayAction() {
         );
       }
 
-      if (
-        !Array.isArray(parsed) ||
-        parsed.length === 0 ||
-        parsed.some(item => typeof item !== 'string' || item.length === 0)
-      ) {
+      if (!isNonEmptyStringArray(parsed)) {
         throw new Error('Expected a JSON-encoded non-empty string array.');
       }
 

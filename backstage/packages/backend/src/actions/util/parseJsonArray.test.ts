@@ -1,4 +1,14 @@
+import type { ActionContext } from '@backstage/plugin-scaffolder-node';
 import { createParseJsonArrayAction } from './parseJsonArray';
+
+type ParseJsonArrayInput = {
+  value: string;
+};
+
+type ParseJsonArrayOutput = {
+  items: string[];
+  count: number;
+};
 
 function createActionContext(value: string) {
   const outputs: Record<string, unknown> = {};
@@ -7,7 +17,7 @@ function createActionContext(value: string) {
     output: (name: string, outputValue: unknown) => {
       outputs[name] = outputValue;
     },
-  } as any;
+  } as ActionContext<ParseJsonArrayInput, ParseJsonArrayOutput>;
   return { ctx, outputs };
 }
 

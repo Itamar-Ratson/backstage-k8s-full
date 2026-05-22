@@ -26,7 +26,7 @@ fi
 
 for template_dir in "${template_dirs[@]}"; do
   slug="$(basename "$template_dir")"
-  if [[ "$slug" =~ ^[a-z][a-z0-9-]*$ || "$slug" =~ ^(decommission)-[a-z][a-z0-9-]*$ ]]; then
+  if [[ "$slug" =~ ^[a-z][a-z0-9-]*$ ]]; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))

@@ -1,4 +1,14 @@
+import type { ActionContext } from '@backstage/plugin-scaffolder-node';
 import { createConcatStringArraysAction } from './concatStringArrays';
+
+type ConcatStringArraysInput = {
+  arrays: string[][];
+};
+
+type ConcatStringArraysOutput = {
+  files: string[];
+  count: number;
+};
 
 function createActionContext(arrays: string[][]) {
   const outputs: Record<string, unknown> = {};
@@ -7,7 +17,7 @@ function createActionContext(arrays: string[][]) {
     output: (name: string, value: unknown) => {
       outputs[name] = value;
     },
-  } as any;
+  } as ActionContext<ConcatStringArraysInput, ConcatStringArraysOutput>;
   return { ctx, outputs };
 }
 
