@@ -62,6 +62,10 @@ backend.add(import('@backstage/plugin-kubernetes-backend'));
 
 // notifications and signals plugins
 backend.add(import('@backstage/plugin-notifications-backend'));
+// Backstage 1.50 uses an in-memory events broker by default. This matches the
+// current single-replica backstage workload; scaling past replicaCount: 1 needs
+// a persistent broker module so events route across backend replicas.
+backend.add(import('@backstage/plugin-events-backend'));
 backend.add(import('@backstage/plugin-signals-backend'));
 
 // mcp actions plugin
