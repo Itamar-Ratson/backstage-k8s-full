@@ -10,12 +10,16 @@ assert_file_exists "root Application manifest exists" "terraform/bootstrap/root-
 assert_file_exists "tfvars example exists" "terraform/terraform.tfvars.example"
 
 terraform_config=$(find terraform -name '*.tf' -type f -print0 | xargs -0 sed -n '1,$p')
+argocd_namespace_config=$(awk '/resource "kubernetes_namespace_v1" "argocd"/,/depends_on = \[kind_cluster.this\]/' terraform/cluster.tf)
 
 assert_contains "ArgoCD seed helm release exists" "$terraform_config" 'resource "helm_release" "argocd"'
 assert_contains "ArgoCD release ignores self-managed drift" "$terraform_config" "ignore_changes = [version, values]"
 assert_contains "root app loaded from manifest file" "$terraform_config" 'yamldecode(file("${path.module}/bootstrap/root-app.yaml"))'
 assert_contains "backstage namespace is managed" "$terraform_config" 'resource "kubernetes_namespace_v1" "backstage"'
 assert_contains "backstage namespace has gateway opt-in label" "$terraform_config" 'gateway-routes = "enabled"'
+assert_contains "argocd namespace is managed" "$terraform_config" 'resource "kubernetes_namespace_v1" "argocd"'
+assert_contains "argocd namespace has gateway opt-in label" "$argocd_namespace_config" 'gateway-routes = "enabled"'
+assert_contains "ArgoCD helm release uses managed namespace" "$terraform_config" 'namespace        = kubernetes_namespace_v1.argocd.metadata[0].name'
 assert_contains "GitHub App secret is managed" "$terraform_config" 'resource "kubernetes_secret_v1" "backstage_github_app"'
 assert_contains "GitHub App private key is sensitive" "$terraform_config" 'variable "PRIVATE_KEY"'
 assert_not_contains "Envoy Gateway helm release removed" "$terraform_config" 'resource "helm_release" "gateway"'

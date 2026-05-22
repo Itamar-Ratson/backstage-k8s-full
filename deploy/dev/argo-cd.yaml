@@ -1,34 +1,37 @@
-configs:
-  cm:
-    resource.customizations.health.networking.k8s.io_Gateway: |
-      hs = {}
-      hs.status = "Progressing"
-      hs.message = "Waiting for Gateway Programmed=True"
-      if obj.status ~= nil and obj.status.conditions ~= nil then
-        for _, condition in ipairs(obj.status.conditions) do
-          if condition.type == "Programmed" and condition.status == "True" then
-            hs.status = "Healthy"
-            hs.message = condition.message or "Gateway is programmed"
-            return hs
+argo-cd:
+  configs:
+    cm:
+      resource.customizations.health.networking.k8s.io_Gateway: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = "Waiting for Gateway Programmed=True"
+        if obj.status ~= nil and obj.status.conditions ~= nil then
+          for _, condition in ipairs(obj.status.conditions) do
+            if condition.type == "Programmed" and condition.status == "True" then
+              hs.status = "Healthy"
+              hs.message = condition.message or "Gateway is programmed"
+              return hs
+            end
           end
         end
-      end
-      return hs
-    resource.customizations.health.networking.k8s.io_HTTPRoute: |
-      hs = {}
-      hs.status = "Progressing"
-      hs.message = "Waiting for HTTPRoute Accepted=True"
-      if obj.status ~= nil and obj.status.parents ~= nil then
-        for _, parent in ipairs(obj.status.parents) do
-          if parent.conditions ~= nil then
-            for _, condition in ipairs(parent.conditions) do
-              if condition.type == "Accepted" and condition.status == "True" then
-                hs.status = "Healthy"
-                hs.message = condition.message or "HTTPRoute is accepted"
-                return hs
+        return hs
+      resource.customizations.health.networking.k8s.io_HTTPRoute: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = "Waiting for HTTPRoute Accepted=True"
+        if obj.status ~= nil and obj.status.parents ~= nil then
+          for _, parent in ipairs(obj.status.parents) do
+            if parent.conditions ~= nil then
+              for _, condition in ipairs(parent.conditions) do
+                if condition.type == "Accepted" and condition.status == "True" then
+                  hs.status = "Healthy"
+                  hs.message = condition.message or "HTTPRoute is accepted"
+                  return hs
+                end
               end
             end
           end
         end
-      end
-      return hs
+        return hs
+    params:
+      server.insecure: true

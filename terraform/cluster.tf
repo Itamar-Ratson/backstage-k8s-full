@@ -33,6 +33,18 @@ resource "kubernetes_namespace_v1" "backstage" {
   depends_on = [kind_cluster.this]
 }
 
+resource "kubernetes_namespace_v1" "argocd" {
+  metadata {
+    name = "argocd"
+
+    labels = {
+      gateway-routes = "enabled"
+    }
+  }
+
+  depends_on = [kind_cluster.this]
+}
+
 resource "kubernetes_secret_v1" "backstage_github_app" {
   metadata {
     name      = "backstage-github-app"
@@ -54,14 +66,14 @@ resource "helm_release" "argocd" {
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
   version          = "9.5.15"
-  namespace        = "argocd"
-  create_namespace = true
+  namespace        = kubernetes_namespace_v1.argocd.metadata[0].name
+  create_namespace = false
 
   lifecycle {
     ignore_changes = [version, values]
   }
 
-  depends_on = [kind_cluster.this]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
 
 resource "kubectl_manifest" "root_app" {

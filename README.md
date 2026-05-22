@@ -95,6 +95,13 @@ Open <http://backstage.localtest.me:8080> in your browser. No port-forwarding is
 
 You should see both `Guest` and `GitHub` sign-in options.
 
+Open ArgoCD at <http://argocd.localtest.me:8080>. The username is `admin`; retrieve the initial password with:
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d && echo
+```
+
 ## Operations
 
 **Force a sync during debugging:** the local KinD cluster has no GitHub webhook receiver, so use ArgoCD as the escape hatch when you do not want to wait for polling:
@@ -145,6 +152,7 @@ kubectl rollout restart deployment backstage -n backstage
 # Check Gateway status
 kubectl get gateway -n gateway
 kubectl get httproute -n backstage
+kubectl get httproute -n argocd
 
 # View Envoy Gateway controller logs
 kubectl logs -n envoy-gateway-system deploy/envoy-gateway

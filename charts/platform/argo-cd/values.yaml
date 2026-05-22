@@ -1,1 +1,9 @@
-{}
+hostname: argocd.localtest.me
+
+gateway:
+  name: edge-gateway
+  namespace: gateway
+
+service:
+  name: argo-cd-argocd-server
+  port: 80
