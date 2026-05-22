@@ -170,7 +170,7 @@ cd terraform && terraform destroy
 
 2. **Add the application scaffolder template** — Use the `application` template to scaffold new deployable applications and publish them as pull requests instead of copying chart files by hand. Merged charts under `charts/workloads/` are discovered by the workloads ApplicationSet.
 
-3. **Decommission a scaffolded application** — Use the `helm-chart-decommission` template to select a catalog Component, verify it was created by `application`, block removal when dependents still reference it, and open a PR deleting `charts/workloads/<name>/` plus `deploy/dev/<name>.yaml`. Merging that PR lets ArgoCD prune the running release.
+3. **Decommission a scaffolded application** — Use the `decommission-component` template to select a catalog Component, verify it was created by a scaffolder template, block removal when dependents still reference it, and open a PR deleting the paths recorded in `backstage.io/source-paths`. Merging that PR lets ArgoCD prune the running resources.
 
 4. **Set up TechDocs** — Add `backstage.io/techdocs-ref` annotations and enable documentation generation and viewing.
 

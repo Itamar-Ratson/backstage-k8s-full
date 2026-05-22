@@ -14,7 +14,7 @@ The local KinD environment previously bootstrapped through a smoke target, which
 
 This works for a single environment with one operator, but four gaps compound:
 
-- The `helm-chart-decommission` scaffolder template opens a PR deleting `charts/<name>/`, but the running Helm release is not uninstalled. The template's PR description warns the operator to run `helm uninstall <name> -n <namespace>` manually. The README's Next Steps document this as the "until ArgoCD lands" gap.
+- The old chart-specific decommission scaffolder template opened a PR deleting `charts/<name>/`, but the running Helm release was not uninstalled. The template's PR description warned the operator to run `helm uninstall <name> -n <namespace>` manually. The README's Next Steps documented this as the "until ArgoCD lands" gap.
 - The `helm-chart` scaffolder template produces charts in `charts/<name>/` that nothing deploys. Each scaffolded chart requires a follow-up manual `helm install`.
 - Bootstrap is imperative and multi-step: two manual Secrets (`backstage-github-token`, `backstage-github-oauth`) via `kubectl create secret`, `terraform apply`, two `helm upgrade --install`s, namespace creation, namespace labeling, secret existence checks, then a Deployment wait.
 - Drift between Git and the running cluster is invisible. A failed imperative smoke retry can leave half-deployed state. No dashboard, no audit trail, no self-healing.
@@ -179,7 +179,7 @@ Rejected alternatives:
 ## Consequences
 
 - Fresh-clone bootstrap collapses to: install tools; create a GitHub App in the UI; fill `terraform/terraform.tfvars`; `cd terraform && terraform apply`; visit `http://backstage.localtest.me:8080` when the workloads `backstage` Application reports Healthy in `kubectl get applications -n argocd`. The README's prior eight numbered steps shrink to five.
-- The `helm-chart-decommission` scaffolder template's loop fully closes. Merging a decommission PR removes the chart directory from `charts/workloads/<name>/`; the Git directory generator stops producing the Application; the finalizer prunes its resources; the running Helm release is gone. The README's "until ArgoCD lands" caveat is removed.
+- The `decommission-component` scaffolder template's loop fully closes. Merging a decommission PR removes the annotated source paths such as `charts/workloads/<name>/`; the Git directory generator stops producing the Application; the finalizer prunes its resources; the running Helm release is gone. The README's "until ArgoCD lands" caveat is removed.
 - The `application` scaffolder template's output deploys without intervention: any chart it produces under `charts/workloads/<name>/` with a sibling `deploy/dev/<name>.yaml` is auto-discovered by the workloads ApplicationSet on the next reconcile.
 - The two-chart pattern from ADR-0002 extends to four charts. The `existingSecret`-based Hybrid Secrets pattern from ADR-0002 carries through; only the Secret name and shape change, and only the `existingSecret: false` rendering path is exercised under GitOps.
 - The Backstage RBAC Secret pattern from ADR-0005 is preserved in shape (Backstage reads credentials from a Kubernetes Secret via `existingSecret`). The Secret's identity changes from a pair (`backstage-github-token`, `backstage-github-oauth`) to a single `backstage-github-app`, and its content changes from PAT + OAuth credentials to GitHub App App ID + private key + client ID + client secret.

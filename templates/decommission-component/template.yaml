@@ -1,0 +1,139 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: decommission-component
+  title: Decommission Component
+  description: Open a pull request that removes a scaffolded component.
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - scaffolder
+    - decommission
+spec:
+  owner: platform
+  type: service
+  parameters:
+    - title: Component decommission details
+      required:
+        - component
+      properties:
+        component:
+          title: Component
+          type: string
+          description: Catalog component to decommission.
+          ui:field: EntityPicker
+          ui:options:
+            allowedKinds:
+              - Component
+  steps:
+    - id: fetchEntity
+      name: Fetch catalog entity
+      action: catalog:fetch
+      input:
+        entityRef: ${{ parameters.component }}
+
+    - id: assertManagedByTemplate
+      name: Assert template marker
+      action: util:assert
+      input:
+        condition: ${{ steps.fetchEntity.output.entity.metadata.annotations !== undefined and steps.fetchEntity.output.entity.metadata.annotations['backstage.io/managed-by-template'] !== undefined }}
+        message: >-
+          Component `${{ parameters.component }}` is not eligible for
+          decommission. Expected annotation `backstage.io/managed-by-template`.
+
+    - id: assertSourcePaths
+      name: Assert source paths marker
+      action: util:assert
+      input:
+        condition: ${{ steps.fetchEntity.output.entity.metadata.annotations !== undefined and steps.fetchEntity.output.entity.metadata.annotations['backstage.io/source-paths'] !== undefined }}
+        message: >-
+          Component `${{ parameters.component }}` is not eligible for
+          decommission. Expected annotation `backstage.io/source-paths`.
+
+    - id: parseSourcePaths
+      name: Parse source paths
+      action: util:parseJsonArray
+      input:
+        value: ${{ steps.fetchEntity.output.entity.metadata.annotations['backstage.io/source-paths'] }}
+
+    - id: collectBlockingRelations
+      name: Collect blocking dependents
+      action: util:filterByAttribute
+      input:
+        items: ${{ steps.fetchEntity.output.entity.relations }}
+        attribute: type
+        values:
+          - dependencyOf
+          - hasSubcomponent
+          - apiConsumedBy
+          - apiProvidedBy
+        extract: targetRef
+
+    - id: assertNoBlockingRelations
+      name: Assert no blocking dependents
+      action: util:assert
+      input:
+        condition: ${{ steps.collectBlockingRelations.output.count === 0 }}
+        message: >-
+          Cannot decommission `${{ steps.fetchEntity.output.entity.metadata.name }}`
+          because these catalog entities still depend on it:
+          ${{ steps.collectBlockingRelations.output.extracted | join(', ') }}
+
+    - id: fetchRepository
+      name: Fetch repository contents
+      action: fetch:plain
+      input:
+        url: https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/
+        targetPath: .
+
+    - id: classifySourcePaths
+      name: Classify source paths
+      action: fs:classifyPaths
+      input:
+        paths: ${{ steps.parseSourcePaths.output.items }}
+
+    - id: listDirectoryFiles
+      name: List directory files
+      action: fs:readdir
+      input:
+        paths: ${{ steps.classifySourcePaths.output.directories }}
+        recursive: true
+
+    - id: extractDirectoryFilePaths
+      name: Extract directory file paths
+      action: util:filterByAttribute
+      input:
+        items: ${{ steps.listDirectoryFiles.output.files }}
+        extract: path
+
+    - id: collectFilesToDelete
+      name: Collect files to delete
+      action: util:concatStringArrays
+      input:
+        arrays:
+          - ${{ steps.extractDirectoryFilePaths.output.extracted }}
+          - ${{ steps.classifySourcePaths.output.files }}
+
+    - id: publishPullRequest
+      name: Publish pull request
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=Itamar-Ratson&repo=backstage-k8s-full
+        branchName: decommission/component/${{ steps.fetchEntity.output.entity.metadata.name }}
+        targetBranchName: main
+        title: "Decommission component: ${{ steps.fetchEntity.output.entity.metadata.name }}"
+        description: |
+          Decommissioned scaffolded component generated from Backstage.
+
+          - Component: `${{ steps.fetchEntity.output.entity.metadata.name }}`
+          - Source paths: `${{ steps.parseSourcePaths.output.items | join(', ') }}`
+          - File count: `${{ steps.collectFilesToDelete.output.count }}`
+          - Requesting user: `${{ user.ref or 'unknown' }}`
+
+          Merging this PR removes the catalog-owned source files. ArgoCD will detect the removal and prune the running resources within ~3 minutes.
+        filesToDelete: ${{ steps.collectFilesToDelete.output.files }}
+        draft: false
+  output:
+    links:
+      - title: Pull request
+        url: ${{ steps.publishPullRequest.output.remoteUrl }}

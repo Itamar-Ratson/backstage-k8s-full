@@ -16,6 +16,7 @@ assert_contains "template targets workload chart path" "$TEMPLATE" 'targetPath: 
 assert_contains "template emits dev values file" "$TEMPLATE" "targetPath: deploy/dev"
 assert_contains "template name is application" "$TEMPLATE" "name: application"
 assert_contains "catalog records application template" "$CATALOG_TEMPLATE" "backstage.io/managed-by-template: application"
+assert_contains "catalog records generated source paths" "$CATALOG_TEMPLATE" "backstage.io/source-paths: '[\"charts/workloads/\${{ values.name }}\",\"deploy/dev/\${{ values.name }}.yaml\"]'"
 assert_contains "dev values skeleton contains image" "$DEPLOY_TEMPLATE" 'image: ${{ values.image }}'
 assert_contains "dev values skeleton contains host" "$DEPLOY_TEMPLATE" 'host: ${{ values.host }}'
 assert_contains "dev values skeleton contains port" "$DEPLOY_TEMPLATE" 'port: ${{ values.port }}'

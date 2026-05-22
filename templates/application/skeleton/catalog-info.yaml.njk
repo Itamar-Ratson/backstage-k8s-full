@@ -5,6 +5,7 @@ metadata:
   description: ${{ values.description }}
   annotations:
     backstage.io/managed-by-template: application
+    backstage.io/source-paths: '["charts/workloads/${{ values.name }}","deploy/dev/${{ values.name }}.yaml"]'
     backstage.io/techdocs-ref: dir:.
     backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/workloads/${{ values.name }}/
     github.com/project-slug: Itamar-Ratson/backstage-k8s-full

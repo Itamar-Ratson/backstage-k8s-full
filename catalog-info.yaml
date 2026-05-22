@@ -75,14 +75,14 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
-  name: helm-chart-decommission-template
-  description: Backstage scaffolder template for removing scaffolded applications.
+  name: decommission-component-template
+  description: Backstage scaffolder template for removing scaffolded components.
   annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/helm-chart-decommission/template.yaml
+    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/decommission-component/template.yaml
     github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: url
-  target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/helm-chart-decommission/template.yaml
+  target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/decommission-component/template.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Location

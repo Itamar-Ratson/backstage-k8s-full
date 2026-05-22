@@ -9,7 +9,7 @@ TEMPLATE="$(cat templates/ci-pipeline/template.yaml)"
 CALLER_TEMPLATE="$(cat "$SKELETON_DIR/.github/workflows/caller-\${{ values.name }}.yaml.njk")"
 OVERLAY_TEMPLATE="$(cat "$SKELETON_DIR/deploy/dev/\${{ values.name }}.yaml.njk")"
 APPLICATION_TEMPLATE="$(cat templates/application/template.yaml)"
-DECOMMISSION_TEMPLATE="$(cat templates/helm-chart-decommission/template.yaml)"
+DECOMMISSION_TEMPLATE="$(cat templates/decommission-component/template.yaml)"
 
 echo "=== CI pipeline scaffold tests ==="
 
@@ -33,8 +33,8 @@ assert_contains "overlay references GHCR app path" "$OVERLAY_TEMPLATE" 'reposito
 assert_contains "overlay starts with empty tag" "$OVERLAY_TEMPLATE" 'tag: ""'
 assert_contains "overlay uses IfNotPresent pull policy" "$OVERLAY_TEMPLATE" "pullPolicy: IfNotPresent"
 assert_contains "application scaffold emits deploy values path" "$APPLICATION_TEMPLATE" "targetPath: deploy/dev"
-assert_contains "decommission deletes deploy values file" "$DECOMMISSION_TEMPLATE" 'deploy/dev/${{ steps.fetchEntity.output.entity.metadata.name }}.yaml'
-assert_contains "decommission PR documents ArgoCD prune" "$DECOMMISSION_TEMPLATE" "ArgoCD will detect the removal and prune the running release within ~3 minutes."
+assert_contains "decommission reads source paths annotation" "$DECOMMISSION_TEMPLATE" "backstage.io/source-paths"
+assert_contains "decommission PR documents ArgoCD prune" "$DECOMMISSION_TEMPLATE" "ArgoCD will detect the removal and prune the running resources within ~3 minutes."
 assert_not_contains "decommission PR does not mention manual helm uninstall" "$DECOMMISSION_TEMPLATE" "helm uninstall"
 
 report_results "CI pipeline scaffold"

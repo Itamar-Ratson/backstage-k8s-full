@@ -12,7 +12,7 @@ const repoSlug = 'Itamar-Ratson/backstage-k8s-full';
 const repoUrl = `https://github.com/${repoSlug}`;
 const catalogInfoPath = 'catalog-info.yaml';
 const chartTemplatePath = 'templates/application/template.yaml';
-const decommissionTemplatePath = 'templates/helm-chart-decommission/template.yaml';
+const decommissionTemplatePath = 'templates/decommission-component/template.yaml';
 const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
 const readmePath = 'README.md';
 
@@ -54,6 +54,7 @@ describe('application template contract', () => {
         snippets: [
           'lifecycle: experimental',
           'backstage.io/kubernetes-id: ${{ values.name }}',
+          `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}","deploy/dev/\${{ values.name }}.yaml"]'`,
           `github.com/project-slug: ${repoSlug}`,
           `backstage.io/source-location: url:${repoUrl}/tree/main/charts/workloads/` +
             '${{ values.name }}/',
@@ -73,36 +74,43 @@ describe('application template contract', () => {
   });
 });
 
-describe('helm chart decommission template contract', () => {
+describe('generic decommission component template contract', () => {
   it('registers the template and documents the decommission flow', () => {
     const fileExpectations = [
       {
         path: catalogInfoPath,
         snippets: [
           'kind: Location',
-          `target: ${repoUrl}/blob/main/templates/helm-chart-decommission/template.yaml`,
+          `target: ${repoUrl}/blob/main/templates/decommission-component/template.yaml`,
         ],
       },
       {
         path: decommissionTemplatePath,
         snippets: [
           'kind: Template',
-          'branchName: decommission/helm-chart/',
+          'name: decommission-component',
+          'branchName: decommission/component/',
           'filesToDelete:',
           'targetBranchName: main',
           'action: util:assert',
+          'action: util:parseJsonArray',
           'action: util:filterByAttribute',
           'action: catalog:fetch',
           'action: fetch:plain',
+          'action: fs:classifyPaths',
           'action: fs:readdir',
-          'deploy/dev/\' + steps.fetchEntity.output.entity.metadata.name + \'.yaml',
-          'ArgoCD will detect the removal and prune the running release within ~3 minutes.',
+          "backstage.io/source-paths",
+          'steps.collectFilesToDelete.output.files',
+          'ArgoCD will detect the removal and prune the running resources within ~3 minutes.',
           'draft: false',
         ],
       },
       {
         path: chartCatalogPath,
-        snippets: ['backstage.io/managed-by-template: application'],
+        snippets: [
+          'backstage.io/managed-by-template: application',
+          `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}","deploy/dev/\${{ values.name }}.yaml"]'`,
+        ],
       },
     ] as const;
 
@@ -141,7 +149,11 @@ describe('helm chart decommission template contract', () => {
             entity: {
               metadata: {
                 name: 'test-01',
-                annotations: { 'backstage.io/managed-by-template': 'application' },
+                annotations: {
+                  'backstage.io/managed-by-template': 'application',
+                  'backstage.io/source-paths':
+                    '["charts/workloads/test-01","deploy/dev/test-01.yaml"]',
+                },
               },
             },
           },
