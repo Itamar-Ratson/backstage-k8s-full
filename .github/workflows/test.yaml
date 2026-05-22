@@ -40,6 +40,7 @@ jobs:
         run: |
           ./tests/charts/test-actionlint.sh
           ./tests/charts/test-scaffolder-template-syntax.sh
+          ./tests/charts/test-hello-world-source.sh
           ./tests/charts/test-templates-registered.sh
           ./tests/charts/test-chart-layout.sh
           ./tests/charts/test-no-make-references.sh

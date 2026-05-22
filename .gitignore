@@ -18,6 +18,7 @@
 !.gitignore
 !Dockerfile
 !.dockerignore
+!hello-world/index.html
 
 # Backstage app source (scaffolded, needed for build + yarn dev)
 !backstage/.yarnrc.yml
