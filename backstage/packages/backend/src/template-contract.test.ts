@@ -153,7 +153,7 @@ describe('generic decommission component template contract', () => {
                 annotations: {
                   'backstage.io/managed-by-template': 'application',
                   'backstage.io/source-paths':
-                    '["charts/workloads/test-01","deploy/dev/test-01.yaml"]',
+                    '["charts/workloads/test-01"]',
                 },
               },
             },
