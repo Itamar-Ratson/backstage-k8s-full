@@ -54,6 +54,7 @@ charts/platform/*/charts/*.tgz
 node_modules
 .sandcastle
 CLAUDE.md
+docs/agents
 
 # Never track files prefixed with `secret-` (they typically hold real
 # credentials produced by `kubectl create secret ... -o yaml`).
