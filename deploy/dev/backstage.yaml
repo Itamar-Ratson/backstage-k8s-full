@@ -124,6 +124,6 @@ appConfig:
   catalog:
     locations:
       - type: url
-        target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/**/catalog-info.yaml
+        target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/**/*catalog-info.yaml
       - type: file
         target: /etc/backstage/rbac/users.yaml

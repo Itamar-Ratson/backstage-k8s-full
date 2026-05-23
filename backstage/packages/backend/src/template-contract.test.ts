@@ -46,7 +46,7 @@ describe('application template contract', () => {
           'branchName: scaffold/application/${{ parameters.name }}',
           'draft: false',
           'targetPath: charts/workloads/${{ parameters.name }}',
-          'repository: ${{ parameters.repository }}',
+          "repository: ${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}",
           'tag: ${{ parameters.tag }}',
         ],
       },
