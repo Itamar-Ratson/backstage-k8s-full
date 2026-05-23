@@ -1,0 +1,4 @@
+image:
+  repository: ghcr.io/itamar-ratson/backstage-k8s-full/test-01
+  tag: ""
+  pullPolicy: IfNotPresent

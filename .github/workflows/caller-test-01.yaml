@@ -1,0 +1,30 @@
+name: Build test-01 Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+
+
+      - test-01/**
+
+
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+  attestations: write
+  issues: write
+
+jobs:
+  build:
+    name: Build test-01
+    uses: ./.github/workflows/build-image.yaml
+    with:
+      app-name: test-01
+      context: test-01
+      dockerfile: test-01/Dockerfile
+      bump-file: deploy/dev/test-01.yaml
+      bump-yaml-path: .image.tag
