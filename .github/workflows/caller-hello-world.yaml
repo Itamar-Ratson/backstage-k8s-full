@@ -1,0 +1,30 @@
+name: Build hello-world Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+
+
+      - ${{ parameters.name }}/**
+
+
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+  attestations: write
+  issues: write
+
+jobs:
+  build:
+    name: Build hello-world
+    uses: ./.github/workflows/build-image.yaml
+    with:
+      app-name: hello-world
+      context: ${{ parameters.name }}
+      dockerfile: ${{ parameters.name }}/Dockerfile
+      bump-file: deploy/dev/${{ parameters.name }}.yaml
+      bump-yaml-path: .image.tag
