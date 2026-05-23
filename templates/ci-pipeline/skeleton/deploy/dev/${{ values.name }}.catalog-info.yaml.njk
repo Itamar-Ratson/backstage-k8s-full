@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}-ci
+  description: ${{ values.description }}
+  annotations:
+    backstage.io/managed-by-template: ci-pipeline
+    backstage.io/source-paths: '[".github/workflows/caller-${{ values.name }}.yaml","deploy/dev/${{ values.name }}.yaml","deploy/dev/${{ values.name }}.catalog-info.yaml"]'
+    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/.github/workflows/caller-${{ values.name }}.yaml
+    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
+  links:
+    - title: Workflow runs
+      url: https://github.com/Itamar-Ratson/backstage-k8s-full/actions/workflows/caller-${{ values.name }}.yaml
+      icon: github
+spec:
+  type: ci-pipeline
+  lifecycle: experimental
+  owner: ${{ values.owner }}
+  system: ${{ values.system }}

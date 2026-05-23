@@ -19,7 +19,7 @@ assert_contains "template publishes a pull request" "$TEMPLATE" "publish:github:
 assert_contains "template documents Dockerfile prerequisite" "$TEMPLATE" "Requires a working Dockerfile"
 assert_contains "template documents scaffold-created bump file" "$TEMPLATE" "bump file is created by this scaffold"
 assert_not_contains "template does not catalog register" "$TEMPLATE" "catalog:register"
-assert_not_contains "template does not catalog write" "$TEMPLATE" "catalog-info.yaml"
+assert_file_exists "skeleton includes pipeline catalog-info file" "$SKELETON_DIR/deploy/dev/\${{ values.name }}.catalog-info.yaml.njk"
 
 assert_contains "caller uses reusable build workflow" "$CALLER_TEMPLATE" "uses: ./.github/workflows/build-image.yaml"
 assert_contains "caller emits app-name substitution" "$CALLER_TEMPLATE" 'app-name: ${{ values.name }}'
