@@ -21,7 +21,18 @@ The base catalog rules allow the entity kinds used by this repo:
 ```yaml
 catalog:
   rules:
-    - allow: [Component, System, API, Resource, Location, Domain, User, Group, Template]
+    - allow:
+        [
+          Component,
+          System,
+          API,
+          Resource,
+          Location,
+          Domain,
+          User,
+          Group,
+          Template,
+        ]
 ```
 
 The KinD values file adds a runtime catalog location that scans the GitHub repository for every `catalog-info.yaml` file:
@@ -30,7 +41,7 @@ The KinD values file adds a runtime catalog location that scans the GitHub repos
 catalog:
   locations:
     - type: url
-      target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/**/catalog-info.yaml
+      target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/**/*catalog-info.yaml
 ```
 
 That discovery model makes co-located entity ownership important. Root platform entities live in the repo-level `catalog-info.yaml`, the Backstage Component/API/Resource entities live in `backstage/catalog-info.yaml`, and scaffolded charts are expected to carry their own `catalog-info.yaml` under `charts/<name>/`.

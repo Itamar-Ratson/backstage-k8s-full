@@ -4,7 +4,9 @@ import path from 'node:path';
 // nunjucks ships no TypeScript types; this is a test-only import.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const nunjucks = require('nunjucks') as {
-  configure: (opts: object) => { renderString: (str: string, ctx: object) => string };
+  configure: (opts: object) => {
+    renderString: (str: string, ctx: object) => string;
+  };
 };
 
 const repoRoot = path.resolve(__dirname, '../../../../');
@@ -12,15 +14,21 @@ const repoSlug = 'Itamar-Ratson/backstage-k8s-full';
 const repoUrl = `https://github.com/${repoSlug}`;
 const catalogInfoPath = 'catalog-info.yaml';
 const chartTemplatePath = 'templates/application/template.yaml';
-const decommissionTemplatePath = 'templates/decommission-component/template.yaml';
+const decommissionTemplatePath =
+  'templates/decommission-component/template.yaml';
 const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
 const readmePath = 'README.md';
+const defaultImageRepositoryExpression =
+  "${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}";
 
 function readRepoFile(relativePath: string) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
 
-function expectFileToContain(relativePath: string, snippets: readonly string[]) {
+function expectFileToContain(
+  relativePath: string,
+  snippets: readonly string[],
+) {
   const contents = readRepoFile(relativePath);
 
   for (const snippet of snippets) {
@@ -46,7 +54,7 @@ describe('application template contract', () => {
           'branchName: scaffold/application/${{ parameters.name }}',
           'draft: false',
           'targetPath: charts/workloads/${{ parameters.name }}',
-          "repository: ${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}",
+          `repository: ${defaultImageRepositoryExpression}`,
           'tag: ${{ parameters.tag }}',
         ],
       },
@@ -71,7 +79,9 @@ describe('application template contract', () => {
     const templateSection = '**Add the application scaffolder template**';
     const techDocsSection = '**Set up TechDocs**';
     expect(readme).toContain(templateSection);
-    expect(readme.indexOf(templateSection)).toBeLessThan(readme.indexOf(techDocsSection));
+    expect(readme.indexOf(templateSection)).toBeLessThan(
+      readme.indexOf(techDocsSection),
+    );
   });
 });
 
@@ -100,7 +110,7 @@ describe('generic decommission component template contract', () => {
           'action: fetch:plain',
           'action: fs:classifyPaths',
           'action: fs:readdir',
-          "backstage.io/source-paths",
+          'backstage.io/source-paths',
           'steps.collectFilesToDelete.output.files',
           'ArgoCD will detect the removal and prune the running resources within ~3 minutes.',
           'draft: false',
@@ -152,8 +162,7 @@ describe('generic decommission component template contract', () => {
                 name: 'test-01',
                 annotations: {
                   'backstage.io/managed-by-template': 'application',
-                  'backstage.io/source-paths':
-                    '["charts/workloads/test-01"]',
+                  'backstage.io/source-paths': '["charts/workloads/test-01"]',
                 },
               },
             },
