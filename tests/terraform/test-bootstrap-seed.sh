@@ -18,7 +18,7 @@ assert_contains "root app loaded from manifest file" "$terraform_config" 'yamlde
 assert_contains "backstage namespace is managed" "$terraform_config" 'resource "kubernetes_namespace_v1" "backstage"'
 assert_contains "backstage namespace has gateway opt-in label" "$terraform_config" 'gateway-routes = "enabled"'
 assert_contains "argocd namespace is managed" "$terraform_config" 'resource "kubernetes_namespace_v1" "argocd"'
-assert_contains "argocd namespace has gateway opt-in label" "$argocd_namespace_config" 'gateway-routes = "enabled"'
+assert_not_contains "argocd namespace gateway opt-in label moved to ApplicationSet" "$argocd_namespace_config" 'gateway-routes = "enabled"'
 assert_contains "ArgoCD helm release uses managed namespace" "$terraform_config" 'namespace        = kubernetes_namespace_v1.argocd.metadata[0].name'
 assert_contains "GitHub App secret is managed" "$terraform_config" 'resource "kubernetes_secret_v1" "backstage_github_app"'
 assert_contains "GitHub App private key is sensitive" "$terraform_config" 'variable "PRIVATE_KEY"'

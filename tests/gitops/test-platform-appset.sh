@@ -37,6 +37,8 @@ assert_contains "CreateNamespace sync option is enabled" "$appset" "CreateNamesp
 assert_contains "ServerSideApply sync option is enabled" "$appset" "ServerSideApply=true"
 assert_contains "automated prune is enabled" "$appset" "prune: true"
 assert_contains "automated self-heal is enabled" "$appset" "selfHeal: true"
+assert_contains "platform namespaces have managed metadata" "$appset" "managedNamespaceMetadata:"
+assert_contains "platform namespaces opt into gateway routes" "$appset" "gateway-routes: enabled"
 
 argocd_values=$(sed -n '1,$p' "$argocd_values_path" 2>/dev/null || true)
 
