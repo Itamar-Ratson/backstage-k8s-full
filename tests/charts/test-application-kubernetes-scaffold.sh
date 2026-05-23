@@ -20,6 +20,7 @@ assert_path_missing "application dev values skeleton is removed" "templates/appl
 assert_contains "template name is application" "$TEMPLATE" "name: application"
 assert_contains "catalog records application template" "$CATALOG_TEMPLATE" "backstage.io/managed-by-template: application"
 assert_contains "catalog records generated source paths" "$CATALOG_TEMPLATE" "backstage.io/source-paths: '[\"charts/workloads/\${{ values.name }}\"]'"
+assert_contains "catalog identifies scaffolded artifact as Helm chart" "$CATALOG_TEMPLATE" "type: helm-chart"
 assert_contains "values skeleton contains image object" "$VALUES_TEMPLATE" "image:"
 assert_contains "values skeleton contains image repository" "$VALUES_TEMPLATE" 'repository: ${{ values.repository }}'
 assert_contains "values skeleton contains image tag" "$VALUES_TEMPLATE" 'tag: ${{ values.tag }}'
