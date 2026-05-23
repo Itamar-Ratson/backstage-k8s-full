@@ -12,14 +12,14 @@ const nunjucks = require('nunjucks') as {
 const repoRoot = path.resolve(__dirname, '../../../../');
 const repoSlug = 'Itamar-Ratson/backstage-k8s-full';
 const repoUrl = `https://github.com/${repoSlug}`;
+const defaultImageRepositoryExpression =
+  "repository: ${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}";
 const catalogInfoPath = 'catalog-info.yaml';
 const chartTemplatePath = 'templates/application/template.yaml';
 const decommissionTemplatePath =
   'templates/decommission-component/template.yaml';
 const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
 const readmePath = 'README.md';
-const defaultImageRepositoryExpression =
-  "${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}";
 
 function readRepoFile(relativePath: string) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -54,7 +54,7 @@ describe('application template contract', () => {
           'branchName: scaffold/application/${{ parameters.name }}',
           'draft: false',
           'targetPath: charts/workloads/${{ parameters.name }}',
-          `repository: ${defaultImageRepositoryExpression}`,
+          defaultImageRepositoryExpression,
           'tag: ${{ parameters.tag }}',
         ],
       },
