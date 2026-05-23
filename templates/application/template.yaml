@@ -20,7 +20,6 @@ spec:
         - description
         - owner
         - system
-        - repository
         - tag
       properties:
         name:
