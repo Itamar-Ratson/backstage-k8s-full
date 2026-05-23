@@ -6,7 +6,9 @@ metadata:
     {{- include "workload.labels" . | nindent 4 }}
 spec:
   parentRefs:
-    - name: {{ .Values.gateway.name }}
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ .Values.gateway.name }}
       namespace: {{ .Values.gateway.namespace }}
   hostnames:
     - {{ .Values.host | quote }}
@@ -16,5 +18,8 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: {{ include "workload.fullname" . }}
+        - group: ""
+          kind: Service
+          name: {{ include "workload.fullname" . }}
           port: {{ .Values.port }}
+          weight: 1
