@@ -38,6 +38,9 @@ spec:
         automated:
           prune: true
           selfHeal: true
+        managedNamespaceMetadata:
+          labels:
+            gateway-routes: enabled
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true

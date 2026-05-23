@@ -36,10 +36,6 @@ resource "kubernetes_namespace_v1" "backstage" {
 resource "kubernetes_namespace_v1" "argocd" {
   metadata {
     name = "argocd"
-
-    labels = {
-      gateway-routes = "enabled"
-    }
   }
 
   depends_on = [kind_cluster.this]
