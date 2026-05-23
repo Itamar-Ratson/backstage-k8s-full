@@ -54,8 +54,7 @@ spec:
         repository:
           title: Image repository
           type: string
-          description: Container image repository to run.
-          default: ghcr.io/itamar-ratson/backstage-k8s-full/${{ parameters.name }}
+          description: Container image repository to run. Leave blank to default to `ghcr.io/itamar-ratson/backstage-k8s-full/<name>`.
         tag:
           title: Image tag
           type: string
@@ -83,7 +82,7 @@ spec:
           description: ${{ parameters.description }}
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
-          repository: ${{ parameters.repository }}
+          repository: ${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}
           tag: ${{ parameters.tag }}
           host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
           port: ${{ parameters.port }}
@@ -102,7 +101,7 @@ spec:
           - Description: `${{ parameters.description }}`
           - Owner: `${{ parameters.owner }}`
           - System: `${{ parameters.system }}`
-          - Image repository: `${{ parameters.repository }}`
+          - Image repository: `${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}`
           - Image tag: `${{ parameters.tag }}`
           - Host: `${{ parameters.host or (parameters.name + '.localtest.me') }}`
           - Port: `${{ parameters.port }}`

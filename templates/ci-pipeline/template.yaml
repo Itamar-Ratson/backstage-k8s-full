@@ -48,18 +48,15 @@ spec:
         context:
           title: Build context
           type: string
-          description: Docker build context. Defaults to the app name.
-          default: ${{ parameters.name }}
+          description: Docker build context. Leave blank to default to the app name.
         dockerfile:
           title: Dockerfile
           type: string
-          description: Path to a working Dockerfile. The generated workflow expects this file to exist before the first build.
-          default: ${{ parameters.name }}/Dockerfile
+          description: Path to a working Dockerfile. Leave blank to default to `<name>/Dockerfile`. The generated workflow expects this file to exist before the first build.
         bump-file:
           title: Bump file
           type: string
-          description: Deploy values file whose image tag will be bumped. This scaffold creates the file, so first-run failures from a missing bump file should not occur.
-          default: deploy/dev/${{ parameters.name }}.yaml
+          description: Deploy values file whose image tag will be bumped. Leave blank to default to `deploy/dev/<name>.yaml`. This scaffold creates the file, so first-run failures from a missing bump file should not occur.
         bump-yaml-path:
           title: Bump YAML path
           type: string
@@ -68,9 +65,8 @@ spec:
         path-filter-patterns:
           title: Path filter patterns
           type: string
-          description: Explicit allowlist of paths that should trigger an image build.
+          description: Explicit allowlist of paths that should trigger an image build. Leave blank to default to `<name>/**`.
           ui:widget: textarea
-          default: ${{ parameters.name }}/**
   steps:
     - id: fetchTemplate
       name: Fetch template
