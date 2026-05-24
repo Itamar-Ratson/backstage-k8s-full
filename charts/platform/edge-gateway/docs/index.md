@@ -8,7 +8,7 @@ Terraform installs the Gateway API CRDs, the Envoy Gateway controller, and a cus
 
 ```mermaid
 flowchart LR
-  browser[Browser] --> host[127.0.0.1:8080]
+  browser[Browser] --> host[127.0.0.1:80]
   host --> kind[KinD port mapping]
   kind --> nodeport[Envoy data plane NodePort]
   nodeport --> gateway[Gateway in gateway namespace]

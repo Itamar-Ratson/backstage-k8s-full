@@ -178,7 +178,7 @@ Rejected alternatives:
 
 ## Consequences
 
-- Fresh-clone bootstrap collapses to: install tools; create a GitHub App in the UI; fill `terraform/terraform.tfvars`; `cd terraform && terraform apply`; visit `http://backstage.localtest.me:8080` when the workloads `backstage` Application reports Healthy in `kubectl get applications -n argocd`. The README's prior eight numbered steps shrink to five.
+- Fresh-clone bootstrap collapses to: install tools; create a GitHub App in the UI; fill `terraform/terraform.tfvars`; `cd terraform && terraform apply`; visit `http://backstage.localtest.me` when the workloads `backstage` Application reports Healthy in `kubectl get applications -n argocd`. The README's prior eight numbered steps shrink to five.
 - The `decommission-component` scaffolder template's loop fully closes. Merging a decommission PR removes the annotated source paths such as `charts/workloads/<name>/`; the Git directory generator stops producing the Application; the finalizer prunes its resources; the running Helm release is gone. The README's "until ArgoCD lands" caveat is removed.
 - The `application` scaffolder template's output deploys without intervention: any chart it produces under `charts/workloads/<name>/` with a sibling `deploy/dev/<name>.yaml` is auto-discovered by the workloads ApplicationSet on the next reconcile.
 - The two-chart pattern from ADR-0002 extends to four charts. The `existingSecret`-based Hybrid Secrets pattern from ADR-0002 carries through; only the Secret name and shape change, and only the `existingSecret: false` rendering path is exercised under GitOps.

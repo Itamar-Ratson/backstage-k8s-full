@@ -4,7 +4,7 @@ This site is the TechDocs entry point for the `platform` Domain. It collects rep
 
 ## Runtime Shape
 
-The local platform is built around a KinD cluster provisioned by Terraform. Envoy Gateway exposes Backstage through the Gateway API at `backstage.localtest.me:8080`, while Helm owns the Backstage workload and the reusable edge Gateway resources.
+The local platform is built around a KinD cluster provisioned by Terraform. Envoy Gateway exposes Backstage through the Gateway API at `backstage.localtest.me`, while Helm owns the Backstage workload and the reusable edge Gateway resources.
 
 ```mermaid
 flowchart LR

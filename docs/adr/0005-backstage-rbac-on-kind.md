@@ -49,7 +49,7 @@ The Deployment's `checksum/config` annotation covers the full rendered ConfigMap
 
 ### Kind Is the Supported GitHub OAuth Runtime
 
-GitHub OAuth sign-in is supported on the kind deployment at `http://backstage.localtest.me:8080`.
+GitHub OAuth sign-in is supported on the kind deployment at `http://backstage.localtest.me`.
 
 `yarn start` remains useful for typecheck, tests, and guest UI iteration, but GitHub sign-in through `yarn start` is no longer part of the supported surface.
 

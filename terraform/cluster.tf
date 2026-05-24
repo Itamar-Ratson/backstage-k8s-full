@@ -10,7 +10,7 @@ resource "kind_cluster" "this" {
 
       extra_port_mappings {
         container_port = 30080
-        host_port      = 8080
+        host_port      = 80
         protocol       = "TCP"
       }
     }

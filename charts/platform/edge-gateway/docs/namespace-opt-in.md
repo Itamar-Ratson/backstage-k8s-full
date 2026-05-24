@@ -25,7 +25,7 @@ The template turns that into an `allowedRoutes.namespaces.from: Selector` rule. 
 
 An application can still install its Deployment, Service, and `HTTPRoute` without the label, but the route will not be admitted by the Gateway. The result is a workload that exists inside the cluster but is not reachable through the shared edge hostname.
 
-Use this as the first check when a service is healthy but the browser cannot reach `http://<name>.localtest.me:8080`:
+Use this as the first check when a service is healthy but the browser cannot reach `http://<name>.localtest.me`:
 
 ```bash
 kubectl get namespace <namespace> --show-labels --context kind-backstage

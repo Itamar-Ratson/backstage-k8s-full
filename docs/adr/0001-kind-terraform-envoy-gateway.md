@@ -31,12 +31,12 @@ The Gateway API reference implementation. Alternatives considered:
 
 ### Cluster Exposure: NodePort + extraPortMappings
 
-The data plane uses `Service.type=NodePort` on port 30080. KinD's `extraPortMappings` routes host:8080 to the control-plane node's port 30080. Alternatives considered:
+The data plane uses `Service.type=NodePort` on port 30080. KinD's `extraPortMappings` routes host:80 to the control-plane node's port 30080. Alternatives considered:
 - **hostNetwork: true** — bypasses Service abstraction, anti-pattern
 - **MetalLB** — same complexity, worse URL story (LB IPs are Docker bridge addresses)
 - **Cloud Provider KIND** — out-of-cluster daemon to install and explain
 
-### URL Strategy: backstage.localtest.me:8080
+### URL Strategy: backstage.localtest.me
 
 `localtest.me` is a real DNS domain resolving all subdomains to 127.0.0.1 — no `/etc/hosts` edits, real hostname for Gateway listener filtering. HTTPS deferred (would pull in cert-manager or mkcert complexity).
 
