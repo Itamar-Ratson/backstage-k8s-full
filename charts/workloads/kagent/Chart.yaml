@@ -1,5 +1,0 @@
-apiVersion: v2
-name: kagent
-description: kagent
-type: application
-version: 0.1.0
