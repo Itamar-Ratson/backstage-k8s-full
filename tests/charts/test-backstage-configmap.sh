@@ -13,7 +13,7 @@ assert_contains "ConfigMap preserves POSTGRES_HOST substitution" "$output" '${PO
 assert_contains "ConfigMap preserves POSTGRES_PORT substitution" "$output" '${POSTGRES_PORT}'
 assert_contains "ConfigMap preserves POSTGRES_USER substitution" "$output" '${POSTGRES_USER}'
 assert_contains "ConfigMap preserves POSTGRES_PASSWORD substitution" "$output" '${POSTGRES_PASSWORD}'
-assert_contains "ConfigMap has app baseUrl" "$output" "baseUrl: http://backstage.localtest.me:8080"
+assert_contains "ConfigMap has app baseUrl" "$output" "baseUrl: http://backstage.localtest.me"
 assert_contains "ConfigMap has backend listen" "$output" 'listen: :7007'
 assert_contains "ConfigMap has guest auth" "$output" "dangerouslyAllowOutsideDevelopment: true"
 

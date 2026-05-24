@@ -82,9 +82,9 @@ hostname: backstage.localtest.me
 
 appConfig:
   app:
-    baseUrl: http://backstage.localtest.me:8080
+    baseUrl: http://backstage.localtest.me
   backend:
-    baseUrl: http://backstage.localtest.me:8080
+    baseUrl: http://backstage.localtest.me
     listen: ":7007"
     csp:
       upgrade-insecure-requests: false

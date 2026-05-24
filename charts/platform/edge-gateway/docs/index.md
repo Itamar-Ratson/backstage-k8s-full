@@ -4,14 +4,14 @@ This site documents the `edge` System: the Envoy Gateway entry point used by the
 
 ## Architecture
 
-Terraform installs the Gateway API CRDs, the Envoy Gateway controller, and a custom `GatewayClass` named `eg-nodeport`. This chart then creates a `Gateway` that binds to that class and listens for HTTP traffic on hostnames matching `*.localtest.me`.
+Terraform installs the Gateway API CRDs, the Envoy Gateway controller, and a custom `GatewayClass` named `eg-lb`. This chart then creates a `Gateway` that binds to that class and listens for HTTP traffic on hostnames matching `*.localtest.me`.
 
 ```mermaid
 flowchart LR
-  browser[Browser] --> host[127.0.0.1:8080]
-  host --> kind[KinD port mapping]
-  kind --> nodeport[Envoy data plane NodePort]
-  nodeport --> gateway[Gateway in gateway namespace]
+  browser[Browser] --> host[127.0.0.1:80]
+  host --> nginx[nginx host forwarder]
+  nginx --> lb[Envoy data plane LoadBalancer]
+  lb --> gateway[Gateway in gateway namespace]
   gateway --> route[HTTPRoute in app namespace]
   route --> service[Workload Service]
 ```
@@ -22,7 +22,7 @@ The local URL shape depends on `localtest.me`, which resolves subdomains to `127
 
 The chart renders one Gateway resource:
 
-- `gatewayClassName` defaults to `eg-nodeport`.
+- `gatewayClassName` defaults to `eg-lb`.
 - `hostname` defaults to `"*.localtest.me"`.
 - The HTTP listener is named `http`, uses port `80`, and accepts only routes from opted-in namespaces.
 - The `allowedRoutes` selector defaults to `gateway-routes=enabled`.

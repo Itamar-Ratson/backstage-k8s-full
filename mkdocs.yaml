@@ -8,3 +8,4 @@ nav:
   - ADRs:
       - "ADR-0001: KinD + Terraform + Envoy Gateway": adr/0001-kind-terraform-envoy-gateway.md
       - "ADR-0002: Helm Chart Architecture": adr/0002-helm-chart-architecture.md
+      - "ADR-0007: LoadBalancer via cloud-provider-kind": adr/0007-loadbalancer-cloud-provider-kind.md

@@ -48,7 +48,7 @@ sudo apt-get install -y python3 g++ build-essential
 ## Bootstrap
 
 1. Install tools: Docker, KinD, kubectl, Helm, Terraform, Node.js, `actionlint`, and `yq`.
-2. Create and install the GitHub App using the [operator guide](docs/operator/github-app-setup.md).
+2. Create and install the GitHub App using the [operator guide](docs/operator/github-app-setup.md). If you already have the older local App, update its callback URL to `http://backstage.localtest.me/api/auth/github/handler/frame`.
 3. Fill `terraform/terraform.tfvars` from `terraform/terraform.tfvars.example` with the GitHub App credentials. Keep both the downloaded `.pem` key and `terraform.tfvars` out of version control.
 4. Apply Terraform:
 
@@ -56,7 +56,7 @@ sudo apt-get install -y python3 g++ build-essential
    cd terraform && terraform apply
    ```
 
-5. Wait for ArgoCD to finish syncing, then visit <http://backstage.localtest.me:8080>.
+5. Wait for ArgoCD to finish syncing, then visit <http://backstage.localtest.me>.
 
 Terraform creates the KinD cluster, the Backstage namespace, the `backstage-github-app` Secret, the ArgoCD seed install, and the root ArgoCD Application. ArgoCD then reconciles platform charts from `charts/platform/` and workloads from `charts/workloads/`.
 
@@ -86,16 +86,16 @@ Then check Backstage through the Gateway:
 
 ```bash
 curl -fsS --retry 10 --retry-delay 3 --retry-connrefused --retry-all-errors \
-  http://backstage.localtest.me:8080 | grep -q '<title>'
+  http://backstage.localtest.me | grep -q '<title>'
 ```
 
-Open <http://backstage.localtest.me:8080> in your browser. No port-forwarding is required.
+Open <http://backstage.localtest.me> in your browser. No port-forwarding is required.
 
-`localtest.me` is a real DNS domain that resolves to 127.0.0.1. Traffic flows through KinD's port mappings into the Envoy Gateway, which routes based on the hostname to the Backstage service.
+`localtest.me` is a real DNS domain that resolves to 127.0.0.1. Traffic flows through the Terraform-managed nginx forwarder into Envoy Gateway's LoadBalancer Service, which routes based on the hostname to the Backstage service.
 
 You should see both `Guest` and `GitHub` sign-in options.
 
-Open ArgoCD at <http://argocd.localtest.me:8080>. The username is `admin`; retrieve the initial password with:
+Open ArgoCD at <http://argocd.localtest.me>. The username is `admin`; retrieve the initial password with:
 
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret \
@@ -125,7 +125,7 @@ After changing frontend code or pulling a new image tag, wait for ArgoCD to sync
 
 Then verify the end-to-end flow:
 
-1. Visit <http://backstage.localtest.me:8080>.
+1. Visit <http://backstage.localtest.me>.
 2. Confirm both Guest and GitHub sign-in buttons are visible.
 3. Sign in with GitHub.
 4. Open `/rbac` and confirm the `viewer` and `platform-admin` roles are listed.

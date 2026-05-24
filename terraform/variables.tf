@@ -10,6 +10,12 @@ variable "gitops_repo_url" {
   default     = "https://github.com/Itamar-Ratson/backstage-k8s-full.git"
 }
 
+variable "envoy_lb_ip" {
+  description = "Static LoadBalancer IP assigned to the Envoy Gateway data plane Service on the KinD docker bridge."
+  type        = string
+  default     = "172.18.0.250"
+}
+
 variable "APP_ID" {
   description = "GitHub App ID used by Backstage."
   type        = string

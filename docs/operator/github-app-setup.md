@@ -14,11 +14,11 @@ This App is used for both Backstage automation and GitHub sign-in:
    - User App: `Settings` -> `Developer settings` -> `GitHub Apps` -> `New GitHub App`
    - Organization App: organization `Settings` -> `Developer settings` -> `GitHub Apps` -> `New GitHub App`
 2. Set a clear name, such as `backstage-dev-<your-name>`.
-3. Set the homepage URL to this repository or to `http://backstage.localtest.me:8080`.
+3. Set the homepage URL to this repository or to `http://backstage.localtest.me`.
 4. Set the callback URL exactly to:
 
 ```text
-http://backstage.localtest.me:8080/api/auth/github/handler/frame
+http://backstage.localtest.me/api/auth/github/handler/frame
 ```
 
 5. Disable webhook delivery for the local KinD setup unless you have a public tunnel configured. ArgoCD polling is enough for this repo.

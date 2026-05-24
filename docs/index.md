@@ -4,7 +4,7 @@ This site is the TechDocs entry point for the `platform` Domain. It collects rep
 
 ## Runtime Shape
 
-The local platform is built around a KinD cluster provisioned by Terraform. Envoy Gateway exposes Backstage through the Gateway API at `backstage.localtest.me:8080`, while Helm owns the Backstage workload and the reusable edge Gateway resources.
+The local platform is built around a KinD cluster provisioned by Terraform. Envoy Gateway exposes Backstage through the Gateway API at `backstage.localtest.me`, while Helm owns the Backstage workload and the reusable edge Gateway resources.
 
 ```mermaid
 flowchart LR
@@ -22,6 +22,7 @@ Use the ADR pages for durable decisions:
 
 - [ADR-0001: KinD + Terraform + Envoy Gateway](adr/0001-kind-terraform-envoy-gateway.md)
 - [ADR-0002: Helm Chart Architecture](adr/0002-helm-chart-architecture.md)
+- [ADR-0007: LoadBalancer via cloud-provider-kind](adr/0007-loadbalancer-cloud-provider-kind.md)
 
 Use the operator guides for setup tasks:
 

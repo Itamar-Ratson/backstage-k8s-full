@@ -6,3 +6,6 @@ PRIVATE_KEY   = <<EOT
 example-private-key
 -----END RSA PRIVATE KEY-----
 EOT
+
+# Override only if 172.18.0.250 collides with another docker bridge address on your host.
+envoy_lb_ip = "172.18.0.250"

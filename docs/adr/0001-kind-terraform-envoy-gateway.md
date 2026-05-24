@@ -31,6 +31,8 @@ The Gateway API reference implementation. Alternatives considered:
 
 ### Cluster Exposure: NodePort + extraPortMappings
 
+*Superseded for current local development by [ADR-0007: LoadBalancer via cloud-provider-kind](0007-loadbalancer-cloud-provider-kind.md).*
+
 The data plane uses `Service.type=NodePort` on port 30080. KinD's `extraPortMappings` routes host:8080 to the control-plane node's port 30080. Alternatives considered:
 - **hostNetwork: true** — bypasses Service abstraction, anti-pattern
 - **MetalLB** — same complexity, worse URL story (LB IPs are Docker bridge addresses)
