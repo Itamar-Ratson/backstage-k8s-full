@@ -47,6 +47,7 @@ terraform/terraform.tfvars
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/.terraform.tfstate.lock.info
+terraform/.generated/
 
 # Helm dependency archives are rebuilt by Helm/ArgoCD from Chart.yaml.
 charts/platform/*/charts/*.tgz

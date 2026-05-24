@@ -26,7 +26,7 @@ resource "terraform_data" "nginx_lb_proxy_config" {
   triggers_replace = local.nginx_lb_proxy_config_raw
 
   provisioner "local-exec" {
-    command     = "mkdir -p ${path.module}/.generated && printf '%s' \"$NGINX_LB_PROXY_CONFIG\" > ${local.nginx_lb_proxy_config}"
+    command     = "mkdir -p '${local.generated_dir}' && printf '%s' \"$NGINX_LB_PROXY_CONFIG\" > '${local.nginx_lb_proxy_config}'"
     interpreter = ["/bin/sh", "-c"]
 
     environment = {

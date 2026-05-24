@@ -9,6 +9,8 @@ echo "=== Terraform LoadBalancer exposure tests ==="
 terraform_config=$(find terraform -name '*.tf' -type f -print0 | xargs -0 sed -n '1,$p')
 tfvars_example=$(sed -n '1,$p' terraform/terraform.tfvars.example 2>/dev/null || true)
 cluster_config=$(sed -n '1,$p' terraform/cluster.tf 2>/dev/null || true)
+gitignore=$(sed -n '1,$p' .gitignore 2>/dev/null || true)
+smoke_test=$(sed -n '1,$p' tests/cluster/test-loadbalancer.sh 2>/dev/null || true)
 
 assert_contains "docker provider is declared" "$terraform_config" 'source  = "kreuzwerker/docker"'
 assert_contains "docker provider is configured" "$terraform_config" 'provider "docker"'
@@ -37,12 +39,13 @@ assert_contains "nginx listens on IPv4" "$terraform_config" "listen 80;"
 assert_contains "nginx listens on IPv6" "$terraform_config" "listen [::]:80;"
 assert_contains "nginx forwards to envoy_lb_ip" "$terraform_config" 'proxy_pass http://${var.envoy_lb_ip}:80;'
 assert_contains "nginx preserves Host header" "$terraform_config" 'proxy_set_header Host $host;'
+assert_contains "generated nginx config is gitignored" "$gitignore" "terraform/.generated/"
 
 assert_file_exists "LoadBalancer smoke test exists" "tests/cluster/test-loadbalancer.sh"
-assert_contains "smoke test checks EXTERNAL-IP equality" "$(sed -n '1,$p' tests/cluster/test-loadbalancer.sh 2>/dev/null || true)" "EXTERNAL-IP"
-assert_contains "smoke test curls direct LB IP" "$(sed -n '1,$p' tests/cluster/test-loadbalancer.sh 2>/dev/null || true)" 'http://${EXPECTED_LB_IP}/'
-assert_contains "smoke test curls Backstage localtest.me" "$(sed -n '1,$p' tests/cluster/test-loadbalancer.sh 2>/dev/null || true)" "http://backstage.localtest.me/"
-assert_contains "smoke test curls ArgoCD localtest.me" "$(sed -n '1,$p' tests/cluster/test-loadbalancer.sh 2>/dev/null || true)" "http://argocd.localtest.me/"
+assert_contains "smoke test checks EXTERNAL-IP equality" "$smoke_test" "EXTERNAL-IP"
+assert_contains "smoke test curls direct LB IP" "$smoke_test" 'http://${EXPECTED_LB_IP}/'
+assert_contains "smoke test curls Backstage localtest.me" "$smoke_test" "http://backstage.localtest.me/"
+assert_contains "smoke test curls ArgoCD localtest.me" "$smoke_test" "http://argocd.localtest.me/"
 
 if [ -x tests/cluster/test-loadbalancer.sh ]; then
   PASS=$((PASS + 1))
