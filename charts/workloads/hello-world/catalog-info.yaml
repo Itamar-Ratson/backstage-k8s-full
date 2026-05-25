@@ -7,8 +7,8 @@ metadata:
     backstage.io/managed-by-template: application
     backstage.io/source-paths: '["charts/workloads/hello-world"]'
     backstage.io/techdocs-ref: dir:.
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/workloads/hello-world/
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
+    # backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/workloads/hello-world/
+    # github.com/project-slug: Itamar-Ratson/backstage-k8s-full
     backstage.io/kubernetes-id: hello-world
 spec:
   type: helm-chart
