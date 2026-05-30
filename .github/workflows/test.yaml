@@ -67,6 +67,7 @@ jobs:
           ./tests/charts/test-backstage-kubernetes-label.sh
           ./tests/charts/test-backstage-httproute-defaults.sh
           ./tests/charts/test-backstage-rbac.sh
+          ./tests/charts/test-backstage-rbac-admin-user.sh
           ./tests/charts/test-edge-gateway-kubernetes-label.sh
           ./tests/charts/test-application-techdocs-scaffold.sh
           ./tests/charts/test-application-kubernetes-scaffold.sh

@@ -63,7 +63,6 @@ rbac:
     p, role:default/platform-admin, policy.entity.create, create, allow
     g, user:default/guest, role:default/viewer
     g, user:development/guest, role:default/viewer
-    g, user:default/itamar-ratson, role:default/platform-admin
   users: |
     apiVersion: backstage.io/v1alpha1
     kind: User

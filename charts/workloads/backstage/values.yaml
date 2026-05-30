@@ -47,6 +47,7 @@ oauth:
     clientSecret: ""
 
 rbac:
+  adminUser: ""
   policies: ""
   users: ""
 

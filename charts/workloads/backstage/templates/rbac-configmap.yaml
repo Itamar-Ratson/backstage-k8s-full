@@ -6,6 +6,9 @@ metadata:
     {{- include "backstage.labels" . | nindent 4 }}
 data:
   rbac-policies.csv: |
-    {{- .Values.rbac.policies | nindent 4 }}
+    {{- .Values.rbac.policies | trimSuffix "\n" | nindent 4 }}
+    {{- if .Values.rbac.adminUser }}
+    g, user:default/{{ .Values.rbac.adminUser }}, role:default/platform-admin
+    {{- end }}
   users.yaml: |
     {{- .Values.rbac.users | nindent 4 }}
