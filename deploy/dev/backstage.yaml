@@ -1,7 +1,6 @@
 # Dev environment overrides for backstage chart.
 # These values are for local development only - do not use for other environments.
 image:
-  repository: ghcr.io/itamar-ratson/backstage-k8s-full/backstage
   tag: "4e9edb1"
   pullPolicy: IfNotPresent
 github:
@@ -115,6 +114,10 @@ appConfig:
             clientId: ${CLIENT_ID}
             clientSecret: ${CLIENT_SECRET}
             privateKey: ${PRIVATE_KEY}
+  platform:
+    githubOwner: ${GITHUB_OWNER}
+    githubRepo: ${GITHUB_REPO}
+    ghcrBase: ${GHCR_BASE}
   permission:
     rbac:
       admin:
@@ -124,6 +127,6 @@ appConfig:
   catalog:
     locations:
       - type: url
-        target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/**/*catalog-info.yaml
+        target: https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/main/**/*catalog-info.yaml
       - type: file
         target: /etc/backstage/rbac/users.yaml

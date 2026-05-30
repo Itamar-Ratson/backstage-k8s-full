@@ -62,12 +62,16 @@ Terraform creates the KinD cluster, the Backstage namespace, the `backstage-gith
 
 The dev overlay pulls Backstage from GHCR using the tag in `deploy/dev/backstage.yaml`. The CI image build workflow updates that tag after a successful image build. GHCR packages default to private after the first push; set package visibility to public once per package so the local cluster can pull without image pull secrets.
 
+## Fork setup
+
+Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars`, set `github_owner` and `github_repo` to your fork, then run `terraform apply` from the `terraform/` directory. Terraform derives the GitOps repository URL, Backstage runtime identity, and GHCR image base from those two values.
+
 ## Verifying Images
 
 Verify a CI-built image with cosign:
 
 ```bash
-cosign verify ghcr.io/itamar-ratson/backstage-k8s-full/<app>:<sha> \
+cosign verify ${GHCR_BASE}/<app>:<sha> \
   --certificate-identity-regexp ".+" \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```

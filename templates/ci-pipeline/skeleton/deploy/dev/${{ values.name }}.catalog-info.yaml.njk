@@ -6,11 +6,10 @@ metadata:
   annotations:
     backstage.io/managed-by-template: ci-pipeline
     backstage.io/source-paths: '[".github/workflows/caller-${{ values.name }}.yaml","deploy/dev/${{ values.name }}.yaml","deploy/dev/${{ values.name }}.catalog-info.yaml"]'
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/.github/workflows/caller-${{ values.name }}.yaml
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
+    backstage.io/source-location: url:https://github.com/${{ values.repositoryPath }}/blob/main/.github/workflows/caller-${{ values.name }}.yaml
   links:
     - title: Workflow runs
-      url: https://github.com/Itamar-Ratson/backstage-k8s-full/actions/workflows/caller-${{ values.name }}.yaml
+      url: https://github.com/${{ values.repositoryPath }}/actions/workflows/caller-${{ values.name }}.yaml
       icon: github
 spec:
   type: ci-pipeline

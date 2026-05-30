@@ -53,7 +53,7 @@ spec:
         repository:
           title: Image repository
           type: string
-          description: Container image repository to run. Leave blank to default to `ghcr.io/itamar-ratson/backstage-k8s-full/<name>`.
+          description: Container image repository to run. Leave blank to default to the configured platform GHCR base plus `<name>`.
         tag:
           title: Image tag
           type: string
@@ -69,6 +69,10 @@ spec:
           description: Service and container port.
           default: 80
   steps:
+    - id: defaults
+      name: Resolve platform defaults
+      action: platform:resolve-repo-url
+
     - id: fetchTemplate
       name: Fetch template
       action: fetch:template
@@ -81,7 +85,7 @@ spec:
           description: ${{ parameters.description }}
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
-          repository: ${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}
+          repository: ${{ parameters.repository or (steps.defaults.output.imageRepositoryBase + '/' + parameters.name) }}
           tag: ${{ parameters.tag }}
           host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
           port: ${{ parameters.port }}
@@ -89,7 +93,7 @@ spec:
       name: Publish pull request
       action: publish:github:pull-request
       input:
-        repoUrl: github.com?owner=Itamar-Ratson&repo=backstage-k8s-full
+        repoUrl: ${{ steps.defaults.output.repoUrl }}
         branchName: scaffold/application/${{ parameters.name }}
         targetBranchName: main
         title: "Scaffold new application: ${{ parameters.name }}"
@@ -100,7 +104,7 @@ spec:
           - Description: `${{ parameters.description }}`
           - Owner: `${{ parameters.owner }}`
           - System: `${{ parameters.system }}`
-          - Image repository: `${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}`
+          - Image repository: `${{ parameters.repository or (steps.defaults.output.imageRepositoryBase + '/' + parameters.name) }}`
           - Image tag: `${{ parameters.tag }}`
           - Host: `${{ parameters.host or (parameters.name + '.localtest.me') }}`
           - Port: `${{ parameters.port }}`

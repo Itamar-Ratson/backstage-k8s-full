@@ -46,7 +46,8 @@ jobs:
         id: meta
         run: |
           short_sha="${GITHUB_SHA::7}"
-          image="ghcr.io/itamar-ratson/backstage-k8s-full/${{ inputs.app-name }}"
+          slug="${GITHUB_REPOSITORY,,}"
+          image="ghcr.io/${slug}/${{ inputs.app-name }}"
           {
             echo "short-sha=${short_sha}"
             echo "image=${image}"

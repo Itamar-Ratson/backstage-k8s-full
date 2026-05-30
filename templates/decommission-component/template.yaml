@@ -26,6 +26,10 @@ spec:
             allowedKinds:
               - Component
   steps:
+    - id: defaults
+      name: Resolve platform defaults
+      action: platform:resolve-repo-url
+
     - id: fetchEntity
       name: Fetch catalog entity
       action: catalog:fetch
@@ -83,7 +87,7 @@ spec:
       name: Fetch repository contents
       action: fetch:plain
       input:
-        url: https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/
+        url: https://github.com/${{ steps.defaults.output.repoUrl | replace('github.com?owner=', '') | replace('&repo=', '/') }}/tree/main/
         targetPath: .
 
     - id: classifySourcePaths
@@ -118,7 +122,7 @@ spec:
       name: Publish pull request
       action: publish:github:pull-request
       input:
-        repoUrl: github.com?owner=Itamar-Ratson&repo=backstage-k8s-full
+        repoUrl: ${{ steps.defaults.output.repoUrl }}
         branchName: decommission/component/${{ steps.fetchEntity.output.entity.metadata.name }}
         targetBranchName: main
         title: "Decommission component: ${{ steps.fetchEntity.output.entity.metadata.name }}"

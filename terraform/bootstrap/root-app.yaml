@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Itamar-Ratson/backstage-k8s-full.git
+    repoURL: https://github.com/example-owner/example-repo.git
     targetRevision: main
     path: gitops/dev
   destination:

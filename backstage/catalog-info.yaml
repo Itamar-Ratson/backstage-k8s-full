@@ -6,8 +6,6 @@ metadata:
   description: Backstage application providing a unified developer portal with software catalog, scaffolder, and TechDocs.
   annotations:
     backstage.io/kubernetes-id: backstage
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/backstage/
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: service
   lifecycle: production
@@ -24,9 +22,6 @@ kind: API
 metadata:
   name: backstage-api
   description: Backstage backend API serving the software catalog, scaffolder, and auth endpoints.
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/backstage/
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: openapi
   lifecycle: production
@@ -57,9 +52,6 @@ kind: Resource
 metadata:
   name: backstage-postgres
   description: PostgreSQL database backing the Backstage catalog, auth, and scaffolder state.
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/workloads/backstage/
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: database
   lifecycle: production

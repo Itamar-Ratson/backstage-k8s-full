@@ -21,6 +21,7 @@ assert_contains "ConfigMap has guest auth" "$output" "dangerouslyAllowOutsideDev
 assert_contains "Deployment has volume mount path" "$output" "/etc/backstage"
 assert_contains "Deployment has app-config volume" "$output" "name: app-config"
 assert_contains "Deployment references configmap" "$output" "backstage-app-config"
+assert_contains "Deployment imports platform identity configmap" "$output" "name: platform-identity"
 
 # Test 3: Deployment uses explicit command/args with --config for runtime config
 assert_contains "Deployment has node command" "$output" 'command:'

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gitops-dev
+description: Argo CD ApplicationSets for the local development environment
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

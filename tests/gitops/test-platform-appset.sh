@@ -6,11 +6,13 @@ source "$(dirname "$0")/../charts/helpers.sh"
 
 echo "=== Platform ApplicationSet tests ==="
 
-appset_path="gitops/dev/platform-appset.yaml"
+appset_path="gitops/dev/templates/platform-appset.yaml"
 argocd_values_path="deploy/dev/argo-cd.yaml"
 envoy_values_path="deploy/dev/envoy-gateway.yaml"
 
 assert_file_exists "platform ApplicationSet exists" "$appset_path"
+assert_file_exists "gitops dev chart exists" "gitops/dev/Chart.yaml"
+assert_file_exists "gitops dev values exist" "gitops/dev/values.yaml"
 assert_file_exists "Argo CD dev values exist" "$argocd_values_path"
 assert_file_exists "Envoy Gateway dev values exist" "$envoy_values_path"
 
@@ -29,10 +31,12 @@ assert_contains "envoy-gateway sync wave is -2" "$appset" 'syncWave: "-2"'
 assert_contains "edge-gateway list element exists" "$appset" "name: edge-gateway"
 assert_contains "edge-gateway namespace is gateway" "$appset" "namespace: gateway"
 assert_contains "edge-gateway sync wave is -1" "$appset" 'syncWave: "-1"'
-assert_contains "source uses platform chart path" "$appset" "charts/platform/{{.name}}"
-assert_contains "source uses dev values file" "$appset" "/deploy/dev/{{.name}}.yaml"
-assert_contains "destination namespace is templated" "$appset" "namespace: '{{.namespace}}'"
-assert_contains "sync-wave annotation is templated" "$appset" "argocd.argoproj.io/sync-wave: '{{.syncWave}}'"
+assert_contains "source uses repository value" "$appset" "repoURL: {{ .Values.repoURL | quote }}"
+assert_contains "source uses target revision value" "$appset" "targetRevision: {{ .Values.targetRevision | quote }}"
+assert_contains "source uses platform chart path" "$appset" 'charts/platform/{{ "{{.name}}" }}'
+assert_contains "source uses dev values file" "$appset" '/deploy/dev/{{ "{{.name}}" }}.yaml'
+assert_contains "destination namespace is templated" "$appset" 'namespace: '\''{{ "{{.namespace}}" }}'\'''
+assert_contains "sync-wave annotation is templated" "$appset" 'argocd.argoproj.io/sync-wave: '\''{{ "{{.syncWave}}" }}'\'''
 assert_contains "CreateNamespace sync option is enabled" "$appset" "CreateNamespace=true"
 assert_contains "ServerSideApply sync option is enabled" "$appset" "ServerSideApply=true"
 assert_contains "automated prune is enabled" "$appset" "prune: true"

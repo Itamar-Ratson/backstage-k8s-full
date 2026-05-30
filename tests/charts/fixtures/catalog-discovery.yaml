@@ -11,4 +11,4 @@ appConfig:
   catalog:
     locations:
       - type: url
-        target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/**/*catalog-info.yaml
+        target: https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/main/**/*catalog-info.yaml

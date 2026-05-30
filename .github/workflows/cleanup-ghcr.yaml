@@ -13,10 +13,16 @@ jobs:
     name: Cleanup backstage
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve repository package namespace
+        id: repo
+        run: |
+          repo="${GITHUB_REPOSITORY,,}"
+          echo "repo=${repo}" >> "$GITHUB_OUTPUT"
+
       - name: Delete old backstage image versions
         uses: actions/delete-package-versions@v5
         with:
-          package-name: backstage-k8s-full/backstage
+          package-name: ${{ steps.repo.outputs.repo }}/backstage
           package-type: container
           token: ${{ secrets.GITHUB_TOKEN }}
           min-versions-to-keep: 10

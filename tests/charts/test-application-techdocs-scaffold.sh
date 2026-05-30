@@ -34,6 +34,6 @@ else
 fi
 
 assert_contains "catalog scaffold has techdocs annotation" "$CATALOG_TEMPLATE" "backstage.io/techdocs-ref: dir:."
-assert_contains "catalog source-location uses workload path" "$CATALOG_TEMPLATE" 'tree/main/charts/workloads/${{ values.name }}/'
+assert_not_contains "catalog scaffold omits source-location annotation" "$CATALOG_TEMPLATE" "backstage.io/source-location"
 
 report_results "Application TechDocs scaffold"

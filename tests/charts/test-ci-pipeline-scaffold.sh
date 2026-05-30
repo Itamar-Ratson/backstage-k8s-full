@@ -29,10 +29,13 @@ assert_contains "caller emits bump-file substitution" "$CALLER_TEMPLATE" "bump-f
 assert_contains "caller emits bump-yaml-path substitution" "$CALLER_TEMPLATE" "bump-yaml-path: \${{ values['bump-yaml-path'] }}"
 assert_contains "caller renders path filter patterns" "$CALLER_TEMPLATE" "path-filter-patterns"
 
-assert_contains "overlay references GHCR app path" "$OVERLAY_TEMPLATE" 'repository: ghcr.io/itamar-ratson/backstage-k8s-full/${{ values.name }}'
+assert_contains "overlay references resolved GHCR app path" "$OVERLAY_TEMPLATE" 'repository: ${{ values.imageRepositoryBase }}/${{ values.name }}'
 assert_contains "overlay starts with empty tag" "$OVERLAY_TEMPLATE" 'tag: ""'
 assert_contains "overlay uses IfNotPresent pull policy" "$OVERLAY_TEMPLATE" "pullPolicy: IfNotPresent"
 assert_not_contains "application scaffold does not emit deploy values path" "$APPLICATION_TEMPLATE" "targetPath: deploy/dev"
+assert_contains "application scaffold resolves platform defaults first" "$APPLICATION_TEMPLATE" "action: platform:resolve-repo-url"
+assert_contains "ci-pipeline scaffold resolves platform defaults first" "$TEMPLATE" "action: platform:resolve-repo-url"
+assert_contains "decommission scaffold resolves platform defaults first" "$DECOMMISSION_TEMPLATE" "action: platform:resolve-repo-url"
 assert_contains "decommission reads source paths annotation" "$DECOMMISSION_TEMPLATE" "backstage.io/source-paths"
 assert_contains "decommission PR documents ArgoCD prune" "$DECOMMISSION_TEMPLATE" "ArgoCD will detect the removal and prune the running resources within ~3 minutes."
 assert_not_contains "decommission PR does not mention manual helm uninstall" "$DECOMMISSION_TEMPLATE" "helm uninstall"

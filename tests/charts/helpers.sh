@@ -89,6 +89,13 @@ assert_git_ignored() {
   fi
 }
 
+render_gitops_dev_chart() {
+  local repo_url="$1" target_revision="$2"
+  helm template gitops-dev gitops/dev \
+    --set-string "repoURL=$repo_url" \
+    --set-string "targetRevision=$target_revision" 2>&1
+}
+
 report_results() {
   local suite="$1"
   echo ""

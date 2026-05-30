@@ -10,8 +10,8 @@ CALLER_WORKFLOW_PATH=".github/workflows/caller-\${{ values.name }}.yaml"
 BUMP_FILE_PATH="deploy/dev/\${{ values.name }}.yaml"
 CATALOG_INFO_PATH="deploy/dev/\${{ values.name }}.catalog-info.yaml"
 SOURCE_PATHS_ANNOTATION="backstage.io/source-paths: '[\"$CALLER_WORKFLOW_PATH\",\"$BUMP_FILE_PATH\",\"$CATALOG_INFO_PATH\"]'"
-CALLER_WORKFLOW_URL="https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/$CALLER_WORKFLOW_PATH"
-WORKFLOW_RUNS_URL="https://github.com/Itamar-Ratson/backstage-k8s-full/actions/workflows/caller-\${{ values.name }}.yaml"
+CALLER_WORKFLOW_URL="https://github.com/\${{ values.repositoryPath }}/blob/main/$CALLER_WORKFLOW_PATH"
+WORKFLOW_RUNS_URL="https://github.com/\${{ values.repositoryPath }}/actions/workflows/caller-\${{ values.name }}.yaml"
 
 echo "=== CI pipeline catalog scaffold tests ==="
 
@@ -23,7 +23,7 @@ assert_contains "catalog skeleton has exact source paths" "$CATALOG_TEMPLATE" "$
 assert_contains "catalog skeleton source paths include caller workflow" "$CATALOG_TEMPLATE" "$CALLER_WORKFLOW_PATH"
 assert_contains "catalog skeleton source paths include bump file" "$CATALOG_TEMPLATE" "$BUMP_FILE_PATH"
 assert_contains "catalog skeleton source paths include catalog file" "$CATALOG_TEMPLATE" "$CATALOG_INFO_PATH"
-assert_contains "catalog skeleton has project slug" "$CATALOG_TEMPLATE" "github.com/project-slug: Itamar-Ratson/backstage-k8s-full"
+assert_not_contains "catalog skeleton omits project slug" "$CATALOG_TEMPLATE" "github.com/project-slug"
 assert_contains "catalog skeleton source link targets caller workflow" "$CATALOG_TEMPLATE" "backstage.io/source-location: url:$CALLER_WORKFLOW_URL"
 assert_contains "catalog skeleton links to workflow runs" "$CATALOG_TEMPLATE" "url: $WORKFLOW_RUNS_URL"
 assert_contains "catalog skeleton carries system" "$CATALOG_TEMPLATE" 'system: ${{ values.system }}'

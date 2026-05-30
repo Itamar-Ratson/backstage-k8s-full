@@ -29,7 +29,8 @@ assert_contains "deployment composes image repository and tag" "$DEPLOYMENT_TEMP
 assert_contains "deployment uses image pull policy value" "$DEPLOYMENT_TEMPLATE" 'imagePullPolicy: {{ .Values.image.pullPolicy }}'
 assert_contains "helpers scaffold emits kubernetes-id label" "$HELPERS_TEMPLATE" "backstage.io/kubernetes-id: {{ .Chart.Name }}"
 assert_contains "catalog scaffold has kubernetes-id annotation" "$CATALOG_TEMPLATE" 'backstage.io/kubernetes-id: ${{ values.name }}'
-assert_contains "catalog source-location uses workload path" "$CATALOG_TEMPLATE" 'tree/main/charts/workloads/${{ values.name }}/'
+assert_not_contains "catalog scaffold omits source-location annotation" "$CATALOG_TEMPLATE" "backstage.io/source-location"
+assert_not_contains "catalog scaffold omits project slug annotation" "$CATALOG_TEMPLATE" "github.com/project-slug"
 assert_contains "scaffold owns its namespace" "$NAMESPACE_TEMPLATE" "kind: Namespace"
 assert_contains "scaffold namespace opts into the edge gateway" "$NAMESPACE_TEMPLATE" "gateway-routes: enabled"
 

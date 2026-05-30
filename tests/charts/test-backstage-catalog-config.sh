@@ -9,6 +9,8 @@ echo "=== Catalog config tests ==="
 output=$(helm template backstage "$CHART_DIR" -f "$FIXTURES/catalog-discovery.yaml" 2>&1)
 assert_contains "ConfigMap has catalog url location type" "$output" "type: url"
 assert_contains "ConfigMap has discovery glob target" "$output" "**/*catalog-info.yaml"
+assert_contains "ConfigMap uses GitHub owner placeholder" "$output" '${GITHUB_OWNER}'
+assert_contains "ConfigMap uses GitHub repo placeholder" "$output" '${GITHUB_REPO}'
 
 # Test 2: Default values render expanded catalog rules allowlist
 assert_contains "catalog rules include Component" "$output" "Component"

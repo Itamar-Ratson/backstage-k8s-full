@@ -3,6 +3,8 @@ set -euo pipefail
 
 # shellcheck source=helpers.sh
 source "$(dirname "$0")/helpers.sh"
+# shellcheck source=../lib/platform-identity.sh
+source "$(dirname "$0")/../lib/platform-identity.sh"
 
 echo "=== Template registration tests ==="
 
@@ -13,13 +15,12 @@ if ! command -v yq >/dev/null 2>&1; then
 fi
 
 CATALOG_INFO="catalog-info.yaml"
-REPO_URL="https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main"
 
 mapfile -t templates < <(find templates -mindepth 2 -maxdepth 2 -type f -name template.yaml | sort)
 
 for template_path in "${templates[@]}"; do
   template_name="$(basename "$(dirname "$template_path")")"
-  expected_target="${REPO_URL}/${template_path}"
+  expected_target="./${template_path}"
   matching_targets="$(EXPECTED_TARGET="$expected_target" yq eval-all -N 'select(.kind == "Location" and .spec.target == env(EXPECTED_TARGET)) | .spec.target' "$CATALOG_INFO")"
 
   assert_contains "registered template ${template_name}" "$matching_targets" "$expected_target"
@@ -38,7 +39,7 @@ done
 mapfile -t registered_template_targets < <(yq eval-all -N 'select(.kind == "Location" and .spec.target != null and (.spec.target | contains("/templates/"))) | .spec.target' "$CATALOG_INFO" | sort)
 
 for target in "${registered_template_targets[@]}"; do
-  template_path="${target#${REPO_URL}/}"
+  template_path="${target#./}"
 
   if [ -f "$template_path" ]; then
     PASS=$((PASS + 1))

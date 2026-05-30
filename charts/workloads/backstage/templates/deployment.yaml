@@ -55,6 +55,8 @@ spec:
             - name: http
               containerPort: 7007
           envFrom:
+            - configMapRef:
+                name: platform-identity
             - secretRef:
                 name: {{ include "backstage.postgresSecretName" . }}
             - secretRef:

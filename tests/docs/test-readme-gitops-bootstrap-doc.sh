@@ -14,6 +14,12 @@ assert_contains "bootstrap links GitHub App setup guide" "$README_CONTENT" "docs
 assert_contains "bootstrap fills terraform tfvars" "$README_CONTENT" "terraform/terraform.tfvars"
 assert_contains "bootstrap applies terraform" "$README_CONTENT" "cd terraform && terraform apply"
 assert_contains "bootstrap points to Backstage URL" "$README_CONTENT" "http://backstage.localtest.me"
+assert_contains "fork setup section exists" "$README_CONTENT" "## Fork setup"
+assert_contains "fork setup copies tfvars example" "$README_CONTENT" "terraform/terraform.tfvars.example"
+assert_contains "fork setup documents github owner" "$README_CONTENT" "github_owner"
+assert_contains "fork setup documents github repo" "$README_CONTENT" "github_repo"
+assert_contains "cosign example uses GHCR base placeholder" "$README_CONTENT" 'cosign verify ${GHCR_BASE}/<app>:<sha>'
+assert_not_contains "README has no literal repo slug" "$README_CONTENT" "backstage-k8s-full/<app>"
 assert_contains "verifying install section exists" "$README_CONTENT" "## Verifying the install"
 assert_contains "verification uses ArgoCD applications" "$README_CONTENT" "kubectl get applications -n argocd"
 assert_contains "verification has curl check" "$README_CONTENT" "curl -fsS --retry"

@@ -12,7 +12,7 @@ The Create form collects the values needed to render the chart and catalog entit
 | `description` | Yes | Human-readable summary used in `Chart.yaml`, `catalog-info.yaml`, and starter docs. |
 | `owner` | Yes | Backstage `Group` or `User` that owns the generated Component. Defaults to `platform`. |
 | `system` | Yes | Backstage `System` that the generated Component belongs to. |
-| `repository` | Yes | Container image repository placed in the chart defaults. Defaults to `ghcr.io/itamar-ratson/backstage-k8s-full/<name>`. |
+| `repository` | Yes | Container image repository placed in the chart defaults. Defaults to `${GHCR_BASE}/<name>`. |
 | `tag` | Yes | Container image tag placed in the chart defaults. Defaults to `latest`. |
 | `host` | No | Public hostname for the generated `HTTPRoute`. Defaults to `<name>.localtest.me`. |
 | `port` | No | Container and Service port. Defaults to `80`. |

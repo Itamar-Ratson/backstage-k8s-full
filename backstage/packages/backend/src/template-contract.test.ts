@@ -10,16 +10,28 @@ const nunjucks = require('nunjucks') as {
 };
 
 const repoRoot = path.resolve(__dirname, '../../../../');
-const repoSlug = 'Itamar-Ratson/backstage-k8s-full';
-const repoUrl = `https://github.com/${repoSlug}`;
-const defaultImageRepositoryExpression =
-  "repository: ${{ parameters.repository or ('ghcr.io/itamar-ratson/backstage-k8s-full/' + parameters.name) }}";
 const catalogInfoPath = 'catalog-info.yaml';
 const chartTemplatePath = 'templates/application/template.yaml';
+const ciPipelineTemplatePath = 'templates/ci-pipeline/template.yaml';
 const decommissionTemplatePath =
   'templates/decommission-component/template.yaml';
+const platformTemplatePaths = [
+  chartTemplatePath,
+  ciPipelineTemplatePath,
+  decommissionTemplatePath,
+] as const;
 const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
 const readmePath = 'README.md';
+const forbiddenRepoSlugs = [
+  ['Itamar-Ratson', 'backstage-k8s-full'].join('/'),
+  ['itamar-ratson', 'backstage-k8s-full'].join('/'),
+] as const;
+const ignoredRepoSearchDirectories = new Set([
+  '.git',
+  '.terraform',
+  'node_modules',
+  '.techdocs-output',
+]);
 
 function readRepoFile(relativePath: string) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -43,7 +55,8 @@ describe('application template contract', () => {
         path: catalogInfoPath,
         snippets: [
           'kind: Location',
-          `target: ${repoUrl}/blob/main/templates/application/template.yaml`,
+          'name: application-template',
+          'target: ./templates/application/template.yaml',
         ],
       },
       {
@@ -54,7 +67,7 @@ describe('application template contract', () => {
           'branchName: scaffold/application/${{ parameters.name }}',
           'draft: false',
           'targetPath: charts/workloads/${{ parameters.name }}',
-          defaultImageRepositoryExpression,
+          "repository: ${{ parameters.repository or (steps.defaults.output.imageRepositoryBase + '/' + parameters.name) }}",
           'tag: ${{ parameters.tag }}',
         ],
       },
@@ -64,9 +77,6 @@ describe('application template contract', () => {
           'lifecycle: experimental',
           'backstage.io/kubernetes-id: ${{ values.name }}',
           `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}"]'`,
-          `github.com/project-slug: ${repoSlug}`,
-          `backstage.io/source-location: url:${repoUrl}/tree/main/charts/workloads/` +
-            '${{ values.name }}/',
         ],
       },
     ] as const;
@@ -85,6 +95,73 @@ describe('application template contract', () => {
   });
 });
 
+describe('scaffolder platform identity contract', () => {
+  it.each(platformTemplatePaths)(
+    '%s resolves platform defaults before other steps',
+    templatePath => {
+      const template = readRepoFile(templatePath);
+      const firstStep = extractFirstStep(template);
+
+      expect(firstStep).toContain('id: defaults');
+      expect(firstStep).toContain('action: platform:resolve-repo-url');
+    },
+  );
+
+  it.each(platformTemplatePaths)(
+    '%s publishes pull requests to the resolved repo URL',
+    templatePath => {
+      expect(readRepoFile(templatePath)).toContain(
+        'repoUrl: ${{ steps.defaults.output.repoUrl }}',
+      );
+    },
+  );
+
+  it('uses the resolved image repository base in scaffolder output', () => {
+    expect(readRepoFile(chartTemplatePath)).toContain(
+      "steps.defaults.output.imageRepositoryBase + '/' + parameters.name",
+    );
+    expect(readRepoFile(ciPipelineTemplatePath)).toContain(
+      'imageRepositoryBase: ${{ steps.defaults.output.imageRepositoryBase }}',
+    );
+  });
+
+  it('keeps scaffolder templates and backend action code free of literal repo slugs', () => {
+    const pathsToCheck = [
+      'templates',
+      'backstage/packages/backend/src',
+    ] as const;
+
+    for (const relativePath of pathsToCheck) {
+      for (const filePath of listFiles(path.join(repoRoot, relativePath))) {
+        const contents = fs.readFileSync(filePath, 'utf8');
+
+        for (const repoSlug of forbiddenRepoSlugs) {
+          expect(contents).not.toContain(repoSlug);
+        }
+      }
+    }
+  });
+
+  it('omits fork-specific catalog annotations from the application skeleton', () => {
+    const catalogInfo = readRepoFile(chartCatalogPath);
+
+    expect(catalogInfo).not.toContain('github.com/project-slug:');
+    expect(catalogInfo).not.toContain('backstage.io/source-location:');
+  });
+
+  it('omits fork-specific catalog annotations from in-repo catalog-info files', () => {
+    const catalogInfoFiles = listRepoCatalogInfoFiles(repoRoot);
+
+    expect(catalogInfoFiles.length).toBeGreaterThan(0);
+    for (const filePath of catalogInfoFiles) {
+      const contents = fs.readFileSync(filePath, 'utf8');
+
+      expect(contents).not.toContain('github.com/project-slug:');
+      expect(contents).not.toContain('backstage.io/source-location:');
+    }
+  });
+});
+
 describe('generic decommission component template contract', () => {
   it('registers the template and documents the decommission flow', () => {
     const fileExpectations = [
@@ -92,7 +169,8 @@ describe('generic decommission component template contract', () => {
         path: catalogInfoPath,
         snippets: [
           'kind: Location',
-          `target: ${repoUrl}/blob/main/templates/decommission-component/template.yaml`,
+          'name: decommission-component-template',
+          'target: ./templates/decommission-component/template.yaml',
         ],
       },
       {
@@ -208,4 +286,50 @@ function extractAssertConditions(templateSource: string): string[] {
   }
 
   return conditions;
+}
+
+function extractFirstStep(templateSource: string): string {
+  const stepsIndex = templateSource.indexOf('\n  steps:\n');
+  expect(stepsIndex).toBeGreaterThanOrEqual(0);
+
+  const stepsSource = templateSource.slice(stepsIndex);
+  const firstStepMatch = stepsSource.match(
+    /\n    - id:[\s\S]*?(?=\n    - id:)/,
+  );
+  expect(firstStepMatch).not.toBeNull();
+
+  return firstStepMatch?.[0] ?? '';
+}
+
+type ListFilesOptions = {
+  fileName?: string;
+  ignoredDirectories?: ReadonlySet<string>;
+};
+
+function listFiles(rootPath: string, options: ListFilesOptions = {}): string[] {
+  const entries = fs.readdirSync(rootPath, { withFileTypes: true });
+  const files: string[] = [];
+
+  for (const entry of entries) {
+    const entryPath = path.join(rootPath, entry.name);
+    if (entry.isDirectory()) {
+      if (!options.ignoredDirectories?.has(entry.name)) {
+        files.push(...listFiles(entryPath, options));
+      }
+    } else if (
+      entry.isFile() &&
+      (!options.fileName || entry.name === options.fileName)
+    ) {
+      files.push(entryPath);
+    }
+  }
+
+  return files;
+}
+
+function listRepoCatalogInfoFiles(rootPath: string): string[] {
+  return listFiles(rootPath, {
+    fileName: 'catalog-info.yaml',
+    ignoredDirectories: ignoredRepoSearchDirectories,
+  });
 }

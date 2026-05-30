@@ -39,12 +39,14 @@ jobs:
       - name: charts-lint
         run: |
           ./tests/charts/test-actionlint.sh
+          ./tests/charts/test-github-workflow-repo-slug.sh
           ./tests/charts/test-scaffolder-template-syntax.sh
           ./tests/charts/test-scaffolder-form-defaults.sh
           ./tests/charts/test-hello-world-source.sh
           ./tests/charts/test-templates-registered.sh
           ./tests/charts/test-chart-layout.sh
           ./tests/charts/test-no-make-references.sh
+          ./tests/ci/test-no-literal-repo-slug.sh
           ./tests/docs/test-github-app-setup-doc.sh
           ./tests/docs/test-readme-gitops-bootstrap-doc.sh
           helm dependency build charts/platform/argo-cd
@@ -70,6 +72,7 @@ jobs:
           ./tests/charts/test-application-kubernetes-scaffold.sh
           ./tests/charts/test-application-image-renders.sh
           ./tests/charts/test-ci-pipeline-scaffold.sh
+          ./tests/charts/test-ci-pipeline-catalog-scaffold.sh
           ./tests/charts/test-platform-argo-cd-renders.sh
           ./tests/charts/test-platform-envoy-gateway-renders.sh
           ./tests/charts/test-workloads-appset-ignore-missing-value-files.sh

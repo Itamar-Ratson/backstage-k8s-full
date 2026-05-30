@@ -5,9 +5,7 @@ metadata:
   name: platform
   description: Platform infrastructure for the developer portal and supporting services.
   annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/
     backstage.io/techdocs-ref: dir:.
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   owner: platform
 ---
@@ -17,9 +15,7 @@ metadata:
   name: developer-portal
   description: Backstage-based developer portal providing a software catalog, scaffolder, and documentation hub.
   annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/backstage/
     backstage.io/techdocs-ref: dir:.
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   owner: platform
   domain: platform
@@ -30,9 +26,7 @@ metadata:
   name: edge
   description: Edge networking layer providing ingress and routing via Envoy Gateway.
   annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/charts/platform/edge-gateway/
     backstage.io/techdocs-ref: dir:.
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   owner: platform
   domain: platform
@@ -42,9 +36,6 @@ kind: Group
 metadata:
   name: platform
   description: Platform engineering team responsible for infrastructure and developer tooling.
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: team
   children: []
@@ -53,9 +44,6 @@ apiVersion: backstage.io/v1alpha1
 kind: User
 metadata:
   name: itamar
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/tree/main/
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   memberOf:
     - platform
@@ -65,33 +53,24 @@ kind: Location
 metadata:
   name: application-template
   description: Backstage scaffolder template for applications.
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/application/template.yaml
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: url
-  target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/application/template.yaml
+  target: ./templates/application/template.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: decommission-component-template
   description: Backstage scaffolder template for removing scaffolded components.
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/decommission-component/template.yaml
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: url
-  target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/decommission-component/template.yaml
+  target: ./templates/decommission-component/template.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: ci-pipeline-template
   description: Backstage scaffolder template for CI pipeline workflows.
-  annotations:
-    backstage.io/source-location: url:https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/ci-pipeline/template.yaml
-    github.com/project-slug: Itamar-Ratson/backstage-k8s-full
 spec:
   type: url
-  target: https://github.com/Itamar-Ratson/backstage-k8s-full/blob/main/templates/ci-pipeline/template.yaml
+  target: ./templates/ci-pipeline/template.yaml

@@ -80,6 +80,19 @@ resource "kubernetes_secret_v1" "backstage_github_app" {
   type = "Opaque"
 }
 
+resource "kubernetes_config_map_v1" "platform_identity" {
+  metadata {
+    name      = "platform-identity"
+    namespace = kubernetes_namespace_v1.backstage.metadata[0].name
+  }
+
+  data = {
+    GITHUB_OWNER = var.github_owner
+    GITHUB_REPO  = var.github_repo
+    GHCR_BASE    = local.ghcr_base
+  }
+}
+
 resource "helm_release" "argocd" {
   name             = "argo-cd"
   repository       = "https://argoproj.github.io/argo-helm"
@@ -102,16 +115,14 @@ resource "kubectl_manifest" "root_app" {
       spec = merge(
         local.root_application.spec,
         {
-          source = merge(
-            local.root_application.spec.source,
-            {
-              repoURL = var.gitops_repo_url
-            }
-          )
+          source = local.root_application_source
         }
       )
     }
   ))
 
-  depends_on = [helm_release.argocd]
+  depends_on = [
+    helm_release.argocd,
+    kubernetes_config_map_v1.platform_identity,
+  ]
 }

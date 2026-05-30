@@ -25,6 +25,8 @@ if [ -f "$DOC" ]; then
   assert_contains "private key warning" "$content" ".pem"
   assert_contains "tfvars warning" "$content" "terraform.tfvars"
   assert_contains "do not commit warning" "$content" "must not be committed"
+  assert_contains "fork placeholder used for installation" "$content" "<your-fork>"
+  assert_not_contains "full repo slug is not hardcoded" "$content" "backstage-k8s-full"
 else
   FAIL=$((FAIL + 1))
   echo "FAIL: GitHub App setup guide exists"

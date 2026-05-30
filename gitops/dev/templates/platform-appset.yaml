@@ -19,21 +19,21 @@ spec:
             syncWave: "-1"
   template:
     metadata:
-      name: '{{.name}}'
+      name: '{{ "{{.name}}" }}'
       annotations:
-        argocd.argoproj.io/sync-wave: '{{.syncWave}}'
+        argocd.argoproj.io/sync-wave: '{{ "{{.syncWave}}" }}'
     spec:
       project: default
       source:
-        repoURL: https://github.com/Itamar-Ratson/backstage-k8s-full.git
-        targetRevision: main
-        path: charts/platform/{{.name}}
+        repoURL: {{ .Values.repoURL | quote }}
+        targetRevision: {{ .Values.targetRevision | quote }}
+        path: charts/platform/{{ "{{.name}}" }}
         helm:
           valueFiles:
-            - /deploy/dev/{{.name}}.yaml
+            - /deploy/dev/{{ "{{.name}}" }}.yaml
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{.namespace}}'
+        namespace: '{{ "{{.namespace}}" }}'
       syncPolicy:
         automated:
           prune: true

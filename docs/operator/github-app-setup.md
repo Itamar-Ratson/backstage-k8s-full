@@ -45,7 +45,7 @@ No organization permissions are required for the local dev flow.
 
 ## Install The App
 
-After creating the App, install it on the repositories Backstage should read from and write to. For this repo, select only `Itamar-Ratson/backstage-k8s-full` unless you intentionally want Backstage catalog discovery to scan additional repositories.
+After creating the App, install it on the repositories Backstage should read from and write to. For this repo, select only `<your-fork>` unless you intentionally want Backstage catalog discovery to scan additional repositories.
 
 If the App is organization-owned, an organization owner may need to approve the installation before it becomes usable.
 

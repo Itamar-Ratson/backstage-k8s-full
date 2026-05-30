@@ -68,6 +68,10 @@ spec:
           description: Explicit allowlist of paths that should trigger an image build. Leave blank to default to `<name>/**`.
           ui:widget: textarea
   steps:
+    - id: defaults
+      name: Resolve platform defaults
+      action: platform:resolve-repo-url
+
     - id: fetchTemplate
       name: Fetch template
       action: fetch:template
@@ -85,11 +89,13 @@ spec:
           bump-file: ${{ parameters['bump-file'] or ('deploy/dev/' + parameters.name + '.yaml') }}
           bump-yaml-path: ${{ parameters['bump-yaml-path'] or '.image.tag' }}
           path-filter-patterns: ${{ parameters['path-filter-patterns'] or (parameters.name + '/**') }}
+          repositoryPath: ${{ steps.defaults.output.repoUrl | replace('github.com?owner=', '') | replace('&repo=', '/') }}
+          imageRepositoryBase: ${{ steps.defaults.output.imageRepositoryBase }}
     - id: publishPullRequest
       name: Publish pull request
       action: publish:github:pull-request
       input:
-        repoUrl: github.com?owner=Itamar-Ratson&repo=backstage-k8s-full
+        repoUrl: ${{ steps.defaults.output.repoUrl }}
         branchName: scaffold/ci-pipeline/${{ parameters.name }}
         targetBranchName: main
         title: "Scaffold CI pipeline: ${{ parameters.name }}"

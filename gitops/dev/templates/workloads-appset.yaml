@@ -7,13 +7,13 @@ spec:
   goTemplate: true
   generators:
     - git:
-        repoURL: https://github.com/Itamar-Ratson/backstage-k8s-full.git
-        revision: main
+        repoURL: {{ .Values.repoURL | quote }}
+        revision: {{ .Values.targetRevision | quote }}
         directories:
           - path: charts/workloads/*
   template:
     metadata:
-      name: '{{.path.basename}}'
+      name: '{{ "{{.path.basename}}" }}'
       annotations:
         argocd.argoproj.io/sync-wave: "0"
       finalizers:
@@ -21,16 +21,19 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/Itamar-Ratson/backstage-k8s-full.git
-        targetRevision: main
-        path: '{{.path.path}}'
+        repoURL: {{ .Values.repoURL | quote }}
+        targetRevision: {{ .Values.targetRevision | quote }}
+        path: '{{ "{{.path.path}}" }}'
         helm:
           ignoreMissingValueFiles: true
           valueFiles:
-            - /deploy/dev/{{.path.basename}}.yaml
+            - /deploy/dev/{{ "{{.path.basename}}" }}.yaml
+          valuesObject:
+            image:
+              repository: {{ printf "%s/{{.path.basename}}" .Values.ghcrBase | quote }}
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{.path.basename}}'
+        namespace: '{{ "{{.path.basename}}" }}'
       syncPolicy:
         automated:
           prune: true

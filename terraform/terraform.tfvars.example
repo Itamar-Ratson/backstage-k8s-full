@@ -1,3 +1,6 @@
+github_owner = "Itamar-Ratson"
+github_repo  = "backstage-k8s-full"
+
 APP_ID        = "123456"
 CLIENT_ID     = "Iv1.exampleclientid"
 CLIENT_SECRET = "example-client-secret"
