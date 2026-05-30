@@ -39,6 +39,18 @@ assert_not_matches() {
   fi
 }
 
+assert_equals() {
+  local label="$1" actual="$2" expected="$3"
+  if [ "$actual" = "$expected" ]; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  expected: $expected"
+    echo "  got: $actual"
+  fi
+}
+
 assert_fails() {
   local label="$1" expected_msg="$2"
   shift 2

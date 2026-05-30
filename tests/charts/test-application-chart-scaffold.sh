@@ -10,6 +10,7 @@ TEMPLATE="$(cat templates/application/template.yaml)"
 CHART_TEMPLATE="$(cat "$CHART_SKELETON_DIR/Chart.yaml.njk" 2>/dev/null || true)"
 VALUES_TEMPLATE="$(cat "$CHART_SKELETON_DIR/values.yaml.njk" 2>/dev/null || true)"
 CATALOG_TEMPLATE="$(cat "$CHART_SKELETON_DIR/catalog-info.yaml.njk" 2>/dev/null || true)"
+NAMESPACE_TEMPLATE="$(cat "$CHART_SKELETON_DIR/templates/namespace.yaml" 2>/dev/null || true)"
 DEPLOY_DEV_TEMPLATE="$(cat "$DEPLOY_DEV_SKELETON_DIR/values.yaml.njk" 2>/dev/null || true)"
 
 echo "=== Application chart scaffold tests ==="
@@ -36,7 +37,13 @@ assert_contains "chart catalog records generated source paths" "$CATALOG_TEMPLAT
 assert_contains "chart catalog uses Helm instance selector" "$CATALOG_TEMPLATE" "backstage.io/kubernetes-label-selector: 'app.kubernetes.io/instance=\${{ values.name }}'"
 assert_not_contains "chart catalog omits kubernetes-id annotation" "$CATALOG_TEMPLATE" "backstage.io/kubernetes-id"
 
-assert_path_missing "chart skeleton has no templates subdir" "$CHART_SKELETON_DIR/templates"
+assert_directory_exists "chart skeleton has templates subdir" "$CHART_SKELETON_DIR/templates"
+assert_file_exists "chart skeleton ships namespace template" "$CHART_SKELETON_DIR/templates/namespace.yaml"
+assert_contains "chart namespace template declares Namespace kind" "$NAMESPACE_TEMPLATE" "kind: Namespace"
+assert_contains "chart namespace template uses release namespace" "$NAMESPACE_TEMPLATE" "name: {{ .Release.Namespace }}"
+assert_contains "chart namespace template enables gateway routes" "$NAMESPACE_TEMPLATE" "gateway-routes: enabled"
+CHART_TEMPLATE_FILES="$(find "$CHART_SKELETON_DIR/templates" -maxdepth 1 -type f -printf '%f\n' 2>/dev/null | sort || true)"
+assert_equals "chart skeleton templates contains only namespace" "$CHART_TEMPLATE_FILES" "namespace.yaml"
 assert_no_matching_paths "chart skeleton omits _helpers.tpl" "$CHART_SKELETON_DIR" "_helpers.tpl"
 
 assert_contains "template exposes single chart reference field" "$TEMPLATE" "chartRef:"
