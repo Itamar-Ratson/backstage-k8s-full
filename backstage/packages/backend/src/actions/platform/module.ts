@@ -4,6 +4,7 @@ import {
 } from '@backstage/backend-plugin-api';
 import { scaffolderActionsExtensionPoint } from '@backstage/plugin-scaffolder-node/alpha';
 
+import { createParseOciRefAction } from './parseOciRef';
 import { createResolveRepoUrlAction } from './resolveRepoUrl';
 
 export const scaffolderPlatformActionsModule = createBackendModule({
@@ -16,7 +17,10 @@ export const scaffolderPlatformActionsModule = createBackendModule({
         scaffolder: scaffolderActionsExtensionPoint,
       },
       async init({ config, scaffolder }) {
-        scaffolder.addActions(createResolveRepoUrlAction({ config }));
+        scaffolder.addActions(
+          createResolveRepoUrlAction({ config }),
+          createParseOciRefAction(),
+        );
       },
     });
   },

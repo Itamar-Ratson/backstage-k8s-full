@@ -22,6 +22,8 @@ const platformTemplatePaths = [
 ] as const;
 const applicationImageCatalogPath =
   'templates/application/skeleton/image/catalog-info.yaml.njk';
+const platformActionsModulePath =
+  'backstage/packages/backend/src/actions/platform/module.ts';
 const readmePath = 'README.md';
 const forbiddenRepoSlugs = [
   ['Itamar-Ratson', 'backstage-k8s-full'].join('/'),
@@ -121,6 +123,13 @@ describe('scaffolder platform identity contract', () => {
     expect(readRepoFile(ciPipelineTemplatePath)).toContain(
       'imageRepositoryBase: ${{ steps.defaults.output.imageRepositoryBase }}',
     );
+  });
+
+  it('registers platform scaffolder actions', () => {
+    expectFileToContain(platformActionsModulePath, [
+      'createResolveRepoUrlAction({ config })',
+      'createParseOciRefAction()',
+    ]);
   });
 
   it('keeps scaffolder templates and backend action code free of literal repo slugs', () => {

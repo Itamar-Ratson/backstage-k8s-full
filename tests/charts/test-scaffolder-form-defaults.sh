@@ -40,6 +40,17 @@ read_application_template() {
   yq eval -r "$query" "$APPLICATION_TEMPLATE"
 }
 
+assert_line_not_present() {
+  local label="$1" output="$2" unexpected="$3"
+  if ! grep -qxF -- "$unexpected" <<<"$output"; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  expected no line equal to: $unexpected"
+  fi
+}
+
 source_type_enum="$(read_application_template "${APPLICATION_PARAMETERS_QUERY}.properties.sourceType.enum[]")"
 source_type_required="$(read_application_template "${APPLICATION_PARAMETERS_QUERY}.required[]")"
 source_type_widget="$(read_application_template "${APPLICATION_PARAMETERS_QUERY}.properties.sourceType.\"ui:widget\"")"
@@ -54,20 +65,20 @@ assert_contains "sourceType defaults to image" "$source_type_default" "image"
 chart_branch_required="$(read_application_template "${CHART_BRANCH_QUERY} | .required[]")"
 chart_branch_properties="$(read_application_template "${CHART_BRANCH_QUERY} | .properties | keys | .[]")"
 
-for field in chart repoURL targetRevision; do
-  assert_contains "chart branch requires ${field}" "$chart_branch_required" "$field"
-  assert_contains "chart branch exposes ${field}" "$chart_branch_properties" "$field"
-done
+assert_contains "chart branch requires chartRef" "$chart_branch_required" "chartRef"
+assert_contains "chart branch exposes chartRef" "$chart_branch_properties" "chartRef"
+assert_line_not_present "chart branch no longer exposes chart" "$chart_branch_properties" "chart"
+assert_line_not_present "chart branch no longer exposes repoURL" "$chart_branch_properties" "repoURL"
+assert_line_not_present "chart branch no longer exposes targetRevision" "$chart_branch_properties" "targetRevision"
 
-chart_title="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.chart.title")"
-repo_url_title="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.repoURL.title")"
-target_revision_title="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.targetRevision.title")"
-repo_url_description="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.repoURL.description")"
+chart_ref_title="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.chartRef.title")"
+chart_ref_description="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.chartRef.description")"
+chart_ref_pattern="$(read_application_template "${CHART_BRANCH_QUERY} | .properties.chartRef.pattern")"
 
-assert_contains "chart field has expected title" "$chart_title" "Chart name"
-assert_contains "repoURL field has expected title" "$repo_url_title" "OCI repository URL"
-assert_contains "targetRevision field has expected title" "$target_revision_title" "Chart version"
-assert_contains "repoURL field describes OCI prefix" "$repo_url_description" "oci://"
+assert_contains "chartRef field has expected title" "$chart_ref_title" "Chart reference"
+assert_contains "chartRef field describes OCI prefix" "$chart_ref_description" "The oci:// prefix is optional."
+assert_contains "chartRef field describes example full reference" "$chart_ref_description" "ghcr.io/kagent-dev/kagent/helm/kagent:0.9.4"
+assert_contains "chartRef field has validation pattern" "$chart_ref_pattern" '^(oci://)?[a-z0-9.-]+(:[0-9]+)?(/[a-zA-Z0-9._-]+)+:[a-zA-Z0-9._-]+$'
 
 image_branch_properties="$(read_application_template "${IMAGE_BRANCH_QUERY} | .properties | keys | .[]")"
 image_tag_default="$(read_application_template "${IMAGE_BRANCH_QUERY} | .properties.tag.default")"

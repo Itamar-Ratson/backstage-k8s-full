@@ -39,8 +39,24 @@ assert_not_contains "chart catalog omits kubernetes-id annotation" "$CATALOG_TEM
 assert_path_missing "chart skeleton has no templates subdir" "$CHART_SKELETON_DIR/templates"
 assert_no_matching_paths "chart skeleton omits _helpers.tpl" "$CHART_SKELETON_DIR" "_helpers.tpl"
 
+assert_contains "template exposes single chart reference field" "$TEMPLATE" "chartRef:"
+assert_contains "template labels chart reference field" "$TEMPLATE" "title: Chart reference"
+assert_contains "template rejects missing OCI chart version in form" "$TEMPLATE" 'pattern: ^(oci://)?[a-z0-9.-]+(:[0-9]+)?(/[a-zA-Z0-9._-]+)+:[a-zA-Z0-9._-]+$'
+assert_not_contains "template no longer exposes separate chart field" "$TEMPLATE" "title: Chart name"
+assert_not_contains "template no longer exposes separate repoURL field" "$TEMPLATE" "title: OCI repository URL"
+assert_not_contains "template no longer exposes separate targetRevision field" "$TEMPLATE" "title: Chart version"
+assert_contains "template parses chart reference before rendering" "$TEMPLATE" "id: parseRef"
+assert_contains "template uses OCI parser action" "$TEMPLATE" "action: platform:parse-oci-ref"
+assert_contains "template passes chartRef into parser" "$TEMPLATE" 'ref: ${{ parameters.chartRef }}'
+assert_contains "template feeds parsed chart to skeleton" "$TEMPLATE" 'chart: ${{ steps.parseRef.output.chart }}'
+assert_contains "template feeds parsed repository to skeleton" "$TEMPLATE" 'repoURL: ${{ steps.parseRef.output.repository }}'
+assert_contains "template feeds parsed version to skeleton" "$TEMPLATE" 'targetRevision: ${{ steps.parseRef.output.version }}'
 assert_contains "template fetches chart skeleton" "$TEMPLATE" "url: ./skeleton/chart"
 assert_contains "template writes deploy dev placeholder" "$TEMPLATE" 'targetPath: deploy/dev/${{ parameters.name }}.yaml'
+assert_contains "template echoes original chartRef in PR description" "$TEMPLATE" 'Chart reference: `${{ parameters.chartRef }}`'
+assert_contains "template echoes parsed chart in PR description" "$TEMPLATE" 'Parsed chart: `${{ steps.parseRef.output.chart }}`'
+assert_contains "template echoes parsed repository in PR description" "$TEMPLATE" 'Parsed repository: `${{ steps.parseRef.output.repository }}`'
+assert_contains "template echoes parsed version in PR description" "$TEMPLATE" 'Parsed version: `${{ steps.parseRef.output.version }}`'
 assert_contains "template documents ci-pipeline caveat" "$TEMPLATE" "ci-pipeline does not compose with chart-based apps"
 assert_contains "template documents upstream networking ownership" "$TEMPLATE" "Networking and ingress are the upstream chart's responsibility"
 assert_contains "template documents dead injected values" "$TEMPLATE" "image.repository and rbac.adminUser injected by workloads-appset are inert dead values"
