@@ -12,7 +12,7 @@ type ParseOciRefOutput = {
   version: string;
 };
 
-function createActionContext(ref: string) {
+async function parseRef(ref: string) {
   const outputs: Record<string, unknown> = {};
   const ctx = {
     input: { ref },
@@ -20,19 +20,17 @@ function createActionContext(ref: string) {
       outputs[name] = value;
     },
   } as ActionContext<ParseOciRefInput, ParseOciRefOutput>;
-  return { ctx, outputs };
+
+  await createParseOciRefAction().handler(ctx);
+
+  return outputs;
 }
 
 describe('createParseOciRefAction', () => {
   it('parses a reference with an oci prefix', async () => {
-    const action = createParseOciRefAction();
-    const { ctx, outputs } = createActionContext(
-      'oci://ghcr.io/kagent-dev/kagent/helm/kagent:0.9.4',
-    );
-
-    await action.handler(ctx);
-
-    expect(outputs).toEqual({
+    await expect(
+      parseRef('oci://ghcr.io/kagent-dev/kagent/helm/kagent:0.9.4'),
+    ).resolves.toEqual({
       chart: 'kagent',
       repository: 'oci://ghcr.io/kagent-dev/kagent/helm',
       version: '0.9.4',
@@ -40,14 +38,9 @@ describe('createParseOciRefAction', () => {
   });
 
   it('parses a reference without an oci prefix', async () => {
-    const action = createParseOciRefAction();
-    const { ctx, outputs } = createActionContext(
-      'ghcr.io/kagent-dev/kagent/helm/kagent:0.9.4',
-    );
-
-    await action.handler(ctx);
-
-    expect(outputs).toEqual({
+    await expect(
+      parseRef('ghcr.io/kagent-dev/kagent/helm/kagent:0.9.4'),
+    ).resolves.toEqual({
       chart: 'kagent',
       repository: 'oci://ghcr.io/kagent-dev/kagent/helm',
       version: '0.9.4',
@@ -55,14 +48,7 @@ describe('createParseOciRefAction', () => {
   });
 
   it('parses a registry with a port right-to-left', async () => {
-    const action = createParseOciRefAction();
-    const { ctx, outputs } = createActionContext(
-      'localhost:5000/charts/foo:1.0',
-    );
-
-    await action.handler(ctx);
-
-    expect(outputs).toEqual({
+    await expect(parseRef('localhost:5000/charts/foo:1.0')).resolves.toEqual({
       chart: 'foo',
       repository: 'oci://localhost:5000/charts',
       version: '1.0',
@@ -70,28 +56,21 @@ describe('createParseOciRefAction', () => {
   });
 
   it('rejects a reference with no version separator in the suffix', async () => {
-    const action = createParseOciRefAction();
-    const { ctx } = createActionContext('ghcr.io/kagent-dev/kagent/helm/kagent');
-
-    await expect(action.handler(ctx)).rejects.toThrow(
+    await expect(
+      parseRef('ghcr.io/kagent-dev/kagent/helm/kagent'),
+    ).rejects.toThrow(
       'OCI chart reference must include a chart version after the chart name',
     );
   });
 
   it('rejects a reference with no chart segment', async () => {
-    const action = createParseOciRefAction();
-    const { ctx } = createActionContext('ghcr.io');
-
-    await expect(action.handler(ctx)).rejects.toThrow(
+    await expect(parseRef('ghcr.io')).rejects.toThrow(
       'OCI chart reference must include a registry path and chart name',
     );
   });
 
   it('rejects an empty reference', async () => {
-    const action = createParseOciRefAction();
-    const { ctx } = createActionContext('');
-
-    await expect(action.handler(ctx)).rejects.toThrow(
+    await expect(parseRef('')).rejects.toThrow(
       'OCI chart reference is required',
     );
   });

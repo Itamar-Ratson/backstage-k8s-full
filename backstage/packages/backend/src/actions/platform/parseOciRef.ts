@@ -1,8 +1,15 @@
 import { createTemplateAction } from '@backstage/plugin-scaffolder-node';
 
 const actionId = 'platform:parse-oci-ref';
+const ociRefPrefix = 'oci://';
 
-function parseOciRef(ref: string) {
+type ParsedOciRef = {
+  chart: string;
+  repository: string;
+  version: string;
+};
+
+function parseOciRef(ref: string): ParsedOciRef {
   const normalizedRef = ref.trim().replace(/^oci:\/\//, '');
 
   if (!normalizedRef) {
@@ -16,18 +23,18 @@ function parseOciRef(ref: string) {
     );
   }
 
-  const prefix = normalizedRef.slice(0, lastSlashIndex);
-  const suffix = normalizedRef.slice(lastSlashIndex + 1);
-  const versionSeparatorIndex = suffix.indexOf(':');
+  const repositoryPath = normalizedRef.slice(0, lastSlashIndex);
+  const chartWithVersion = normalizedRef.slice(lastSlashIndex + 1);
+  const versionSeparatorIndex = chartWithVersion.indexOf(':');
   if (versionSeparatorIndex < 0) {
     throw new Error(
       'OCI chart reference must include a chart version after the chart name',
     );
   }
 
-  const chart = suffix.slice(0, versionSeparatorIndex);
-  const version = suffix.slice(versionSeparatorIndex + 1);
-  if (!prefix || !chart || !version) {
+  const chart = chartWithVersion.slice(0, versionSeparatorIndex);
+  const version = chartWithVersion.slice(versionSeparatorIndex + 1);
+  if (!repositoryPath || !chart || !version) {
     throw new Error(
       'OCI chart reference must include a registry path, chart name, and version',
     );
@@ -35,7 +42,7 @@ function parseOciRef(ref: string) {
 
   return {
     chart,
-    repository: `oci://${prefix}`,
+    repository: `${ociRefPrefix}${repositoryPath}`,
     version,
   };
 }
@@ -43,7 +50,8 @@ function parseOciRef(ref: string) {
 export function createParseOciRefAction() {
   return createTemplateAction({
     id: actionId,
-    description: 'Parses a full OCI chart reference into Helm dependency fields.',
+    description:
+      'Parses a full OCI chart reference into Helm dependency fields.',
     schema: {
       input: {
         ref: z => z.string(),
