@@ -18,7 +18,7 @@ tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
 chart_dir="$tmpdir/hello-world"
-cp -R templates/application/skeleton "$chart_dir"
+cp -R templates/application/skeleton/image "$chart_dir"
 
 while IFS= read -r file; do
   rendered="${file%.njk}"

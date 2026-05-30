@@ -21,7 +21,7 @@ The template does not run deployment commands. It creates a pull request contain
 
 ## Pull Request Output
 
-When the scaffolder runs, it fetches `templates/application/skeleton`, renders every `.njk` file with the submitted values, and writes the result to `charts/workloads/<name>/`.
+When the scaffolder runs, it fetches `templates/application/skeleton/image`, renders every `.njk` file with the submitted values, and writes the result to `charts/workloads/<name>/`.
 
 The pull request branch is named `scaffold/application/<name>` and targets `main`. The PR description records the submitted name, description, owner, system, image repository, image tag, host, and port so reviewers can compare the rendered files with the form input.
 

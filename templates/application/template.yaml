@@ -77,7 +77,7 @@ spec:
       name: Fetch template
       action: fetch:template
       input:
-        url: ./skeleton
+        url: ./skeleton/image
         targetPath: charts/workloads/${{ parameters.name }}
         templateFileExtension: '.njk'
         values:

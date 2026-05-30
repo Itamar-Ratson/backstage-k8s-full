@@ -20,7 +20,8 @@ const platformTemplatePaths = [
   ciPipelineTemplatePath,
   decommissionTemplatePath,
 ] as const;
-const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
+const chartCatalogPath =
+  'templates/application/skeleton/image/catalog-info.yaml.njk';
 const readmePath = 'README.md';
 const forbiddenRepoSlugs = [
   ['Itamar-Ratson', 'backstage-k8s-full'].join('/'),

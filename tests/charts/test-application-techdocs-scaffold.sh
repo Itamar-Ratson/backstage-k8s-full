@@ -4,7 +4,7 @@ set -euo pipefail
 # shellcheck source=helpers.sh
 source tests/charts/helpers.sh
 
-SKELETON_DIR="templates/application/skeleton"
+SKELETON_DIR="templates/application/skeleton/image"
 TEMPLATE="$(cat templates/application/template.yaml)"
 MKDOCS_TEMPLATE="$(cat "$SKELETON_DIR/mkdocs.yaml.njk" 2>/dev/null || true)"
 DOCS_INDEX_TEMPLATE="$(cat "$SKELETON_DIR/docs/index.md.njk" 2>/dev/null || true)"
