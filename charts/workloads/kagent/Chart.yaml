@@ -1,0 +1,10 @@
+apiVersion: v2
+name: kagent
+description: kagent
+type: application
+version: 0.1.0
+dependencies:
+  - name:  kagent
+    version: 0.9.4
+    repository: ghcr.io/kagent-dev/kagent/helm/kagent
+    alias: app
