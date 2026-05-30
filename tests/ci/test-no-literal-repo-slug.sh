@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
+# Enforces ADR-0008: derived owner/repo, no committed identity literals.
+# The dev overlay is exempt because it pins the bootstrap image to a public
+# upstream GHCR reference so fresh forks can boot before their own CI
+# publishes. Fork CI rewrites both image.repository and image.tag on first
+# publish (see .github/scripts/bump-image.sh), after which the overlay is
+# fork-owned. The carve-out is for a pull reference, not a derived identity.
 set -euo pipefail
 
 owner="Itamar-Ratson"
 lower_owner="$(printf '%s-%s' itamar ratson)"
 repo="backstage-k8s-full"
 patterns=("${owner}/${repo}" "${lower_owner}/${repo}")
-allowlist='^(./)?docs/adr/0004-backstage-rbac.md$'
+allowlist='^(./)?(docs/adr/0004-backstage-rbac\.md|deploy/dev/backstage\.yaml)$'
 violations=()
 
 for pattern in "${patterns[@]}"; do
