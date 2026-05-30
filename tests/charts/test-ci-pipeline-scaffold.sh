@@ -26,7 +26,8 @@ assert_contains "caller emits app-name substitution" "$CALLER_TEMPLATE" 'app-nam
 assert_contains "caller emits context substitution" "$CALLER_TEMPLATE" 'context: ${{ values.context }}'
 assert_contains "caller emits dockerfile substitution" "$CALLER_TEMPLATE" 'dockerfile: ${{ values.dockerfile }}'
 assert_contains "caller emits bump-file substitution" "$CALLER_TEMPLATE" "bump-file: \${{ values['bump-file'] }}"
-assert_contains "caller emits bump-yaml-path substitution" "$CALLER_TEMPLATE" "bump-yaml-path: \${{ values['bump-yaml-path'] }}"
+assert_contains "caller emits bump-repository-path substitution" "$CALLER_TEMPLATE" "bump-repository-path: \${{ values['bump-repository-path'] }}"
+assert_contains "caller emits bump-tag-path substitution" "$CALLER_TEMPLATE" "bump-tag-path: \${{ values['bump-tag-path'] }}"
 assert_contains "caller renders path filter patterns" "$CALLER_TEMPLATE" "path-filter-patterns"
 
 assert_contains "overlay references resolved GHCR app path" "$OVERLAY_TEMPLATE" 'repository: ${{ values.imageRepositoryBase }}/${{ values.name }}'

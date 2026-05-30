@@ -15,7 +15,11 @@ on:
       bump-file:
         required: true
         type: string
-      bump-yaml-path:
+      bump-repository-path:
+        required: false
+        type: string
+        default: .image.repository
+      bump-tag-path:
         required: false
         type: string
         default: .image.tag
@@ -98,12 +102,14 @@ jobs:
           sudo curl -fsSL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
           sudo chmod +x /usr/local/bin/yq
 
-      - name: Bump deploy image tag
+      - name: Bump deploy image
         env:
           BUMP_FILE: ${{ inputs.bump-file }}
-          BUMP_YAML_PATH: ${{ inputs.bump-yaml-path }}
+          BUMP_REPOSITORY_PATH: ${{ inputs.bump-repository-path }}
+          BUMP_TAG_PATH: ${{ inputs.bump-tag-path }}
+          IMAGE_REPOSITORY: ${{ steps.meta.outputs.image }}
           IMAGE_TAG: ${{ steps.meta.outputs.short-sha }}
-        run: yq -i "${BUMP_YAML_PATH} = strenv(IMAGE_TAG)" "$BUMP_FILE"
+        run: .github/scripts/bump-image.sh "$BUMP_FILE" "$IMAGE_REPOSITORY" "$IMAGE_TAG"
 
       - name: Commit and push bump
         env:

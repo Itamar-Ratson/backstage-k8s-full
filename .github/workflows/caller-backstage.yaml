@@ -39,3 +39,5 @@ jobs:
       context: backstage
       dockerfile: backstage/Dockerfile
       bump-file: deploy/dev/backstage.yaml
+      bump-repository-path: .image.repository
+      bump-tag-path: .image.tag
