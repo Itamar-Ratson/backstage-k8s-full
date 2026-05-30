@@ -1,5 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
+{{- $rbacAdminUser := .Values.rbac.adminUser }}
+{{- $rbacAdminEntityRef := printf "user:default/%s" $rbacAdminUser }}
 metadata:
   name: {{ include "backstage.fullname" . }}-app-config
   labels:
@@ -7,11 +9,11 @@ metadata:
 data:
   app-config.runtime.yaml: |
     {{- .Values.appConfig | toYaml | nindent 4 }}
-  {{- if .Values.rbac.adminUser }}
+  {{- if $rbacAdminUser }}
   app-config.admin.yaml: |
     permission:
       rbac:
         admin:
           users:
-            - name: user:default/{{ .Values.rbac.adminUser }}
+            - name: {{ $rbacAdminEntityRef }}
   {{- end }}

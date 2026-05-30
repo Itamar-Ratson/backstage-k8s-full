@@ -14,13 +14,7 @@ without_admin=$(helm template backstage "$CHART_DIR" \
 
 assert_contains "RBAC ConfigMap preserves platform-admin policy definitions" "$without_admin" "p, role:default/platform-admin, policy-entity, update, allow"
 assert_contains "RBAC ConfigMap preserves guest viewer binding" "$without_admin" "g, user:default/guest, role:default/viewer"
-if grep -Eq 'g, user:default/[^,]+, role:default/platform-admin' <<<"$without_admin"; then
-  FAIL=$((FAIL + 1))
-  echo "FAIL: RBAC ConfigMap omits platform-admin user binding when adminUser is empty"
-  echo "  expected no user binding to role:default/platform-admin"
-else
-  PASS=$((PASS + 1))
-fi
+assert_not_matches "RBAC ConfigMap omits platform-admin user binding when adminUser is empty" "$without_admin" 'g, user:default/[^,]+, role:default/platform-admin'
 
 with_admin=$(helm template backstage "$CHART_DIR" \
   -f deploy/dev/backstage.yaml \

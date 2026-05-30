@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 {{- $githubSecretName := include "backstage.githubSecretName" . }}
 {{- $githubOAuthSecretName := include "backstage.githubOAuthSecretName" . }}
+{{- $rbacAdminUser := .Values.rbac.adminUser }}
 metadata:
   name: {{ include "backstage.fullname" . }}
   labels:
@@ -45,7 +46,7 @@ spec:
             - "app-config.yaml"
             - "--config"
             - "/etc/backstage/app-config.runtime.yaml"
-            {{- if .Values.rbac.adminUser }}
+            {{- if $rbacAdminUser }}
             - "--config"
             - "/etc/backstage/app-config.admin.yaml"
             {{- end }}

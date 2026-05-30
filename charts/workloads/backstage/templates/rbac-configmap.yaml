@@ -1,5 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
+{{- $rbacAdminUser := .Values.rbac.adminUser }}
+{{- $rbacAdminEntityRef := printf "user:default/%s" $rbacAdminUser }}
 metadata:
   name: {{ include "backstage.fullname" . }}-rbac
   labels:
@@ -7,18 +9,18 @@ metadata:
 data:
   rbac-policies.csv: |
     {{- .Values.rbac.policies | trimSuffix "\n" | nindent 4 }}
-    {{- if .Values.rbac.adminUser }}
-    g, user:default/{{ .Values.rbac.adminUser }}, role:default/platform-admin
+    {{- if $rbacAdminUser }}
+    g, {{ $rbacAdminEntityRef }}, role:default/platform-admin
     {{- end }}
   users.yaml: |
-    {{- if .Values.rbac.adminUser }}
+    {{- if $rbacAdminUser }}
     apiVersion: backstage.io/v1alpha1
     kind: User
     metadata:
-      name: {{ .Values.rbac.adminUser }}
+      name: {{ $rbacAdminUser }}
     spec:
       profile:
-        displayName: {{ .Values.rbac.adminUser }}
+        displayName: {{ $rbacAdminUser }}
       memberOf: []
     {{- else }}
     {{- .Values.rbac.users | trimSuffix "\n" | nindent 4 }}

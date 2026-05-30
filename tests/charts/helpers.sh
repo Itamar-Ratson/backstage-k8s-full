@@ -28,6 +28,17 @@ assert_not_contains() {
   fi
 }
 
+assert_not_matches() {
+  local label="$1" output="$2" unexpected_pattern="$3"
+  if ! grep -qE -- "$unexpected_pattern" <<<"$output"; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  expected NOT to match: $unexpected_pattern"
+  fi
+}
+
 assert_fails() {
   local label="$1" expected_msg="$2"
   shift 2
