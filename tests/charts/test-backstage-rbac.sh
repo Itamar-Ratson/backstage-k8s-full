@@ -5,13 +5,14 @@ source "$(dirname "$0")/helpers.sh"
 
 echo "=== Backstage Kubernetes RBAC tests ==="
 
-enabled_output=$(helm template backstage "$CHART_DIR" -f deploy/dev/backstage.yaml 2>&1)
+test_owner="test-owner"
+enabled_output=$(helm template backstage "$CHART_DIR" -f deploy/dev/backstage.yaml --set-string "rbac.adminUser=${test_owner}" 2>&1)
 
 assert_contains "RBAC ConfigMap is rendered" "$enabled_output" "name: backstage-rbac"
 assert_contains "RBAC ConfigMap has policies key" "$enabled_output" "rbac-policies.csv: |"
 assert_contains "RBAC ConfigMap includes configured policy content" "$enabled_output" "p, role:default/platform-admin, policy-entity, update, allow"
 assert_contains "RBAC ConfigMap has users key" "$enabled_output" "users.yaml: |"
-assert_contains "RBAC ConfigMap includes configured user content" "$enabled_output" "name: itamar-ratson"
+assert_contains "RBAC ConfigMap includes derived admin user content" "$enabled_output" "name: ${test_owner}"
 assert_contains "Deployment mounts RBAC ConfigMap volume" "$enabled_output" "name: rbac-config"
 assert_contains "Deployment mounts RBAC files at Backstage config path" "$enabled_output" "mountPath: /etc/backstage/rbac"
 assert_contains "app-config references mounted RBAC policies path" "$enabled_output" "policies-csv-file: /etc/backstage/rbac/rbac-policies.csv"

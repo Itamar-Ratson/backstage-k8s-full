@@ -63,15 +63,6 @@ rbac:
     p, role:default/platform-admin, policy.entity.create, create, allow
     g, user:default/guest, role:default/viewer
     g, user:development/guest, role:default/viewer
-  users: |
-    apiVersion: backstage.io/v1alpha1
-    kind: User
-    metadata:
-      name: itamar-ratson
-    spec:
-      profile:
-        displayName: Itamar Ratson
-      memberOf: []
 appConfig:
   kubernetes:
     serviceLocatorMethod:

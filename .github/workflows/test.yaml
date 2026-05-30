@@ -47,6 +47,7 @@ jobs:
           ./tests/charts/test-chart-layout.sh
           ./tests/charts/test-no-make-references.sh
           ./tests/ci/test-no-literal-repo-slug.sh
+          ./tests/ci/test-no-literal-admin-name.sh
           ./tests/docs/test-github-app-setup-doc.sh
           ./tests/docs/test-readme-gitops-bootstrap-doc.sh
           helm dependency build charts/platform/argo-cd

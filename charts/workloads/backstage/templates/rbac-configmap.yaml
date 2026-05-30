@@ -11,4 +11,15 @@ data:
     g, user:default/{{ .Values.rbac.adminUser }}, role:default/platform-admin
     {{- end }}
   users.yaml: |
-    {{- .Values.rbac.users | nindent 4 }}
+    {{- if .Values.rbac.adminUser }}
+    apiVersion: backstage.io/v1alpha1
+    kind: User
+    metadata:
+      name: {{ .Values.rbac.adminUser }}
+    spec:
+      profile:
+        displayName: {{ .Values.rbac.adminUser }}
+      memberOf: []
+    {{- else }}
+    {{- .Values.rbac.users | trimSuffix "\n" | nindent 4 }}
+    {{- end }}

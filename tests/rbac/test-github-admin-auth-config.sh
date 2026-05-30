@@ -16,6 +16,9 @@ sign_in_module_path="backstage/packages/app/src/modules/signIn/index.tsx"
 app_path="backstage/packages/app/src/App.tsx"
 dev_values_path="deploy/dev/backstage.yaml"
 chart_values_path="charts/workloads/backstage/values.yaml"
+former_admin_user="$(printf '%s-%s' itamar ratson)"
+former_admin_binding="g, user:default/${former_admin_user}, role:default/platform-admin"
+former_admin_config_user="user:default/${former_admin_user}"
 
 backend_index=$(cat "$backend_index_path")
 app_config=$(cat "$app_config_path")
@@ -35,25 +38,22 @@ assert_not_contains "Base app config does not contain bootstrap admin users" "$a
 tracked_files=$(git ls-files --cached)
 repo_visible_files=$(git ls-files --cached --others --exclude-standard)
 
-assert_contains "users.yaml is tracked" "$tracked_files" "$users_path"
+assert_not_contains "root users.yaml is not tracked" "$tracked_files" "$users_path"
 assert_not_contains "local config example is not tracked" "$tracked_files" "$local_config_example_path"
 assert_not_contains "real local config is not tracked or unignored" "$repo_visible_files" "$local_config_path"
 
-users_yaml=$(cat "$users_path" 2>/dev/null || true)
-assert_contains "admin user entity is named itamar-ratson" "$users_yaml" "name: itamar-ratson"
-assert_contains "admin user display name is configured" "$users_yaml" "displayName: Itamar Ratson"
-assert_contains "admin user has empty group membership" "$users_yaml" "memberOf: []"
-
-assert_contains "admin user is assigned platform-admin" "$rbac_policies" "g, user:default/itamar-ratson, role:default/platform-admin"
+assert_not_contains "committed RBAC CSV omits former personal platform-admin binding" "$rbac_policies" "$former_admin_binding"
 
 assert_contains "dev values use GitHub App client ID env placeholder" "$dev_values" 'clientId: ${CLIENT_ID}'
 assert_contains "dev values use GitHub App client secret env placeholder" "$dev_values" 'clientSecret: ${CLIENT_SECRET}'
 assert_contains "dev values use GitHub App ID env placeholder" "$dev_values" 'appId: ${APP_ID}'
 assert_contains "dev values use GitHub App private key env placeholder" "$dev_values" 'privateKey: ${PRIVATE_KEY}'
-assert_contains "dev values configure RBAC admin user" "$dev_values" "user:default/itamar-ratson"
+assert_not_contains "dev values omit former inline RBAC admin user" "$dev_values" "$former_admin_config_user"
+assert_not_contains "dev values omit committed RBAC users block" "$dev_values" "  users: |"
 assert_contains "dev values override RBAC CSV path" "$dev_values" "/etc/backstage/rbac/rbac-policies.csv"
 assert_contains "dev values catalog users from mounted file" "$dev_values" "target: /etc/backstage/rbac/users.yaml"
 assert_contains "dev values reference GitHub App existing secret" "$dev_values" "existingSecret: backstage-github-app"
+assert_contains "chart values declare RBAC admin user knob" "$chart_values" "adminUser: \"\""
 assert_contains "chart values declare OAuth section" "$chart_values" "oauth:"
 assert_contains "chart values declare OAuth GitHub section" "$chart_values" "github:"
 assert_contains "chart values default OAuth creation off" "$chart_values" "create: false"

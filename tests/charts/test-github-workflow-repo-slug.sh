@@ -8,7 +8,7 @@ cleanup_workflow="$(<.github/workflows/cleanup-ghcr.yaml)"
 
 # Build the upstream slug from parts so this guard test does not itself embed the
 # literal that tests/ci/test-no-literal-repo-slug.sh forbids.
-upstream_lower_owner="itamar-ratson"
+upstream_lower_owner="$(printf '%s-%s' itamar ratson)"
 upstream_repo="backstage-k8s-full"
 upstream_lower_slug="${upstream_lower_owner}/${upstream_repo}"
 

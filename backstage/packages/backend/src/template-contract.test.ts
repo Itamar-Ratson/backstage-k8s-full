@@ -24,7 +24,7 @@ const chartCatalogPath = 'templates/application/skeleton/catalog-info.yaml.njk';
 const readmePath = 'README.md';
 const forbiddenRepoSlugs = [
   ['Itamar-Ratson', 'backstage-k8s-full'].join('/'),
-  ['itamar-ratson', 'backstage-k8s-full'].join('/'),
+  [['itamar', 'ratson'].join('-'), 'backstage-k8s-full'].join('/'),
 ] as const;
 const ignoredRepoSearchDirectories = new Set([
   '.git',
