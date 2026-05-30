@@ -67,6 +67,16 @@ assert_file_exists() {
   fi
 }
 
+assert_files_equal() {
+  local label="$1" expected="$2" actual="$3"
+  if diff -u "$expected" "$actual" >/dev/null; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+  fi
+}
+
 assert_directory_exists() {
   local label="$1" path="$2"
   if [ -d "$path" ]; then

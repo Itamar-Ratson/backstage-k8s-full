@@ -13,6 +13,25 @@ line_for_heading() {
   grep -nF "$heading" README.md | head -n1 | cut -d: -f1
 }
 
+assert_heading_order() {
+  local label="$1"
+  shift
+  local previous_line=0
+  local heading line
+
+  for heading in "$@"; do
+    line="$(line_for_heading "$heading")"
+    if [ -z "$line" ] || [ "$line" -le "$previous_line" ]; then
+      FAIL=$((FAIL + 1))
+      echo "FAIL: $label"
+      return
+    fi
+    previous_line="$line"
+  done
+
+  PASS=$((PASS + 1))
+}
+
 assert_contains "title exists" "$README_CONTENT" "# Deploying Backstage on Kubernetes"
 assert_contains "description matches PRD" "$README_CONTENT" "A fork-and-run local Kubernetes environment for Backstage on KinD, provisioned by Terraform and continuously reconciled by ArgoCD, with Envoy Gateway for ingress."
 assert_contains "prerequisites section exists" "$README_CONTENT" "## Prerequisites"
@@ -21,17 +40,13 @@ assert_contains "boot section exists" "$README_CONTENT" "## Boot the cluster"
 assert_contains "verification section exists" "$README_CONTENT" "## Verify it's working"
 assert_contains "what's next section exists" "$README_CONTENT" "## What's next"
 
-prereq_line="$(line_for_heading "## Prerequisites")"
-github_line="$(line_for_heading "## One-time GitHub setup")"
-boot_line="$(line_for_heading "## Boot the cluster")"
-verify_line="$(line_for_heading "## Verify it's working")"
-next_line="$(line_for_heading "## What's next")"
-if [ "$prereq_line" -lt "$github_line" ] && [ "$github_line" -lt "$boot_line" ] && [ "$boot_line" -lt "$verify_line" ] && [ "$verify_line" -lt "$next_line" ]; then
-  PASS=$((PASS + 1))
-else
-  FAIL=$((FAIL + 1))
-  echo "FAIL: README sections follow required order"
-fi
+assert_heading_order \
+  "README sections follow required order" \
+  "## Prerequisites" \
+  "## One-time GitHub setup" \
+  "## Boot the cluster" \
+  "## Verify it's working" \
+  "## What's next"
 
 assert_contains "prerequisites include Docker" "$README_CONTENT" "- [Docker](https://docs.docker.com/get-docker/)"
 assert_contains "prerequisites include KinD" "$README_CONTENT" "- [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)"
