@@ -16,8 +16,9 @@ assert_contains "bootstrap applies terraform" "$README_CONTENT" "cd terraform &&
 assert_contains "bootstrap points to Backstage URL" "$README_CONTENT" "http://backstage.localtest.me"
 assert_contains "fork setup section exists" "$README_CONTENT" "## Fork setup"
 assert_contains "fork setup copies tfvars example" "$README_CONTENT" "terraform/terraform.tfvars.example"
-assert_contains "fork setup documents github owner" "$README_CONTENT" "github_owner"
-assert_contains "fork setup documents github repo" "$README_CONTENT" "github_repo"
+assert_contains "fork setup documents standard fork clone" "$README_CONTENT" "standard git clone of your fork"
+assert_contains "fork setup derives owner and repo from git remote" "$README_CONTENT" "reads the GitHub owner and repository from the local git remote"
+assert_contains "fork setup keeps tfvars app-credentials-only" "$README_CONTENT" "terraform.tfvars file carries only GitHub App credentials"
 assert_contains "cosign example uses GHCR base placeholder" "$README_CONTENT" 'cosign verify ${GHCR_BASE}/<app>:<sha>'
 assert_not_contains "README has no literal repo slug" "$README_CONTENT" "backstage-k8s-full/<app>"
 assert_contains "verifying install section exists" "$README_CONTENT" "## Verifying the install"

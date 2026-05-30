@@ -64,7 +64,9 @@ The dev overlay pulls Backstage from GHCR using the tag in `deploy/dev/backstage
 
 ## Fork setup
 
-Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars`, set `github_owner` and `github_repo` to your fork, then run `terraform apply` from the `terraform/` directory. Terraform derives the GitOps repository URL, Backstage runtime identity, and GHCR image base from those two values.
+Use a standard git clone of your fork. Terraform reads the GitHub owner and repository from the local git remote, so no manual owner or repository fields are needed.
+
+Copy `terraform/terraform.tfvars.example` to `terraform/terraform.tfvars` and fill in the GitHub App fields. The terraform.tfvars file carries only GitHub App credentials; Terraform derives the GitOps repository URL, Backstage runtime identity, and GHCR image base from the checkout's remote.
 
 ## Verifying Images
 
