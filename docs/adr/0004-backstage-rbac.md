@@ -4,7 +4,7 @@
 
 Accepted
 
-Superseded in part by [ADR-0005](0005-backstage-rbac-on-kind.md): OAuth credentials no longer stay in `backstage/app-config.local.yaml`, and the deferred KinD / Helm-chart deployment item is closed. The RBAC plugin choice, CSV-as-source-of-truth decision, and `viewer` / `platform-admin` role design remain in force.
+Superseded in part by [ADR-0005](0005-backstage-rbac-on-kind.md): OAuth credentials no longer stay in `backstage/app-config.local.yaml`, and the deferred KinD / Helm-chart deployment item is closed. Superseded in part by [ADR-0007](0007-derived-platform-admin-identity.md): the named maintainer admin identity is replaced by a derived fork-owner identity. The RBAC plugin choice, CSV-as-source-of-truth decision, and `viewer` / `platform-admin` role design remain in force.
 
 ## Context
 

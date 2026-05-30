@@ -3,6 +3,7 @@ locals {
   repo_slug        = "${var.github_owner}/${var.github_repo}"
   gitops_repo_url  = "https://github.com/${local.repo_slug}.git"
   ghcr_base        = "ghcr.io/${lower(local.repo_slug)}"
+  rbac_admin_user  = lower(var.github_owner)
 
   root_application_helm_parameters = [
     {
@@ -12,6 +13,10 @@ locals {
     {
       name  = "ghcrBase"
       value = local.ghcr_base
+    },
+    {
+      name  = "rbacAdminUser"
+      value = local.rbac_admin_user
     },
     {
       name  = "targetRevision"

@@ -1,3 +1,4 @@
 repoURL: ""
 targetRevision: main
 ghcrBase: ""
+rbacAdminUser: ""

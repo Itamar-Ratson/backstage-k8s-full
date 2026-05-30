@@ -33,6 +33,7 @@ assert_contains "GitHub repo variable is required" "$terraform_config" 'variable
 assert_not_contains "GitHub repo has no default" "$(awk '/variable "github_repo"/,/^}/' terraform/variables.tf)" 'default'
 assert_contains "GitOps repo URL is derived from slug" "$terraform_config" 'gitops_repo_url  = "https://github.com/${local.repo_slug}.git"'
 assert_contains "GHCR base is derived from slug" "$terraform_config" 'ghcr_base        = "ghcr.io/${lower(local.repo_slug)}"'
+assert_contains "RBAC admin user is lowercased from owner" "$terraform_config" 'rbac_admin_user  = lower(var.github_owner)'
 assert_contains "Platform identity ConfigMap is managed" "$terraform_config" 'resource "kubernetes_config_map_v1" "platform_identity"'
 assert_contains "Platform identity includes owner" "$terraform_config" 'GITHUB_OWNER = var.github_owner'
 assert_contains "Platform identity includes repo" "$terraform_config" 'GITHUB_REPO  = var.github_repo'
@@ -53,6 +54,8 @@ assert_contains "root Application prunes" "$root_app" "prune: true"
 assert_contains "root Application self heals" "$root_app" "selfHeal: true"
 assert_contains "Terraform root Application injects repoURL Helm parameter" "$terraform_config" 'name  = "repoURL"'
 assert_contains "Terraform root Application injects ghcrBase Helm parameter" "$terraform_config" 'name  = "ghcrBase"'
+assert_contains "Terraform root Application injects rbacAdminUser Helm parameter" "$terraform_config" 'name  = "rbacAdminUser"'
+assert_contains "Terraform root Application passes lowercased RBAC admin user" "$terraform_config" "value = local.rbac_admin_user"
 assert_contains "Terraform root Application injects targetRevision Helm parameter" "$terraform_config" 'name  = "targetRevision"'
 
 gitignore=$(sed -n '1,$p' .gitignore)

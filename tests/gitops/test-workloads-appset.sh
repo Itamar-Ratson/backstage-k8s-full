@@ -23,6 +23,7 @@ appset=$(sed -n '1,$p' "$appset_path" 2>/dev/null || true)
 rendered_appsets=$(helm template gitops-dev "$gitops_chart_path" \
   --set "repoURL=https://github.com/${TEST_REPO_SLUG}.git" \
   --set "ghcrBase=${TEST_GHCR_BASE}" \
+  --set "rbacAdminUser=test-owner" \
   --set targetRevision=main)
 
 assert_contains "ApplicationSet apiVersion" "$appset" "apiVersion: argoproj.io/v1alpha1"
@@ -39,6 +40,7 @@ assert_contains "Application source uses target revision value" "$appset" "targe
 assert_contains "source uses workload chart path" "$appset" 'path: '\''{{ "{{.path.path}}" }}'\'''
 assert_contains "source uses matching dev values file" "$appset" '/deploy/dev/{{ "{{.path.basename}}" }}.yaml'
 assert_contains "source injects default image repository" "$appset" "repository: {{ printf \"%s/{{.path.basename}}\" .Values.ghcrBase | quote }}"
+assert_contains "source injects RBAC admin user" "$appset" "adminUser: {{ .Values.rbacAdminUser | quote }}"
 assert_contains "destination namespace uses basename" "$appset" 'namespace: '\''{{ "{{.path.basename}}" }}'\'''
 assert_contains "sync-wave is zero" "$appset" 'argocd.argoproj.io/sync-wave: "0"'
 assert_not_contains "CreateNamespace sync option is disabled (workload charts own their namespace)" "$appset" "CreateNamespace=true"
@@ -47,6 +49,7 @@ assert_contains "automated prune is enabled" "$appset" "prune: true"
 assert_contains "automated self-heal is enabled" "$appset" "selfHeal: true"
 assert_contains "rendered AppSet uses synthetic repository" "$rendered_appsets" "repoURL: \"https://github.com/test-owner/test-repo.git\""
 assert_contains "rendered AppSet injects synthetic image base" "$rendered_appsets" "repository: \"ghcr.io/test-owner/test-repo/{{.path.basename}}\""
+assert_contains "rendered AppSet injects synthetic RBAC admin user" "$rendered_appsets" "adminUser: \"test-owner\""
 assert_not_contains "workloads AppSet has no synthetic literal slug" "$appset" "${TEST_REPO_SLUG}"
 
 echo ""

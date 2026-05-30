@@ -31,6 +31,8 @@ spec:
           valuesObject:
             image:
               repository: {{ printf "%s/{{.path.basename}}" .Values.ghcrBase | quote }}
+            rbac:
+              adminUser: {{ .Values.rbacAdminUser | quote }}
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{ "{{.path.basename}}" }}'
