@@ -11,6 +11,7 @@ echo "=== Terraform git remote discovery tests ==="
 assert_json_for_remote() {
   local label="$1" remote_url="$2" expected_owner="$3" expected_repo="$4"
   local tmp output expected
+
   tmp="$(mktemp -d)"
   git -C "$tmp" init >/dev/null 2>&1
   git -C "$tmp" remote add origin "$remote_url"
@@ -25,20 +26,8 @@ assert_json_for_remote() {
 assert_remote_failure() {
   local label="$1" expected_error="$2"
   shift 2
-  local output status
 
-  set +e
-  output="$("$@" 2>&1 >/dev/null)"
-  status=$?
-  set -e
-
-  if [ "$status" -eq 0 ]; then
-    FAIL=$((FAIL + 1))
-    echo "FAIL: $label"
-    echo "  expected non-zero exit"
-  else
-    assert_contains "$label reports expected error" "$output" "$expected_error"
-  fi
+  assert_fails "$label reports expected error" "$expected_error" "$@"
 }
 
 assert_json_for_remote "HTTPS remote with .git" "https://github.com/acme-platform/service-portal.git" "acme-platform" "service-portal"

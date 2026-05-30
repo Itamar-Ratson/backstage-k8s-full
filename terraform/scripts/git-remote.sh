@@ -6,6 +6,9 @@ fail() {
   exit 1
 }
 
+github_owner_pattern='[A-Za-z0-9][A-Za-z0-9-]*'
+github_repo_pattern='[A-Za-z0-9][A-Za-z0-9._-]*'
+
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
   fail "not inside a git working tree"
 fi
@@ -36,7 +39,7 @@ fi
 
 repo="${repo%.git}"
 
-if [[ ! "$owner" =~ ^[A-Za-z0-9][A-Za-z0-9-]*$ ]] || [[ ! "$repo" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+if [[ ! "$owner" =~ ^${github_owner_pattern}$ ]] || [[ ! "$repo" =~ ^${github_repo_pattern}$ ]]; then
   fail "could not parse github.com origin URL: $remote_url"
 fi
 
