@@ -7,3 +7,11 @@ metadata:
 data:
   app-config.runtime.yaml: |
     {{- .Values.appConfig | toYaml | nindent 4 }}
+  {{- if .Values.rbac.adminUser }}
+  app-config.admin.yaml: |
+    permission:
+      rbac:
+        admin:
+          users:
+            - name: user:default/{{ .Values.rbac.adminUser }}
+  {{- end }}

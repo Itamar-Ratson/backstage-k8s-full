@@ -119,9 +119,6 @@ appConfig:
     ghcrBase: ${GHCR_BASE}
   permission:
     rbac:
-      admin:
-        users:
-          - name: user:default/itamar-ratson
       policies-csv-file: /etc/backstage/rbac/rbac-policies.csv
   catalog:
     locations:

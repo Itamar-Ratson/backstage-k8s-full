@@ -45,6 +45,10 @@ spec:
             - "app-config.yaml"
             - "--config"
             - "/etc/backstage/app-config.runtime.yaml"
+            {{- if .Values.rbac.adminUser }}
+            - "--config"
+            - "/etc/backstage/app-config.admin.yaml"
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
