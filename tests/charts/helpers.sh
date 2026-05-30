@@ -99,6 +99,20 @@ assert_path_missing() {
   fi
 }
 
+assert_no_matching_paths() {
+  local label="$1" root="$2" name_pattern="$3"
+  local match
+
+  match="$(find "$root" -name "$name_pattern" -print -quit)"
+  if [ -z "$match" ]; then
+    PASS=$((PASS + 1))
+  else
+    FAIL=$((FAIL + 1))
+    echo "FAIL: $label"
+    echo "  unexpected match: $match"
+  fi
+}
+
 assert_git_ignored() {
   local label="$1" path="$2"
   if git check-ignore -q "$path"; then

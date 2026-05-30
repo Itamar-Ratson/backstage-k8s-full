@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: application
   title: New Application
-  description: Create a deployable application chart and catalog entry. It can run from chart defaults, and the ci-pipeline template can add an environment override file later.
+  description: Create a deployable application chart and catalog entry from a container image or third-party Helm chart.
   annotations:
     backstage.io/techdocs-ref: dir:.
   tags:
@@ -114,7 +114,7 @@ spec:
       action: platform:resolve-repo-url
 
     - id: fetchImageTemplate
-      name: Fetch template
+      name: Fetch image template
       if: ${{ parameters.sourceType === 'image' }}
       action: fetch:template
       input:
@@ -160,7 +160,7 @@ spec:
           chart: ${{ parameters.chart }}
 
     - id: publishImagePullRequest
-      name: Publish pull request
+      name: Publish image pull request
       if: ${{ parameters.sourceType === 'image' }}
       action: publish:github:pull-request
       input:
@@ -185,7 +185,7 @@ spec:
         draft: false
 
     - id: publishChartPullRequest
-      name: Publish pull request
+      name: Publish chart pull request
       if: ${{ parameters.sourceType === 'chart' }}
       action: publish:github:pull-request
       input:

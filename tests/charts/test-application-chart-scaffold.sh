@@ -37,12 +37,7 @@ assert_contains "chart catalog uses Helm instance selector" "$CATALOG_TEMPLATE" 
 assert_not_contains "chart catalog omits kubernetes-id annotation" "$CATALOG_TEMPLATE" "backstage.io/kubernetes-id"
 
 assert_path_missing "chart skeleton has no templates subdir" "$CHART_SKELETON_DIR/templates"
-if find "$CHART_SKELETON_DIR" -name '_helpers.tpl' | grep -q .; then
-  FAIL=$((FAIL + 1))
-  echo "FAIL: chart skeleton omits _helpers.tpl"
-else
-  PASS=$((PASS + 1))
-fi
+assert_no_matching_paths "chart skeleton omits _helpers.tpl" "$CHART_SKELETON_DIR" "_helpers.tpl"
 
 assert_contains "template fetches chart skeleton" "$TEMPLATE" "url: ./skeleton/chart"
 assert_contains "template writes deploy dev placeholder" "$TEMPLATE" 'targetPath: deploy/dev/${{ parameters.name }}.yaml'

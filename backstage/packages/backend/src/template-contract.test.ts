@@ -11,16 +11,16 @@ const nunjucks = require('nunjucks') as {
 
 const repoRoot = path.resolve(__dirname, '../../../../');
 const catalogInfoPath = 'catalog-info.yaml';
-const chartTemplatePath = 'templates/application/template.yaml';
+const applicationTemplatePath = 'templates/application/template.yaml';
 const ciPipelineTemplatePath = 'templates/ci-pipeline/template.yaml';
 const decommissionTemplatePath =
   'templates/decommission-component/template.yaml';
 const platformTemplatePaths = [
-  chartTemplatePath,
+  applicationTemplatePath,
   ciPipelineTemplatePath,
   decommissionTemplatePath,
 ] as const;
-const chartCatalogPath =
+const applicationImageCatalogPath =
   'templates/application/skeleton/image/catalog-info.yaml.njk';
 const readmePath = 'README.md';
 const forbiddenRepoSlugs = [
@@ -61,7 +61,7 @@ describe('application template contract', () => {
         ],
       },
       {
-        path: chartTemplatePath,
+        path: applicationTemplatePath,
         snippets: [
           'kind: Template',
           'title: New Application',
@@ -73,7 +73,7 @@ describe('application template contract', () => {
         ],
       },
       {
-        path: chartCatalogPath,
+        path: applicationImageCatalogPath,
         snippets: [
           'lifecycle: experimental',
           'backstage.io/kubernetes-id: ${{ values.name }}',
@@ -115,7 +115,7 @@ describe('scaffolder platform identity contract', () => {
   );
 
   it('uses the resolved image repository base in scaffolder output', () => {
-    expect(readRepoFile(chartTemplatePath)).toContain(
+    expect(readRepoFile(applicationTemplatePath)).toContain(
       "steps.defaults.output.imageRepositoryBase + '/' + parameters.name",
     );
     expect(readRepoFile(ciPipelineTemplatePath)).toContain(
@@ -141,7 +141,7 @@ describe('scaffolder platform identity contract', () => {
   });
 
   it('omits fork-specific catalog annotations from the application skeleton', () => {
-    const catalogInfo = readRepoFile(chartCatalogPath);
+    const catalogInfo = readRepoFile(applicationImageCatalogPath);
 
     expect(catalogInfo).not.toContain('github.com/project-slug:');
     expect(catalogInfo).not.toContain('backstage.io/source-location:');
@@ -193,7 +193,7 @@ describe('generic decommission component template contract', () => {
         ],
       },
       {
-        path: chartCatalogPath,
+        path: applicationImageCatalogPath,
         snippets: [
           'backstage.io/managed-by-template: application',
           `backstage.io/source-paths: '["charts/workloads/\${{ values.name }}"]'`,
