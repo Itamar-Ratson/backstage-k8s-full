@@ -8,27 +8,70 @@ README_CONTENT="$(cat README.md)"
 
 echo "=== README GitOps bootstrap docs tests ==="
 
-assert_contains "bootstrap section exists" "$README_CONTENT" "## Bootstrap"
-assert_contains "bootstrap installs tools" "$README_CONTENT" "Install tools"
-assert_contains "bootstrap links GitHub App setup guide" "$README_CONTENT" "docs/operator/github-app-setup.md"
-assert_contains "bootstrap fills terraform tfvars" "$README_CONTENT" "terraform/terraform.tfvars"
-assert_contains "bootstrap applies terraform" "$README_CONTENT" "cd terraform && terraform apply"
-assert_contains "bootstrap points to Backstage URL" "$README_CONTENT" "http://backstage.localtest.me"
-assert_contains "fork setup section exists" "$README_CONTENT" "## Fork setup"
-assert_contains "fork setup copies tfvars example" "$README_CONTENT" "terraform/terraform.tfvars.example"
-assert_contains "fork setup documents standard fork clone" "$README_CONTENT" "standard git clone of your fork"
-assert_contains "fork setup derives owner and repo from git remote" "$README_CONTENT" "reads the GitHub owner and repository from the local git remote"
-assert_contains "fork setup keeps tfvars app-credentials-only" "$README_CONTENT" "terraform.tfvars file carries only GitHub App credentials"
-assert_contains "cosign example uses GHCR base placeholder" "$README_CONTENT" 'cosign verify ${GHCR_BASE}/<app>:<sha>'
-assert_not_contains "README has no literal repo slug" "$README_CONTENT" "backstage-k8s-full/<app>"
-assert_contains "verifying install section exists" "$README_CONTENT" "## Verifying the install"
-assert_contains "verification uses ArgoCD applications" "$README_CONTENT" "kubectl get applications -n argocd"
+line_for_heading() {
+  local heading="$1"
+  grep -nF "$heading" README.md | head -n1 | cut -d: -f1
+}
+
+assert_contains "title exists" "$README_CONTENT" "# Deploying Backstage on Kubernetes"
+assert_contains "description matches PRD" "$README_CONTENT" "A fork-and-run local Kubernetes environment for Backstage on KinD, provisioned by Terraform and continuously reconciled by ArgoCD, with Envoy Gateway for ingress."
+assert_contains "prerequisites section exists" "$README_CONTENT" "## Prerequisites"
+assert_contains "GitHub setup section exists" "$README_CONTENT" "## One-time GitHub setup"
+assert_contains "boot section exists" "$README_CONTENT" "## Boot the cluster"
+assert_contains "verification section exists" "$README_CONTENT" "## Verify it's working"
+assert_contains "what's next section exists" "$README_CONTENT" "## What's next"
+
+prereq_line="$(line_for_heading "## Prerequisites")"
+github_line="$(line_for_heading "## One-time GitHub setup")"
+boot_line="$(line_for_heading "## Boot the cluster")"
+verify_line="$(line_for_heading "## Verify it's working")"
+next_line="$(line_for_heading "## What's next")"
+if [ "$prereq_line" -lt "$github_line" ] && [ "$github_line" -lt "$boot_line" ] && [ "$boot_line" -lt "$verify_line" ] && [ "$verify_line" -lt "$next_line" ]; then
+  PASS=$((PASS + 1))
+else
+  FAIL=$((FAIL + 1))
+  echo "FAIL: README sections follow required order"
+fi
+
+assert_contains "prerequisites include Docker" "$README_CONTENT" "- [Docker](https://docs.docker.com/get-docker/)"
+assert_contains "prerequisites include KinD" "$README_CONTENT" "- [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)"
+assert_contains "prerequisites include Terraform" "$README_CONTENT" "- [Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.5)"
+assert_contains "prerequisites include Helm" "$README_CONTENT" "- [Helm](https://helm.sh/docs/intro/install/) (>= 3)"
+assert_contains "prerequisites include kubectl" "$README_CONTENT" "- [kubectl](https://kubernetes.io/docs/tasks/tools/)"
+assert_not_contains "README omits actionlint prerequisite" "$README_CONTENT" "actionlint"
+assert_not_contains "README omits yq prerequisite" "$README_CONTENT" "[yq]"
+assert_not_contains "README omits cosign prerequisite" "$README_CONTENT" "[cosign]"
+assert_not_contains "README omits Node prerequisite" "$README_CONTENT" "Node.js 20 or 22"
+assert_not_contains "README omits nvm setup" "$README_CONTENT" "nvm install"
+assert_not_contains "README omits native build setup" "$README_CONTENT" "build-essential"
+
+assert_contains "setup leads with forking" "$README_CONTENT" "Fork the repo."
+assert_contains "setup clones fork" "$README_CONTENT" "Clone your fork"
+assert_contains "setup links GitHub App guide" "$README_CONTENT" "docs/operator/github-app-setup.md"
+assert_contains "setup copies tfvars example" "$README_CONTENT" "cp terraform/terraform.tfvars.example terraform/terraform.tfvars"
+assert_contains "setup notes ignored credentials" "$README_CONTENT" ".pem file and terraform/terraform.tfvars are gitignored"
+assert_contains "boot applies terraform" "$README_CONTENT" "cd terraform && terraform apply"
+assert_contains "boot opens Backstage URL" "$README_CONTENT" "http://backstage.localtest.me"
 assert_contains "verification has curl check" "$README_CONTENT" "curl -fsS --retry"
-assert_contains "operations section exists" "$README_CONTENT" "## Operations"
-assert_contains "force sync uses argocd" "$README_CONTENT" "argocd app sync <app>"
-assert_contains "rotation uses terraform reapply" "$README_CONTENT" "terraform apply"
-assert_contains "rotation restarts backstage" "$README_CONTENT" "kubectl rollout restart deployment/backstage -n backstage"
-assert_contains "future ExternalSecrets path documented" "$README_CONTENT" "ExternalSecrets Operator"
+assert_contains "verification has ArgoCD password command" "$README_CONTENT" "argocd-initial-admin-secret"
+assert_contains "verification expects sign-in buttons" "$README_CONTENT" "Guest and GitHub sign-in buttons"
+assert_contains "what's next links operations" "$README_CONTENT" "docs/operator/operations.md"
+assert_contains "what's next links RBAC demo" "$README_CONTENT" "docs/operator/manual-rbac-demo.md"
+assert_contains "what's next links developer doc" "$README_CONTENT" "docs/developer/backstage-development.md"
+
+while IFS= read -r link; do
+  assert_file_exists "README link resolves: $link" "$link"
+done < <(grep -oE 'docs/(operator|developer)/[^)]+' README.md | sort -u)
+
+assert_not_contains "README drops Fork setup section" "$README_CONTENT" "## Fork setup"
+assert_not_contains "README drops Operations section" "$README_CONTENT" "## Operations"
+assert_not_contains "README drops Useful Commands section" "$README_CONTENT" "## Useful Commands"
+assert_not_contains "README drops Verifying Images section" "$README_CONTENT" "## Verifying Images"
+assert_not_contains "README drops Manual RBAC Demo section" "$README_CONTENT" "## Manual RBAC Demo"
+assert_not_contains "README drops Next Steps section" "$README_CONTENT" "## Next Steps"
+assert_not_contains "README drops isolated-vm rationale" "$README_CONTENT" "isolated-vm"
+assert_contains "README ends with ADR pointer" "$(tail -n 1 README.md)" "See [ADR-0001](docs/adr/0001-kind-terraform-envoy-gateway.md) for the KinD + Terraform + Envoy Gateway rationale."
+assert_not_contains "README has no literal repo slug" "$README_CONTENT" "backstage-k8s-full/<app>"
 assert_not_contains "README no longer has Smoke Test section" "$README_CONTENT" "## Smoke Test"
 assert_not_contains "README has no make target references" "$README_CONTENT" "make "
 

@@ -86,12 +86,9 @@ describe('application template contract', () => {
     }
 
     const readme = readRepoFile(readmePath);
-    const templateSection = '**Add the application scaffolder template**';
-    const techDocsSection = '**Set up TechDocs**';
-    expect(readme).toContain(templateSection);
-    expect(readme.indexOf(templateSection)).toBeLessThan(
-      readme.indexOf(techDocsSection),
-    );
+    expect(readme).toContain('## What\'s next');
+    expect(readme).toContain('docs/operator/operations.md');
+    expect(readme).toContain('docs/developer/backstage-development.md');
   });
 });
 
@@ -208,16 +205,8 @@ describe('generic decommission component template contract', () => {
     }
 
     const readme = readRepoFile(readmePath);
-    const templateSection = '**Add the application scaffolder template**';
-    const decommissionSection = '**Decommission a scaffolded application**';
-    const techDocsSection = '**Set up TechDocs**';
-    expect(readme).toContain(decommissionSection);
-    expect(readme.indexOf(templateSection)).toBeLessThan(
-      readme.indexOf(decommissionSection),
-    );
-    expect(readme.indexOf(decommissionSection)).toBeLessThan(
-      readme.indexOf(techDocsSection),
-    );
+    expect(readme).toContain('## What\'s next');
+    expect(readme).toContain('docs/operator/manual-rbac-demo.md');
   });
 
   it('renders every util:assert condition in the template to a real boolean', () => {
