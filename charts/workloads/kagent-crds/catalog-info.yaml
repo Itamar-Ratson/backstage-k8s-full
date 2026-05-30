@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kagent-crds
+  description: kagent-crds
+  annotations:
+    backstage.io/managed-by-template: application
+    backstage.io/source-paths: '["charts/workloads/kagent-crds"]'
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/kubernetes-label-selector: 'app.kubernetes.io/instance=kagent-crds'
+spec:
+  type: helm-chart
+  lifecycle: experimental
+  owner: platform
+  system: system:default/developer-portal
