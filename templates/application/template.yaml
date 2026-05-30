@@ -16,12 +16,24 @@ spec:
   parameters:
     - title: Application details
       required:
+        - sourceType
         - name
         - description
         - owner
         - system
-        - tag
       properties:
+        sourceType:
+          title: Source type
+          type: string
+          description: Choose whether this workload starts from a container image or a third-party Helm chart.
+          enum:
+            - image
+            - chart
+          enumNames:
+            - Container image
+            - Helm chart
+          default: image
+          ui:widget: radio
         name:
           title: Name
           type: string
@@ -50,31 +62,60 @@ spec:
           ui:options:
             allowedKinds:
               - System
-        repository:
-          title: Image repository
-          type: string
-          description: Container image repository to run. Leave blank to default to the configured platform GHCR base plus `<name>`.
-        tag:
-          title: Image tag
-          type: string
-          description: Container image tag to run until a ci-pipeline override bumps it.
-          default: latest
-        host:
-          title: Host
-          type: string
-          description: Public hostname for the HTTPRoute. Defaults to `<name>.localtest.me`.
-        port:
-          title: Port
-          type: number
-          description: Service and container port.
-          default: 80
+      dependencies:
+        sourceType:
+          oneOf:
+            - properties:
+                sourceType:
+                  const: image
+                repository:
+                  title: Image repository
+                  type: string
+                  description: Container image repository to run. Leave blank to default to the configured platform GHCR base plus `<name>`.
+                tag:
+                  title: Image tag
+                  type: string
+                  description: Container image tag to run until a ci-pipeline override bumps it.
+                  default: latest
+                host:
+                  title: Host
+                  type: string
+                  description: Public hostname for the HTTPRoute. Defaults to `<name>.localtest.me`.
+                port:
+                  title: Port
+                  type: number
+                  description: Service and container port.
+                  default: 80
+              required:
+                - tag
+            - properties:
+                sourceType:
+                  const: chart
+                chart:
+                  title: Chart name
+                  type: string
+                  description: Upstream chart name, for example `kagent`.
+                repoURL:
+                  title: OCI repository URL
+                  type: string
+                  description: OCI repository URL with the `oci://` prefix, for example `oci://ghcr.io/kagent-dev/helm`.
+                  ui:placeholder: oci://ghcr.io/kagent-dev/helm
+                targetRevision:
+                  title: Chart version
+                  type: string
+                  description: Upstream chart semver version to pin.
+              required:
+                - chart
+                - repoURL
+                - targetRevision
   steps:
     - id: defaults
       name: Resolve platform defaults
       action: platform:resolve-repo-url
 
-    - id: fetchTemplate
+    - id: fetchImageTemplate
       name: Fetch template
+      if: ${{ parameters.sourceType === 'image' }}
       action: fetch:template
       input:
         url: ./skeleton/image
@@ -89,8 +130,38 @@ spec:
           tag: ${{ parameters.tag }}
           host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
           port: ${{ parameters.port }}
-    - id: publishPullRequest
+
+    - id: fetchChartTemplate
+      name: Fetch chart template
+      if: ${{ parameters.sourceType === 'chart' }}
+      action: fetch:template
+      input:
+        url: ./skeleton/chart
+        targetPath: charts/workloads/${{ parameters.name }}
+        templateFileExtension: '.njk'
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          chart: ${{ parameters.chart }}
+          repoURL: ${{ parameters.repoURL }}
+          targetRevision: ${{ parameters.targetRevision }}
+
+    - id: fetchChartDeployDev
+      name: Fetch chart deploy values placeholder
+      if: ${{ parameters.sourceType === 'chart' }}
+      action: fetch:template:file
+      input:
+        url: ./skeleton/chart-deploy-dev/values.yaml.njk
+        targetPath: deploy/dev/${{ parameters.name }}.yaml
+        values:
+          name: ${{ parameters.name }}
+          chart: ${{ parameters.chart }}
+
+    - id: publishImagePullRequest
       name: Publish pull request
+      if: ${{ parameters.sourceType === 'image' }}
       action: publish:github:pull-request
       input:
         repoUrl: ${{ steps.defaults.output.repoUrl }}
@@ -100,6 +171,7 @@ spec:
         description: |
           Scaffolded application generated from Backstage.
 
+          - Source type: `image`
           - Name: `${{ parameters.name }}`
           - Description: `${{ parameters.description }}`
           - Owner: `${{ parameters.owner }}`
@@ -111,7 +183,39 @@ spec:
 
           Generated by template application v1
         draft: false
+
+    - id: publishChartPullRequest
+      name: Publish pull request
+      if: ${{ parameters.sourceType === 'chart' }}
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ steps.defaults.output.repoUrl }}
+        branchName: scaffold/application/${{ parameters.name }}
+        targetBranchName: main
+        title: "Scaffold new application: ${{ parameters.name }}"
+        description: |
+          Scaffolded application generated from Backstage.
+
+          - Source type: `chart`
+          - Name: `${{ parameters.name }}`
+          - Description: `${{ parameters.description }}`
+          - Owner: `${{ parameters.owner }}`
+          - System: `${{ parameters.system }}`
+          - Upstream chart: `${{ parameters.chart }}`
+          - OCI repository: `${{ parameters.repoURL }}`
+          - Chart version: `${{ parameters.targetRevision }}`
+
+          Chart source notes:
+          - ci-pipeline does not compose with chart-based apps because there is no Dockerfile to build and no image tag to bump.
+          - Networking and ingress are the upstream chart's responsibility; wiring into the platform's edge-gateway requires upstream-chart values, not platform scaffolding.
+          - Top-level image.repository and rbac.adminUser injected by workloads-appset are inert dead values for umbrella charts unless the upstream chart's values schema uses those keys natively.
+
+          Manual smoke test after merge:
+          - Scaffold a chart-case application with repo `oci://ghcr.io/kagent-dev/helm`, chart `kagent`, and version `0.9.4`; merge the PR; confirm Argo CD syncs the umbrella and kagent resources appear in the cluster.
+
+          Generated by template application v1
+        draft: false
   output:
     links:
       - title: Pull request
-        url: ${{ steps.publishPullRequest.output.remoteUrl }}
+        url: ${{ steps.publishImagePullRequest.output.remoteUrl or steps.publishChartPullRequest.output.remoteUrl }}

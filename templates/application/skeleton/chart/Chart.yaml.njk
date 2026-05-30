@@ -1,0 +1,10 @@
+apiVersion: v2
+name: ${{ values.name }}
+description: ${{ values.description }}
+type: application
+version: 0.1.0
+dependencies:
+  - name: ${{ values.chart }}
+    version: ${{ values.targetRevision }}
+    repository: ${{ values.repoURL }}
+    alias: app

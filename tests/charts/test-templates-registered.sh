@@ -50,4 +50,8 @@ for target in "${registered_template_targets[@]}"; do
   fi
 done
 
+application_template="$(cat templates/application/template.yaml)"
+assert_contains "application template reaches image skeleton" "$application_template" "url: ./skeleton/image"
+assert_contains "application template reaches chart skeleton" "$application_template" "url: ./skeleton/chart"
+
 report_results "Template registration"

@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: ${{ values.description }}
+  annotations:
+    backstage.io/managed-by-template: application
+    backstage.io/source-paths: '["charts/workloads/${{ values.name }}"]'
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/kubernetes-label-selector: 'app.kubernetes.io/instance=${{ values.name }}'
+spec:
+  type: helm-chart
+  lifecycle: experimental
+  owner: ${{ values.owner }}
+  system: ${{ values.system }}

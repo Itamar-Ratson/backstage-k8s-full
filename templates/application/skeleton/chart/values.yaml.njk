@@ -1,0 +1,8 @@
+# Overrides for the upstream chart go under the `app:` key (alias declared in Chart.yaml).
+# Discover available keys with: helm show values ${{ values.repoURL }}/${{ values.chart }} --version ${{ values.targetRevision }}
+app: {}
+
+# Note: the workloads ApplicationSet injects top-level `image.repository` and `rbac.adminUser`
+# into every Application's values. For umbrella charts they sit as inert dead values at the
+# top level (the upstream subchart only sees what's under `app:`). If a future upstream chart
+# uses one of these top-level keys natively, expect a collision and override here.

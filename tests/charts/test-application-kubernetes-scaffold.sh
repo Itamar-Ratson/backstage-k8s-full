@@ -15,7 +15,7 @@ DEPLOYMENT_TEMPLATE="$(cat "$SKELETON_DIR/templates/deployment.yaml")"
 echo "=== Application Kubernetes scaffold tests ==="
 
 assert_contains "template targets workload chart path" "$TEMPLATE" 'targetPath: charts/workloads/${{ parameters.name }}'
-assert_not_contains "template does not emit dev values file" "$TEMPLATE" "targetPath: deploy/dev"
+assert_contains "template fetches image skeleton" "$TEMPLATE" "url: ./skeleton/image"
 assert_path_missing "application dev values skeleton is removed" "templates/application/skeleton-values"
 assert_contains "template name is application" "$TEMPLATE" "name: application"
 assert_contains "catalog records application template" "$CATALOG_TEMPLATE" "backstage.io/managed-by-template: application"
