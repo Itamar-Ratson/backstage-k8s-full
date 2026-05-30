@@ -1,9 +1,9 @@
 locals {
   root_application = yamldecode(file("${path.module}/bootstrap/root-app.yaml"))
-  repo_slug        = "${var.github_owner}/${var.github_repo}"
+  repo_slug        = "${data.external.git_remote.result.owner}/${data.external.git_remote.result.repo}"
   gitops_repo_url  = "https://github.com/${local.repo_slug}.git"
   ghcr_base        = "ghcr.io/${lower(local.repo_slug)}"
-  rbac_admin_user  = lower(var.github_owner)
+  rbac_admin_user  = lower(data.external.git_remote.result.owner)
 
   root_application_helm_parameters = [
     {

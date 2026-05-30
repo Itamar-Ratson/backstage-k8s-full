@@ -87,6 +87,7 @@ jobs:
         run: ./tests/rbac/test-github-admin-auth-config.sh
       - name: tf-check
         run: |
+          ./tests/terraform/test-git-remote.sh
           ./tests/terraform/test-bootstrap-seed.sh
           terraform -chdir=terraform fmt -check -recursive
           terraform -chdir=terraform init -backend=false -input=false

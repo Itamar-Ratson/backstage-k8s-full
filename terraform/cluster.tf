@@ -87,8 +87,8 @@ resource "kubernetes_config_map_v1" "platform_identity" {
   }
 
   data = {
-    GITHUB_OWNER = var.github_owner
-    GITHUB_REPO  = var.github_repo
+    GITHUB_OWNER = data.external.git_remote.result.owner
+    GITHUB_REPO  = data.external.git_remote.result.repo
     GHCR_BASE    = local.ghcr_base
   }
 }

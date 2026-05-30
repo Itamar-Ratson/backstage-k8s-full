@@ -5,7 +5,7 @@ owner="Itamar-Ratson"
 lower_owner="$(printf '%s-%s' itamar ratson)"
 repo="backstage-k8s-full"
 patterns=("${owner}/${repo}" "${lower_owner}/${repo}")
-allowlist='^(./)?(docs/adr/0004-backstage-rbac.md|terraform/terraform.tfvars.example)$'
+allowlist='^(./)?docs/adr/0004-backstage-rbac.md$'
 violations=()
 
 for pattern in "${patterns[@]}"; do
