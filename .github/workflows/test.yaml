@@ -72,6 +72,7 @@ jobs:
           ./tests/charts/test-backstage-admin-config-layer.sh
           ./tests/charts/test-edge-gateway-kubernetes-label.sh
           ./tests/charts/test-application-chart-scaffold.sh
+          ./tests/charts/test-application-chart-httproute-renders.sh
           ./tests/charts/test-application-techdocs-scaffold.sh
           ./tests/charts/test-application-kubernetes-scaffold.sh
           ./tests/charts/test-application-image-renders.sh
