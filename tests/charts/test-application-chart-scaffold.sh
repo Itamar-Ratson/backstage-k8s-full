@@ -57,9 +57,10 @@ assert_equals "chart skeleton templates contains namespace, httproute, and helpe
 httproute.yaml
 namespace.yaml"
 assert_contains "chart helper defines workload labels" "$HELPERS_TEMPLATE" '{{- define "workload.labels" -}}'
-assert_not_contains "chart helper omits workload fullname" "$HELPERS_TEMPLATE" '{{- define "workload.fullname" -}}'
+assert_contains "chart helper defines workload fullname for HTTPRoute metadata" "$HELPERS_TEMPLATE" '{{- define "workload.fullname" -}}'
 assert_not_contains "chart helper omits selector labels" "$HELPERS_TEMPLATE" '{{- define "workload.selectorLabels" -}}'
 assert_contains "chart HTTPRoute declares Gateway API kind" "$HTTPROUTE_TEMPLATE" "kind: HTTPRoute"
+assert_contains "chart HTTPRoute names route with workload fullname" "$HTTPROUTE_TEMPLATE" 'name: {{ include "workload.fullname" . }}'
 assert_contains "chart HTTPRoute applies workload labels" "$HTTPROUTE_TEMPLATE" '{{- include "workload.labels" . | nindent 4 }}'
 assert_contains "chart HTTPRoute targets shared gateway name" "$HTTPROUTE_TEMPLATE" "name: {{ .Values.gateway.name }}"
 assert_contains "chart HTTPRoute targets shared gateway namespace" "$HTTPROUTE_TEMPLATE" "namespace: {{ .Values.gateway.namespace }}"
