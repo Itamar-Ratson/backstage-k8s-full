@@ -9,7 +9,6 @@ echo "=== Application chart HTTPRoute render tests ==="
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
-chart_dir="$tmpdir/chart-http-route"
 upstream_dir="$tmpdir/upstream-chart"
 chart_name="podinfo"
 chart_version="6.0.0"
@@ -26,6 +25,7 @@ EOF
 render_case() {
   local release="$1" host="$2" port="$3" service_name_suffix_input="$4" expected_service_name_suffix="$5"
   local case_dir="$tmpdir/$release"
+  local expected_service_name="$release-$expected_service_name_suffix"
 
   cp -R templates/application/skeleton/chart "$case_dir"
 
@@ -34,6 +34,7 @@ render_case() {
     mv "$file" "$rendered"
   done < <(find "$case_dir" -type f -name '*.njk' | sort)
 
+  RELEASE="$release" \
   perl -0pi -e '
     s/\$\{\{ values\.name \}\}/$ENV{RELEASE}/g;
     s/\$\{\{ values\.description \}\}/Chart HTTPRoute render test/g;
@@ -69,7 +70,7 @@ render_case() {
     assert_contains "HTTPRoute hostname matches scaffold input for $release" "$rendered" "$host"
     assert_contains "HTTPRoute parentRef points at edge-gateway for $release" "$rendered" "name: edge-gateway"
     assert_contains "HTTPRoute parentRef points at gateway namespace for $release" "$rendered" "namespace: gateway"
-    assert_contains "HTTPRoute backend service resolves release and suffix for $release" "$rendered" "name: $release-$expected_service_name_suffix"
+    assert_contains "HTTPRoute backend service resolves release and suffix for $release" "$rendered" "name: $expected_service_name"
     assert_contains "HTTPRoute backend port matches scaffold input for $release" "$rendered" "port: $port"
   else
     FAIL=$((FAIL + 1))
@@ -78,7 +79,7 @@ render_case() {
   fi
 }
 
-RELEASE="chart-http-route-default" render_case "chart-http-route-default" "chart-http-route-default.localtest.me" "9898" "app" "app"
-RELEASE="chart-http-route-override" render_case "chart-http-route-override" "chart-http-route-override.localtest.me" "8080" "podinfo" "podinfo"
+render_case "chart-http-route-default" "chart-http-route-default.localtest.me" "9898" "app" "app"
+render_case "chart-http-route-override" "chart-http-route-override.localtest.me" "8080" "podinfo" "podinfo"
 
 report_results "Application chart HTTPRoute render"
