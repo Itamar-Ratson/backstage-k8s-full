@@ -17,9 +17,10 @@ The Create form collects the values needed to render the chart and catalog entit
 | `tag` | Image only | Container image tag placed in the chart defaults. Defaults to `latest`. |
 | `host` | Image only | Public hostname for the generated `HTTPRoute`. Defaults to `<name>.localtest.me`. |
 | `port` | Image only | Container and Service port. Defaults to `80`. |
-| `chart` | Chart only | Upstream chart name, such as `kagent`. |
-| `repoURL` | Chart only | OCI repository URL with the `oci://` prefix. |
-| `targetRevision` | Chart only | Upstream chart semver version to pin. |
+| `chartRef` | Chart only | OCI chart reference, with optional `oci://` prefix, including the upstream chart version. |
+| `serviceNameSuffix` | Chart only | Suffix appended to the Helm release name to form the upstream Service name targeted by the generated `HTTPRoute`. |
+| `port` | Chart only | Upstream Service port targeted by the generated `HTTPRoute`. |
+| `host` | Chart only | Public hostname for the generated `HTTPRoute`. Defaults to `<name>.localtest.me`. |
 
 The template does not run deployment commands. It creates a pull request containing the chart files. After merge, the workloads ApplicationSet discovers the chart and ArgoCD reconciles it. A `ci-pipeline` scaffold can later create `deploy/dev/<name>.yaml` to override the image tag without changing the chart.
 
@@ -27,7 +28,7 @@ The template does not run deployment commands. It creates a pull request contain
 
 When the scaffolder runs with `sourceType: image`, it fetches `templates/application/skeleton/image`, renders every `.njk` file with the submitted values, and writes the result to `charts/workloads/<name>/`.
 
-When the scaffolder runs with `sourceType: chart`, it fetches `templates/application/skeleton/chart`, writes an umbrella chart at `charts/workloads/<name>/`, and writes `deploy/dev/<name>.yaml` with an empty `app: {}` override scope for the upstream dependency alias.
+When the scaffolder runs with `sourceType: chart`, it fetches `templates/application/skeleton/chart`, writes an umbrella chart at `charts/workloads/<name>/`, and writes `deploy/dev/<name>.yaml` with an empty `app: {}` override scope for the upstream dependency alias. The umbrella chart owns the Namespace, HTTPRoute, and labels helper; the upstream chart owns the rendered Deployment and Service.
 
 The pull request branch is named `scaffold/application/<name>` and targets `main`. The PR description records the submitted source type and source-specific fields so reviewers can compare the rendered files with the form input.
 
