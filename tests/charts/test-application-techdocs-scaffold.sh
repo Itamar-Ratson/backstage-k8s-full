@@ -52,7 +52,9 @@ assert_contains "generated-chart docs list chart helper" "$GENERATED_CHART_DOC" 
 assert_contains "generated-chart docs list missing deployment" "$GENERATED_CHART_DOC" '`templates/deployment.yaml` is not generated for chart-source scaffolds'
 assert_contains "generated-chart docs list missing service" "$GENERATED_CHART_DOC" '`templates/service.yaml` is not generated for chart-source scaffolds'
 assert_contains "generated-chart docs state ownership boundary" "$GENERATED_CHART_DOC" "The platform-owned umbrella wrapper owns the Namespace, HTTPRoute, and labels helper; the upstream chart owns the rendered Deployment and Service."
-assert_contains "generated-chart docs explain service suffix convention" "$GENERATED_CHART_DOC" 'serviceNameSuffix` resolves the HTTPRoute backend Service name as `<release>-<serviceNameSuffix>`'
+assert_contains "generated-chart docs explain service suffix default" "$GENERATED_CHART_DOC" 'serviceNameSuffix` defaults to `app`'
+assert_contains "generated-chart docs explain service suffix convention" "$GENERATED_CHART_DOC" 'resolves the HTTPRoute backend Service name as `<release>-<serviceNameSuffix>`'
+assert_contains "generated-chart docs explain service suffix override case" "$GENERATED_CHART_DOC" 'Override `serviceNameSuffix` only when the upstream chart sets `fullnameOverride` by default'
 assert_contains "generated-chart docs explain app alias convention" "$GENERATED_CHART_DOC" 'Chart-source upstream values live under the `app:` alias scope.'
 
 report_results "Application TechDocs scaffold"

@@ -35,6 +35,8 @@ A chart generated from an upstream OCI Helm chart is an umbrella wrapper around 
 
 The platform-owned umbrella wrapper owns the Namespace, HTTPRoute, and labels helper; the upstream chart owns the rendered Deployment and Service.
 
+For chart-source scaffolds, `serviceNameSuffix` defaults to `app` because the umbrella `Chart.yaml` aliases the upstream dependency as `app`. Conventional upstream fullname helpers derive the rendered Service name from the Helm release name plus `.Chart.Name`, and Helm resolves `.Chart.Name` to the alias inside the subchart. Override `serviceNameSuffix` only when the upstream chart sets `fullnameOverride` by default or uses a non-standard fullname helper that renders a different Service name.
+
 ## Conventions
 
 The scaffolded chart follows the repo's local platform conventions:
@@ -47,7 +49,7 @@ The scaffolded chart follows the repo's local platform conventions:
 - Image-source Deployments use the generated `image.repository`, `image.tag`, and `image.pullPolicy` values.
 - Image-source Services and containers both use the submitted `port` value with a named `http` target port.
 - Chart-source upstream values live under the `app:` alias scope.
-- Chart-source `serviceNameSuffix` resolves the HTTPRoute backend Service name as `<release>-<serviceNameSuffix>`.
+- Chart-source `serviceNameSuffix` defaults to `app` and resolves the HTTPRoute backend Service name as `<release>-<serviceNameSuffix>`.
 - Chart-source HTTPRoutes target the upstream chart's Service as their backend.
 - The `HTTPRoute` attaches to the shared `edge-gateway` Gateway in the `gateway` namespace.
 - The default hostname is `<name>.localtest.me`, matching the local Envoy Gateway wildcard listener.

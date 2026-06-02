@@ -31,7 +31,7 @@ assert_contains "chart skeleton parameterizes dependency repository" "$CHART_TEM
 assert_contains "chart values expose alias scope" "$VALUES_TEMPLATE" "app: {}"
 assert_contains "chart values expose HTTPRoute host" "$VALUES_TEMPLATE" 'host: ${{ values.host }}'
 assert_contains "chart values expose HTTPRoute port" "$VALUES_TEMPLATE" 'port: ${{ values.port }}'
-assert_contains "chart values expose service name suffix" "$VALUES_TEMPLATE" 'serviceNameSuffix: ${{ values.serviceNameSuffix }}'
+assert_contains "chart values default service name suffix" "$VALUES_TEMPLATE" 'serviceNameSuffix: ${{ values.serviceNameSuffix or "app" }}'
 assert_contains "chart values default gateway name" "$VALUES_TEMPLATE" "name: edge-gateway"
 assert_contains "chart values default gateway namespace" "$VALUES_TEMPLATE" "namespace: gateway"
 assert_contains "chart values explain discovery command" "$VALUES_TEMPLATE" "helm show values"
@@ -74,9 +74,11 @@ assert_contains "template exposes single chart reference field" "$TEMPLATE" "cha
 assert_contains "template labels chart reference field" "$TEMPLATE" "title: Chart reference"
 assert_contains "template exposes chart service suffix field" "$TEMPLATE" "serviceNameSuffix:"
 assert_contains "template labels chart service suffix field" "$TEMPLATE" "title: Service name suffix"
+assert_contains "template defaults chart service suffix to app" "$TEMPLATE" "default: app"
 assert_contains "template exposes chart port field" "$TEMPLATE" "title: Service port"
 assert_contains "template exposes chart host field" "$TEMPLATE" "title: Host"
 assert_contains "template defaults chart host from name" "$TEMPLATE" "host: \${{ parameters.host or (parameters.name + '.localtest.me') }}"
+assert_not_contains "template does not require chart service suffix" "$TEMPLATE" "                - serviceNameSuffix"
 assert_contains "template rejects missing OCI chart version in form" "$TEMPLATE" 'pattern: ^(oci://)?[a-z0-9.-]+(:[0-9]+)?(/[a-zA-Z0-9._-]+)+:[a-zA-Z0-9._-]+$'
 assert_not_contains "template no longer exposes separate chart field" "$TEMPLATE" "title: Chart name"
 assert_not_contains "template no longer exposes separate repoURL field" "$TEMPLATE" "title: OCI repository URL"
@@ -87,7 +89,7 @@ assert_contains "template passes chartRef into parser" "$TEMPLATE" 'ref: ${{ par
 assert_contains "template feeds parsed chart to skeleton" "$TEMPLATE" 'chart: ${{ steps.parseRef.output.chart }}'
 assert_contains "template feeds parsed repository to skeleton" "$TEMPLATE" 'repoURL: ${{ steps.parseRef.output.repository }}'
 assert_contains "template feeds parsed version to skeleton" "$TEMPLATE" 'targetRevision: ${{ steps.parseRef.output.version }}'
-assert_contains "template feeds service suffix to skeleton" "$TEMPLATE" 'serviceNameSuffix: ${{ parameters.serviceNameSuffix }}'
+assert_contains "template feeds resolved service suffix to skeleton" "$TEMPLATE" 'serviceNameSuffix: ${{ parameters.serviceNameSuffix or "app" }}'
 assert_contains "template feeds service port to skeleton" "$TEMPLATE" 'port: ${{ parameters.port }}'
 assert_contains "template feeds host to skeleton" "$TEMPLATE" "host: \${{ parameters.host or (parameters.name + '.localtest.me') }}"
 assert_contains "template fetches chart skeleton" "$TEMPLATE" "url: ./skeleton/chart"
@@ -96,7 +98,7 @@ assert_contains "template echoes original chartRef in PR description" "$TEMPLATE
 assert_contains "template echoes parsed chart in PR description" "$TEMPLATE" 'Parsed chart: `${{ steps.parseRef.output.chart }}`'
 assert_contains "template echoes parsed repository in PR description" "$TEMPLATE" 'Parsed repository: `${{ steps.parseRef.output.repository }}`'
 assert_contains "template echoes parsed version in PR description" "$TEMPLATE" 'Parsed version: `${{ steps.parseRef.output.version }}`'
-assert_contains "template echoes service suffix in PR description" "$TEMPLATE" 'Service name suffix: `${{ parameters.serviceNameSuffix }}`'
+assert_contains "template echoes resolved service suffix in PR description" "$TEMPLATE" 'Service name suffix: `${{ parameters.serviceNameSuffix or "app" }}`'
 assert_contains "template echoes port in PR description" "$TEMPLATE" 'Service port: `${{ parameters.port }}`'
 assert_contains "template echoes host in PR description" "$TEMPLATE" "Host: \`\${{ parameters.host or (parameters.name + '.localtest.me') }}\`"
 assert_contains "template documents ci-pipeline caveat" "$TEMPLATE" "ci-pipeline does not compose with chart-based apps"
