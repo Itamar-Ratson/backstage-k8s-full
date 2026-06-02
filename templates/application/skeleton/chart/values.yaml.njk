@@ -2,6 +2,14 @@
 # Discover available keys with: helm show values ${{ values.repoURL }}/${{ values.chart }} --version ${{ values.targetRevision }}
 app: {}
 
+host: ${{ values.host }}
+port: ${{ values.port }}
+serviceNameSuffix: ${{ values.serviceNameSuffix }}
+
+gateway:
+  name: edge-gateway
+  namespace: gateway
+
 # Note: the workloads ApplicationSet injects top-level `image.repository` and `rbac.adminUser`
 # into every Application's values. For umbrella charts they sit as inert dead values at the
 # top level (the upstream subchart only sees what's under `app:`). If a future upstream chart
