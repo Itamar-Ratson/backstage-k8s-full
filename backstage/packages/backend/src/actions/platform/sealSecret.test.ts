@@ -29,9 +29,7 @@ type TestCert = {
 };
 
 async function createTestCertificate(): Promise<TestCert> {
-  const workDir = await fs.mkdtemp(
-    path.join(os.tmpdir(), 'seal-secret-cert-'),
-  );
+  const workDir = await fs.mkdtemp(path.join(os.tmpdir(), 'seal-secret-cert-'));
   const keyPath = path.join(workDir, 'tls.key');
   const certPath = path.join(workDir, 'tls.crt');
 
@@ -112,7 +110,9 @@ function expectNoPlaintextLogged(
 }
 
 async function runAction(input: SealSecretInput, certPem: string) {
-  const workspacePath = await fs.mkdtemp(path.join(os.tmpdir(), 'seal-secret-'));
+  const workspacePath = await fs.mkdtemp(
+    path.join(os.tmpdir(), 'seal-secret-'),
+  );
   const logger = createLoggerSpy();
   const fetchSpy = jest
     .spyOn(global, 'fetch')

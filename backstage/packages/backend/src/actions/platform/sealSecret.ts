@@ -7,12 +7,13 @@ import path from 'node:path';
 
 const actionId = 'platform:sealSecret';
 const certPath = '/v1/cert.pem';
+const configControllerUrlPath = 'platform.sealedSecrets.controllerUrl';
 
 type Options = {
   config: Config;
 };
 
-function sealingCertUrl(controllerUrl: string): string {
+function buildCertUrl(controllerUrl: string): string {
   const baseUrl = controllerUrl.endsWith('/')
     ? controllerUrl
     : `${controllerUrl}/`;
@@ -21,11 +22,11 @@ function sealingCertUrl(controllerUrl: string): string {
 }
 
 function readControllerUrl(config: Config): string {
-  const value = config.getOptionalString('platform.sealedSecrets.controllerUrl');
+  const value = config.getOptionalString(configControllerUrlPath);
 
   if (!value) {
     throw new Error(
-      'Missing required sealed secrets config value platform.sealedSecrets.controllerUrl',
+      `Missing required sealed secrets config value ${configControllerUrlPath}`,
     );
   }
 
@@ -36,13 +37,15 @@ function yamlScalar(value: string): string {
   return JSON.stringify(value);
 }
 
-export async function fetchCert(url: string): Promise<X509Certificate> {
-  const urlToFetch = sealingCertUrl(url);
-  const response = await fetch(urlToFetch);
+export async function fetchCert(
+  controllerUrl: string,
+): Promise<X509Certificate> {
+  const certUrl = buildCertUrl(controllerUrl);
+  const response = await fetch(certUrl);
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch sealed secrets certificate from ${urlToFetch}: HTTP ${response.status}`,
+      `Failed to fetch sealed secrets certificate from ${certUrl}: HTTP ${response.status}`,
     );
   }
 
@@ -53,11 +56,9 @@ export function sealValue(
   cert: X509Certificate,
   namespace: string,
   name: string,
-  key: string,
+  _key: string,
   value: string,
 ): string {
-  void key;
-
   return publicEncrypt(
     {
       key: cert.publicKey,
@@ -92,6 +93,20 @@ export function buildSealedSecretManifest(
   ].join('\n');
 }
 
+function sealEntries(
+  cert: X509Certificate,
+  namespace: string,
+  name: string,
+  entries: [string, string][],
+): Record<string, string> {
+  return Object.fromEntries(
+    entries.map(([key, value]) => [
+      key,
+      sealValue(cert, namespace, name, key, value),
+    ]),
+  );
+}
+
 export function createSealSecretAction(options: Options) {
   return createTemplateAction({
     id: actionId,
@@ -117,11 +132,11 @@ export function createSealSecretAction(options: Options) {
       const controllerUrl =
         ctx.input.controllerUrl ?? readControllerUrl(options.config);
       const cert = await fetchCert(controllerUrl);
-      const encryptedData = Object.fromEntries(
-        entries.map(([key, value]) => [
-          key,
-          sealValue(cert, ctx.input.namespace, ctx.input.name, key, value),
-        ]),
+      const encryptedData = sealEntries(
+        cert,
+        ctx.input.namespace,
+        ctx.input.name,
+        entries,
       );
       const manifest = buildSealedSecretManifest(
         ctx.input.namespace,
