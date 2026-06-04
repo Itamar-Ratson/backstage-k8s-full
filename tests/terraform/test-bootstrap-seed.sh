@@ -14,6 +14,19 @@ argocd_namespace_config=$(awk '/resource "kubernetes_namespace_v1" "argocd"/,/de
 
 assert_contains "ArgoCD seed helm release exists" "$terraform_config" 'resource "helm_release" "argocd"'
 assert_contains "ArgoCD release ignores self-managed drift" "$terraform_config" "ignore_changes = [version, values]"
+assert_contains "Sealed Secrets TLS provider is declared" "$terraform_config" 'source  = "hashicorp/tls"'
+assert_contains "Sealed Secrets namespace is managed" "$terraform_config" 'resource "kubernetes_namespace_v1" "sealed_secrets"'
+assert_contains "Sealed Secrets private key is generated" "$terraform_config" 'resource "tls_private_key" "sealed_secrets"'
+assert_contains "Sealed Secrets private key uses RSA" "$terraform_config" 'algorithm = "RSA"'
+assert_contains "Sealed Secrets private key is 4096-bit" "$terraform_config" 'rsa_bits  = 4096'
+assert_contains "Sealed Secrets certificate is self-signed" "$terraform_config" 'resource "tls_self_signed_cert" "sealed_secrets"'
+assert_contains "Sealed Secrets certificate is valid for ten years" "$terraform_config" 'validity_period_hours = 87600'
+assert_contains "Sealed Secrets key secret is seeded" "$terraform_config" 'resource "kubernetes_secret_v1" "sealed_secrets_key"'
+assert_contains "Sealed Secrets key secret has active label" "$terraform_config" '"sealedsecrets.bitnami.com/sealed-secrets-key" = "active"'
+assert_contains "Sealed Secrets key secret uses TLS type" "$terraform_config" 'type = "kubernetes.io/tls"'
+assert_contains "Sealed Secrets helm release exists" "$terraform_config" 'resource "helm_release" "sealed_secrets"'
+assert_contains "Sealed Secrets release uses Bitnami Labs repository" "$terraform_config" 'repository       = "https://bitnami-labs.github.io/sealed-secrets"'
+assert_contains "Sealed Secrets release ignores self-managed drift" "$terraform_config" "ignore_changes = [version, values]"
 assert_contains "root app loaded from manifest file" "$terraform_config" 'yamldecode(file("${path.module}/bootstrap/root-app.yaml"))'
 assert_contains "backstage namespace is managed" "$terraform_config" 'resource "kubernetes_namespace_v1" "backstage"'
 assert_contains "backstage namespace has gateway opt-in label" "$terraform_config" 'gateway-routes = "enabled"'
@@ -46,6 +59,12 @@ chart_version=$(awk '
   in_dependency && /^[[:space:]]*version:/ { sub(/^[[:space:]]*version:[[:space:]]*/, ""); print; exit }
 ' charts/platform/argo-cd/Chart.yaml)
 assert_contains "Terraform ArgoCD chart pin matches wrapper chart" "$terraform_config" "version          = \"$chart_version\""
+
+sealed_secrets_chart_version=$(awk '
+  /^[[:space:]]*-[[:space:]]*name:[[:space:]]*sealed-secrets[[:space:]]*$/ { in_dependency = 1; next }
+  in_dependency && /^[[:space:]]*version:/ { sub(/^[[:space:]]*version:[[:space:]]*/, ""); print; exit }
+' charts/platform/sealed-secrets/Chart.yaml 2>/dev/null || true)
+assert_contains "Terraform Sealed Secrets chart pin matches wrapper chart" "$terraform_config" "version          = \"$sealed_secrets_chart_version\""
 
 root_app=$(sed -n '1,$p' terraform/bootstrap/root-app.yaml 2>/dev/null || true)
 assert_contains "root Application points at gitops/dev" "$root_app" "path: gitops/dev"

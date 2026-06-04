@@ -1,5 +1,7 @@
 provider "kind" {}
 
+provider "tls" {}
+
 provider "helm" {
   kubernetes {
     host                   = kind_cluster.this.endpoint
