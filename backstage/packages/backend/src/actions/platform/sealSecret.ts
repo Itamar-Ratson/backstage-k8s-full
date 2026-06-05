@@ -13,12 +13,13 @@ type Options = {
   config: Config;
 };
 
-type SecretRow = {
+type SecretFormRow = {
   envVar: string;
   value: string;
 };
 
-type SecretKeys = Record<string, string> | SecretRow[];
+type SecretInput = Record<string, string> | SecretFormRow[];
+type SecretEntry = [key: string, value: string];
 
 function buildCertUrl(controllerUrl: string): string {
   const baseUrl = controllerUrl.endsWith('/')
@@ -104,7 +105,7 @@ function sealEntries(
   cert: X509Certificate,
   namespace: string,
   name: string,
-  entries: [string, string][],
+  entries: SecretEntry[],
 ): Record<string, string> {
   return Object.fromEntries(
     entries.map(([key, value]) => [
@@ -114,7 +115,7 @@ function sealEntries(
   );
 }
 
-function normalizeSecretEntries(keys: SecretKeys | undefined): [string, string][] {
+function normalizeSecretEntries(keys: SecretInput | undefined): SecretEntry[] {
   if (!keys) {
     return [];
   }

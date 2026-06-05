@@ -18,8 +18,13 @@ type SealSecretInput = {
   controllerUrl?: string;
   namespace: string;
   name: string;
-  keys?: Record<string, string> | { envVar: string; value: string }[];
+  keys?: Record<string, string> | SecretFormRow[];
   writePath: string;
+};
+
+type SecretFormRow = {
+  envVar: string;
+  value: string;
 };
 
 type TestCert = {
@@ -298,7 +303,7 @@ describe('createSealSecretAction', () => {
 
   it('accepts scaffolder form secret rows', async () => {
     const { certPem } = await createTestCertificate();
-    const values = [
+    const values: SecretFormRow[] = [
       { envVar: 'GROQ_API_KEY', value: 'groq-secret-value' },
       { envVar: 'MODEL_TOKEN', value: 'model-secret-value' },
     ];
@@ -312,15 +317,11 @@ describe('createSealSecretAction', () => {
       certPem,
     );
 
-    const manifest = YAML.parse(
-      await fs.readFile(
-        path.join(
-          workspacePath,
-          'charts/workloads/kagent/templates/sealed-secret.yaml',
-        ),
-        'utf8',
-      ),
+    const manifestPath = path.join(
+      workspacePath,
+      'charts/workloads/kagent/templates/sealed-secret.yaml',
     );
+    const manifest = YAML.parse(await fs.readFile(manifestPath, 'utf8'));
 
     expect(manifest.metadata).toEqual({
       namespace: 'kagent',
