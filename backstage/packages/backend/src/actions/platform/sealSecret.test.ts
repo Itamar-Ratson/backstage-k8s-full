@@ -18,7 +18,7 @@ type SealSecretInput = {
   controllerUrl?: string;
   namespace: string;
   name: string;
-  keys?: Record<string, string>;
+  keys?: Record<string, string> | { envVar: string; value: string }[];
   writePath: string;
 };
 
@@ -294,5 +294,45 @@ describe('createSealSecretAction', () => {
       'TOKEN',
     ]);
     expectNoPlaintextLogged(logger, Object.values(values));
+  });
+
+  it('accepts scaffolder form secret rows', async () => {
+    const { certPem } = await createTestCertificate();
+    const values = [
+      { envVar: 'GROQ_API_KEY', value: 'groq-secret-value' },
+      { envVar: 'MODEL_TOKEN', value: 'model-secret-value' },
+    ];
+    const { logger, workspacePath } = await runAction(
+      {
+        namespace: 'kagent',
+        name: 'kagent-secrets',
+        keys: values,
+        writePath: 'charts/workloads/kagent/templates/sealed-secret.yaml',
+      },
+      certPem,
+    );
+
+    const manifest = YAML.parse(
+      await fs.readFile(
+        path.join(
+          workspacePath,
+          'charts/workloads/kagent/templates/sealed-secret.yaml',
+        ),
+        'utf8',
+      ),
+    );
+
+    expect(manifest.metadata).toEqual({
+      namespace: 'kagent',
+      name: 'kagent-secrets',
+    });
+    expect(Object.keys(manifest.spec.encryptedData).sort()).toEqual([
+      'GROQ_API_KEY',
+      'MODEL_TOKEN',
+    ]);
+    expectNoPlaintextLogged(
+      logger,
+      values.map(secret => secret.value),
+    );
   });
 });

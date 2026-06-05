@@ -112,6 +112,35 @@ spec:
               required:
                 - chartRef
                 - port
+    - title: Secrets
+      dependencies:
+        sourceType:
+          allOf:
+            - if:
+                properties:
+                  sourceType:
+                    const: chart
+              then:
+                properties:
+                  secrets:
+                    title: Secrets
+                    type: array
+                    description: Optional environment variable secrets to seal into the scaffolded chart.
+                    default: []
+                    items:
+                      type: object
+                      required:
+                        - envVar
+                        - value
+                      properties:
+                        envVar:
+                          title: Environment variable
+                          type: string
+                          description: Secret data key, usually an environment variable name such as GROQ_API_KEY.
+                        value:
+                          title: Value
+                          type: string
+                          description: Plaintext value to seal before the pull request is opened.
   steps:
     - id: defaults
       name: Resolve platform defaults
@@ -161,6 +190,16 @@ spec:
           serviceNameSuffix: ${{ parameters.serviceNameSuffix or "app" }}
           port: ${{ parameters.port }}
           host: ${{ parameters.host or (parameters.name + '.localtest.me') }}
+
+    - id: sealChartSecrets
+      name: Seal chart secrets
+      if: ${{ parameters.sourceType === 'chart' }}
+      action: platform:sealSecret
+      input:
+        name: ${{ parameters.name }}-secrets
+        namespace: ${{ parameters.name }}
+        keys: ${{ parameters.secrets }}
+        writePath: charts/workloads/${{ parameters.name }}/templates/sealed-secret.yaml
 
     - id: fetchChartDeployDev
       name: Fetch chart deploy values placeholder

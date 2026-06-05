@@ -13,6 +13,13 @@ type Options = {
   config: Config;
 };
 
+type SecretRow = {
+  envVar: string;
+  value: string;
+};
+
+type SecretKeys = Record<string, string> | SecretRow[];
+
 function buildCertUrl(controllerUrl: string): string {
   const baseUrl = controllerUrl.endsWith('/')
     ? controllerUrl
@@ -107,6 +114,18 @@ function sealEntries(
   );
 }
 
+function normalizeSecretEntries(keys: SecretKeys | undefined): [string, string][] {
+  if (!keys) {
+    return [];
+  }
+
+  if (Array.isArray(keys)) {
+    return keys.map(({ envVar, value }) => [envVar, value]);
+  }
+
+  return Object.entries(keys);
+}
+
 export function createSealSecretAction(options: Options) {
   return createTemplateAction({
     id: actionId,
@@ -117,13 +136,23 @@ export function createSealSecretAction(options: Options) {
         controllerUrl: z => z.string().optional(),
         namespace: z => z.string().min(1),
         name: z => z.string().min(1),
-        keys: z => z.record(z.string(), z.string()).optional(),
+        keys: z =>
+          z
+            .union([
+              z.record(z.string(), z.string()),
+              z.array(
+                z.object({
+                  envVar: z.string().min(1),
+                  value: z.string(),
+                }),
+              ),
+            ])
+            .optional(),
         writePath: z => z.string().min(1),
       },
     },
     async handler(ctx) {
-      const keys = ctx.input.keys ?? {};
-      const entries = Object.entries(keys);
+      const entries = normalizeSecretEntries(ctx.input.keys);
 
       if (entries.length === 0) {
         return;
