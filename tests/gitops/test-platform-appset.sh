@@ -9,14 +9,12 @@ echo "=== Platform ApplicationSet tests ==="
 appset_path="gitops/dev/templates/platform-appset.yaml"
 argocd_values_path="deploy/dev/argo-cd.yaml"
 envoy_values_path="deploy/dev/envoy-gateway.yaml"
-sealed_secrets_values_path="deploy/dev/sealed-secrets.yaml"
 
 assert_file_exists "platform ApplicationSet exists" "$appset_path"
 assert_file_exists "gitops dev chart exists" "gitops/dev/Chart.yaml"
 assert_file_exists "gitops dev values exist" "gitops/dev/values.yaml"
 assert_file_exists "Argo CD dev values exist" "$argocd_values_path"
 assert_file_exists "Envoy Gateway dev values exist" "$envoy_values_path"
-assert_file_exists "Sealed Secrets dev values exist" "$sealed_secrets_values_path"
 
 appset=$(sed -n '1,$p' "$appset_path" 2>/dev/null || true)
 
@@ -30,9 +28,6 @@ assert_contains "argo-cd sync wave is -3" "$appset" 'syncWave: "-3"'
 assert_contains "envoy-gateway list element exists" "$appset" "name: envoy-gateway"
 assert_contains "envoy-gateway namespace is envoy-gateway-system" "$appset" "namespace: envoy-gateway-system"
 assert_contains "envoy-gateway sync wave is -2" "$appset" 'syncWave: "-2"'
-assert_contains "sealed-secrets list element exists" "$appset" "name: sealed-secrets"
-assert_contains "sealed-secrets namespace is sealed-secrets" "$appset" "namespace: sealed-secrets"
-assert_contains "sealed-secrets sync wave is -2" "$appset" 'syncWave: "-2"'
 assert_contains "edge-gateway list element exists" "$appset" "name: edge-gateway"
 assert_contains "edge-gateway namespace is gateway" "$appset" "namespace: gateway"
 assert_contains "edge-gateway sync wave is -1" "$appset" 'syncWave: "-1"'

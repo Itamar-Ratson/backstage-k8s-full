@@ -6,7 +6,6 @@ import { scaffolderActionsExtensionPoint } from '@backstage/plugin-scaffolder-no
 
 import { createParseOciRefAction } from './parseOciRef';
 import { createResolveRepoUrlAction } from './resolveRepoUrl';
-import { createSealSecretAction } from './sealSecret';
 
 export const scaffolderPlatformActionsModule = createBackendModule({
   pluginId: 'scaffolder',
@@ -21,7 +20,6 @@ export const scaffolderPlatformActionsModule = createBackendModule({
         scaffolder.addActions(
           createResolveRepoUrlAction({ config }),
           createParseOciRefAction(),
-          createSealSecretAction({ config }),
         );
       },
     });

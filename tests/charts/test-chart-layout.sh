@@ -7,7 +7,6 @@ source "$(dirname "$0")/helpers.sh"
 echo "=== Chart layout tests ==="
 
 for expected_dir in \
-  "charts/platform/sealed-secrets" \
   "charts/platform/edge-gateway" \
   "charts/workloads/backstage"; do
   assert_directory_exists "expected chart directory exists" "$expected_dir"

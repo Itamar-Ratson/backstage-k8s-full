@@ -78,14 +78,6 @@ assert_contains "template defaults chart service suffix to app" "$TEMPLATE" "def
 assert_contains "template exposes chart port field" "$TEMPLATE" "title: Service port"
 assert_contains "template exposes chart host field" "$TEMPLATE" "title: Host"
 assert_contains "template defaults chart host from name" "$TEMPLATE" "host: \${{ parameters.host or (parameters.name + '.localtest.me') }}"
-assert_contains "template adds chart secrets step" "$TEMPLATE" "title: Secrets"
-assert_contains "template exposes chart secrets array" "$TEMPLATE" "secrets:"
-assert_contains "template defaults chart secrets to empty array" "$TEMPLATE" "default: []"
-assert_contains "template exposes chart secret env var field" "$TEMPLATE" "envVar:"
-assert_contains "template labels chart secret env var field" "$TEMPLATE" "title: Environment variable"
-assert_contains "template exposes chart secret value field" "$TEMPLATE" "value:"
-assert_contains "template labels chart secret value field" "$TEMPLATE" "title: Value"
-assert_not_contains "template does not mask chart secret values" "$TEMPLATE" "ui:widget: password"
 assert_not_contains "template does not require chart service suffix" "$TEMPLATE" "                - serviceNameSuffix"
 assert_contains "template rejects missing OCI chart version in form" "$TEMPLATE" 'pattern: ^(oci://)?[a-z0-9.-]+(:[0-9]+)?(/[a-zA-Z0-9._-]+)+:[a-zA-Z0-9._-]+$'
 assert_not_contains "template no longer exposes separate chart field" "$TEMPLATE" "title: Chart name"
@@ -101,13 +93,6 @@ assert_contains "template feeds resolved service suffix to skeleton" "$TEMPLATE"
 assert_contains "template feeds service port to skeleton" "$TEMPLATE" 'port: ${{ parameters.port }}'
 assert_contains "template feeds host to skeleton" "$TEMPLATE" "host: \${{ parameters.host or (parameters.name + '.localtest.me') }}"
 assert_contains "template fetches chart skeleton" "$TEMPLATE" "url: ./skeleton/chart"
-assert_contains "template seals chart secrets after rendering skeleton" "$TEMPLATE" "id: sealChartSecrets"
-assert_contains "template uses seal secret action" "$TEMPLATE" "action: platform:sealSecret"
-assert_contains "template runs seal secret action only for chart source" "$TEMPLATE" "if: \${{ parameters.sourceType === 'chart' }}"
-assert_contains "template auto-names chart secret" "$TEMPLATE" 'name: ${{ parameters.name }}-secrets'
-assert_contains "template seals secret into chart namespace" "$TEMPLATE" 'namespace: ${{ parameters.name }}'
-assert_contains "template passes chart secrets to seal action" "$TEMPLATE" 'keys: ${{ parameters.secrets }}'
-assert_contains "template writes sealed secret into chart templates" "$TEMPLATE" 'writePath: charts/workloads/${{ parameters.name }}/templates/sealed-secret.yaml'
 assert_contains "template writes deploy dev placeholder" "$TEMPLATE" 'targetPath: deploy/dev/${{ parameters.name }}.yaml'
 assert_contains "template echoes original chartRef in PR description" "$TEMPLATE" 'Chart reference: `${{ parameters.chartRef }}`'
 assert_contains "template echoes parsed chart in PR description" "$TEMPLATE" 'Parsed chart: `${{ steps.parseRef.output.chart }}`'
