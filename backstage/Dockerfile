@@ -70,3 +70,4 @@ ENV NODE_ENV=production
 ENV NODE_OPTIONS="--no-node-snapshot"
 
 CMD ["node", "packages/backend", "--config", "app-config.yaml"]
+
