@@ -47,12 +47,11 @@ spec:
         owner:
           title: Owner
           type: string
-          description: Owner of the workload.
+          description: Owner of the workload. Must be a Group; personal User owners are rejected by the ADR-0007 admin-login guard.
           ui:field: EntityPicker
           ui:options:
             allowedKinds:
               - Group
-              - User
           default: platform
         system:
           title: System
