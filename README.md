@@ -4,13 +4,7 @@ A fork-and-run local Kubernetes environment for Backstage on KinD, provisioned b
 
 ## Prerequisites
 
-Install these tools:
-
-- [Docker](https://docs.docker.com/get-docker/)
-- [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-- [Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.5)
-- [Helm](https://helm.sh/docs/intro/install/) (>= 3)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+Install [Docker](https://docs.docker.com/get-docker/), [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation), [Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.5), [Helm](https://helm.sh/docs/intro/install/) (>= 3), and [kubectl](https://kubernetes.io/docs/tasks/tools/).
 
 ## One-time GitHub setup
 
