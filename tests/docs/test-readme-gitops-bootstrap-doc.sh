@@ -50,11 +50,11 @@ assert_heading_order \
   "## What's next" \
   "## Try the platform"
 
-assert_contains "prerequisites include Docker" "$README_CONTENT" "- [Docker](https://docs.docker.com/get-docker/)"
-assert_contains "prerequisites include KinD" "$README_CONTENT" "- [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)"
-assert_contains "prerequisites include Terraform" "$README_CONTENT" "- [Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.5)"
-assert_contains "prerequisites include Helm" "$README_CONTENT" "- [Helm](https://helm.sh/docs/intro/install/) (>= 3)"
-assert_contains "prerequisites include kubectl" "$README_CONTENT" "- [kubectl](https://kubernetes.io/docs/tasks/tools/)"
+assert_contains "prerequisites include Docker" "$README_CONTENT" "[Docker](https://docs.docker.com/get-docker/)"
+assert_contains "prerequisites include KinD" "$README_CONTENT" "[KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)"
+assert_contains "prerequisites include Terraform" "$README_CONTENT" "[Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.5)"
+assert_contains "prerequisites include Helm" "$README_CONTENT" "[Helm](https://helm.sh/docs/intro/install/) (>= 3)"
+assert_contains "prerequisites include kubectl" "$README_CONTENT" "[kubectl](https://kubernetes.io/docs/tasks/tools/)"
 assert_not_contains "README omits actionlint prerequisite" "$README_CONTENT" "actionlint"
 assert_not_contains "README omits yq prerequisite" "$README_CONTENT" "[yq]"
 assert_not_contains "README omits cosign prerequisite" "$README_CONTENT" "[cosign]"
