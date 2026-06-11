@@ -78,3 +78,10 @@ Open <http://backstage.localtest.me> and confirm the Guest and GitHub sign-in bu
 - Prepare for local Backstage source builds with the [developer setup guide](docs/developer/backstage-development.md).
 
 See [ADR-0001](docs/adr/0001-kind-terraform-envoy-gateway.md) for the KinD + Terraform + Envoy Gateway rationale.
+
+## Try the platform
+
+- Build your own image: edit `hello-world/index.html` and, if desired, `hello-world/Dockerfile`. In Backstage, scaffold an Application with Source type set to Container image and point it at `hello-world/`. The scaffolder wires a caller workflow that uses `.github/workflows/build-image.yaml`; the image lands in GHCR and Argo CD picks it up.
+- Deploy a third-party chart: scaffold an Application with Source type set to Helm chart and use `oci://ghcr.io/stefanprodan/charts/podinfo` as the chart reference. This exercises the umbrella-chart discovery path described in [ADR-0009](docs/adr/0009-kubernetes-discovery-by-template-ownership.md).
+
+These smoke tests are intentionally scaffolded instead of shipped pre-installed; see [ADR-0010](docs/adr/0010-decommission-starter-workloads.md) for the rationale.
