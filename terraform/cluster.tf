@@ -36,9 +36,6 @@ resource "kubernetes_namespace_v1" "backstage" {
 resource "kubernetes_namespace_v1" "argocd" {
   metadata {
     name = "argocd"
-    labels = {
-      gateway-routes = "enabled"
-    }
     annotations = {
       # Threaded to the destroy provisioner via self.metadata, since provisioners
       # cannot reference other resources or vars.
