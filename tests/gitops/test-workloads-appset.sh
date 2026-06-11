@@ -18,9 +18,10 @@ assert_file_exists "gitops dev chart exists" "$gitops_chart_path/Chart.yaml"
 assert_file_exists "gitops dev values exist" "$gitops_chart_path/values.yaml"
 assert_directory_exists "backstage workload chart exists" "$backstage_chart_path"
 assert_file_exists "backstage dev values exist" "$backstage_values_path"
-assert_path_missing "podinfo workload chart is not committed" "charts/workloads/podinfo"
-assert_path_missing "podinfo dev values are not committed" "deploy/dev/podinfo.yaml"
-assert_path_missing "hello-world workload chart is not committed" "charts/workloads/hello-world"
+# Note: ADR-0010 decommissioned podinfo and hello-world as committed starter
+# workloads but documents them as scaffolding examples (podinfo for the
+# third-party chart path, hello-world for the image-source path). Forkers
+# are expected to scaffold them on demand, so we do not guard their paths.
 
 appset=$(sed -n '1,$p' "$appset_path" 2>/dev/null || true)
 rendered_appsets=$(helm template gitops-dev "$gitops_chart_path" \
