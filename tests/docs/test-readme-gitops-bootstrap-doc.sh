@@ -39,6 +39,7 @@ assert_contains "GitHub setup section exists" "$README_CONTENT" "## One-time Git
 assert_contains "boot section exists" "$README_CONTENT" "## Boot the cluster"
 assert_contains "verification section exists" "$README_CONTENT" "## Verify it's working"
 assert_contains "what's next section exists" "$README_CONTENT" "## What's next"
+assert_contains "try platform section exists" "$README_CONTENT" "## Try the platform"
 
 assert_heading_order \
   "README sections follow required order" \
@@ -46,7 +47,8 @@ assert_heading_order \
   "## One-time GitHub setup" \
   "## Boot the cluster" \
   "## Verify it's working" \
-  "## What's next"
+  "## What's next" \
+  "## Try the platform"
 
 assert_contains "prerequisites include Docker" "$README_CONTENT" "- [Docker](https://docs.docker.com/get-docker/)"
 assert_contains "prerequisites include KinD" "$README_CONTENT" "- [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)"
@@ -73,10 +75,17 @@ assert_contains "verification expects sign-in buttons" "$README_CONTENT" "Guest 
 assert_contains "what's next links operations" "$README_CONTENT" "docs/operator/operations.md"
 assert_contains "what's next links RBAC demo" "$README_CONTENT" "docs/operator/manual-rbac-demo.md"
 assert_contains "what's next links developer doc" "$README_CONTENT" "docs/developer/backstage-development.md"
+assert_contains "try platform documents image smoke test" "$README_CONTENT" "Build your own image"
+assert_contains "try platform points at hello-world source" "$README_CONTENT" "hello-world/index.html"
+assert_contains "try platform documents shared image workflow" "$README_CONTENT" ".github/workflows/build-image.yaml"
+assert_contains "try platform documents third-party chart smoke test" "$README_CONTENT" "Deploy a third-party chart"
+assert_contains "try platform points at podinfo OCI chart" "$README_CONTENT" "oci://ghcr.io/stefanprodan/charts/podinfo"
+assert_contains "try platform links ADR-0009" "$README_CONTENT" "docs/adr/0009-kubernetes-discovery-by-template-ownership.md"
+assert_contains "try platform links ADR-0010" "$README_CONTENT" "docs/adr/0010-decommission-starter-workloads.md"
 
 while IFS= read -r link; do
   assert_file_exists "README link resolves: $link" "$link"
-done < <(grep -oE 'docs/(operator|developer)/[^)]+' README.md | sort -u)
+done < <(grep -oE 'docs/(operator|developer|adr)/[^)]+' README.md | sort -u)
 
 assert_not_contains "README drops Fork setup section" "$README_CONTENT" "## Fork setup"
 assert_not_contains "README drops Operations section" "$README_CONTENT" "## Operations"
@@ -85,7 +94,7 @@ assert_not_contains "README drops Verifying Images section" "$README_CONTENT" "#
 assert_not_contains "README drops Manual RBAC Demo section" "$README_CONTENT" "## Manual RBAC Demo"
 assert_not_contains "README drops Next Steps section" "$README_CONTENT" "## Next Steps"
 assert_not_contains "README drops isolated-vm rationale" "$README_CONTENT" "isolated-vm"
-assert_contains "README ends with ADR pointer" "$(tail -n 1 README.md)" "See [ADR-0001](docs/adr/0001-kind-terraform-envoy-gateway.md) for the KinD + Terraform + Envoy Gateway rationale."
+assert_contains "README keeps ADR pointer" "$README_CONTENT" "See [ADR-0001](docs/adr/0001-kind-terraform-envoy-gateway.md) for the KinD + Terraform + Envoy Gateway rationale."
 assert_not_contains "README has no literal repo slug" "$README_CONTENT" "backstage-k8s-full/<app>"
 assert_not_contains "README no longer has Smoke Test section" "$README_CONTENT" "## Smoke Test"
 assert_not_contains "README has no make target references" "$README_CONTENT" "make "

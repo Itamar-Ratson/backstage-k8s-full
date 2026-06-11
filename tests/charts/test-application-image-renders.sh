@@ -8,12 +8,6 @@ source "$(dirname "$0")/../lib/platform-identity.sh"
 
 echo "=== Application image render tests ==="
 
-hello_world_values="$(sed -n '1,$p' charts/workloads/hello-world/values.yaml)"
-assert_not_contains "committed hello-world values omit default image repository" "$hello_world_values" "repository:"
-
-hello_world_render="$(helm template hello-world charts/workloads/hello-world --set "image.repository=${TEST_GHCR_BASE}/hello-world")"
-assert_contains "committed hello-world chart renders injected repository and tag" "$hello_world_render" "image: \"${TEST_GHCR_BASE}/hello-world:latest\""
-
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
