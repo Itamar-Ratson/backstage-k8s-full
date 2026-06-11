@@ -2,6 +2,8 @@
 
 A fork-and-run local Kubernetes environment for Backstage on KinD, provisioned by Terraform and continuously reconciled by ArgoCD, with Envoy Gateway for ingress.
 
+![Backstage demo](docs/backstage.gif)
+
 ## Prerequisites
 
 Install [Docker](https://docs.docker.com/get-docker/), [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/#installation), [Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.5), [Helm](https://helm.sh/docs/intro/install/) (>= 3), and [kubectl](https://kubernetes.io/docs/tasks/tools/).
