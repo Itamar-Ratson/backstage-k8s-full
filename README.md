@@ -27,7 +27,23 @@ Install these tools:
 
 ## Boot the cluster
 
-Run Terraform:
+On a fresh fork, the Backstage image has not been published to your GHCR yet. Run the build once before applying:
+
+```bash
+gh workflow run "Build Backstage Image" --repo <your-user>/backstage-k8s-full
+gh run watch --repo <your-user>/backstage-k8s-full
+```
+
+The build pushes the image to your fork's GHCR and commits a tag bump to `deploy/dev/backstage.yaml` on `main`. After it finishes:
+
+1. Open `https://github.com/users/<your-user>/packages/container/backstage-k8s-full%2Fbackstage/settings` and change visibility to Public. KinD has no GHCR pull secret, so a private package causes `ImagePullBackOff`.
+2. Pull the bump commit into your working tree:
+
+   ```bash
+   git pull --ff-only
+   ```
+
+Then run Terraform:
 
 ```bash
 cd terraform && terraform apply

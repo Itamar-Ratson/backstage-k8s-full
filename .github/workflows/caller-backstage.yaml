@@ -10,6 +10,7 @@
 name: Build Backstage Image
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
