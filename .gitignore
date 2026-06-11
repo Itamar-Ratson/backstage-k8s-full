@@ -13,6 +13,7 @@
 !*.tpl
 !*.txt
 !*.sh
+!*.gif
 
 # Allow specific files
 !.gitignore
