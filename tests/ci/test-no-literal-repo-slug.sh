@@ -5,13 +5,15 @@
 # publishes. Fork CI rewrites both image.repository and image.tag on first
 # publish (see .github/scripts/bump-image.sh), after which the overlay is
 # fork-owned. The carve-out is for a pull reference, not a derived identity.
+# Blog drafts under docs/blog/ are exempt: published prose (Medium) must
+# carry absolute permalinks to this repo, and forks don't republish them.
 set -euo pipefail
 
 owner="Itamar-Ratson"
 lower_owner="$(printf '%s-%s' itamar ratson)"
 repo="backstage-k8s-full"
 patterns=("${owner}/${repo}" "${lower_owner}/${repo}")
-allowlist='^(./)?(docs/adr/0004-backstage-rbac\.md|deploy/dev/backstage\.yaml)$'
+allowlist='^(./)?(docs/adr/0004-backstage-rbac\.md|deploy/dev/backstage\.yaml|docs/blog/.*\.md)$'
 violations=()
 
 for pattern in "${patterns[@]}"; do
