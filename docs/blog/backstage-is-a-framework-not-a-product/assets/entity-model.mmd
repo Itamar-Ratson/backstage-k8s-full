@@ -1,0 +1,24 @@
+%% Backstage catalog entity model, grounded in the entities this repo actually registers.
+flowchart BT
+  classDef domain fill:#1a4d6e,stroke:#0d3a57,color:#fff
+  classDef system fill:#2e7d5b,stroke:#1d5c40,color:#fff
+  classDef component fill:#6d4c9f,stroke:#533a7b,color:#fff
+  classDef org fill:#b0722a,stroke:#8a5820,color:#fff
+
+  domain["Domain: platform"]:::domain
+  sysPortal["System: developer-portal"]:::system
+  sysEdge["System: edge"]:::system
+  compBackstage["Component: backstage"]:::component
+  compGateway["Component: edge-gateway"]:::component
+  group["Group: platform"]:::org
+  user["User: itamar"]:::org
+
+  sysPortal -- "partOf" --> domain
+  sysEdge -- "partOf" --> domain
+  compBackstage -- "partOf" --> sysPortal
+  compGateway -- "partOf" --> sysEdge
+  user -- "memberOf" --> group
+  group -. "ownerOf" .-> sysPortal
+  group -. "ownerOf" .-> sysEdge
+  group -. "ownerOf" .-> compBackstage
+  group -. "ownerOf" .-> compGateway

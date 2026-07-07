@@ -41,6 +41,10 @@
 !backstage/packages/**/*.html
 !backstage/packages/app/public/**
 
+# Blog post assets (Medium drafts under docs/blog/)
+!docs/blog/**/*.png
+!docs/blog/**/*.mmd
+
 # Terraform state and cache (override folder allowlist)
 terraform/.terraform/**
 terraform/terraform.tfvars

@@ -1,6 +1,8 @@
 INHERIT: shared-mkdocs-base.yml
 site_name: Platform
 docs_dir: docs
+exclude_docs: |
+  blog/
 nav:
   - Home: index.md
   - Operator Guides:
