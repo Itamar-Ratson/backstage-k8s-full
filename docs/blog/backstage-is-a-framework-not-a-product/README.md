@@ -4,15 +4,15 @@ Draft: `post.md`. Not part of TechDocs (excluded via `exclude_docs` in the root 
 
 ## Publish steps
 
-1. Copy `post.md` into Medium's editor (paste as markdown works for headers, bold, and code fences; verify code blocks kept their language highlighting — set manually if not).
-2. Title and subtitle are the H1 and the italic line under it; Medium wants them in its own title/subtitle fields — cut them from the body after pasting.
+1. Copy `post.md` into Medium's editor (paste as markdown works for headers, bold, and code fences; verify code blocks kept their language highlighting - set manually if not).
+2. Title and subtitle are the H1 and the italic line under it; Medium wants them in its own title/subtitle fields - cut them from the body after pasting.
 3. Upload images from `assets/` at each `![...]` placeholder, then delete the placeholder lines:
-   - `backstage-hero.gif` — hero, directly under the subtitle
-   - `entity-model.png` — catalog section
-   - `catalog-component-relations.png` — catalog section
-   - `scaffolder-new-application-form.png` — scaffolder section
-   - `deployment-architecture.png` — production section
-4. The `---` horizontal rules paste as Medium section separators — keep them.
+   - `backstage-hero.gif` - hero, directly under the subtitle
+   - `entity-model.png` - catalog section
+   - `catalog-component-relations.png` - catalog section
+   - `scaffolder-new-application-form.png` - scaffolder section
+   - `deployment-architecture.png` - production section
+4. The `---` horizontal rules paste as Medium section separators - keep them.
 5. Suggested tags: Backstage, Platform Engineering, DevOps, Kubernetes, Developer Experience.
 
 ## Regenerating diagrams
